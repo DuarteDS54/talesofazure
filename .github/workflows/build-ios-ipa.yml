@@ -1,0 +1,45 @@
+name: Build iOS Test IPA
+
+# Produces an *unsigned* .ipa on GitHub's macOS runner -- no Mac of your own
+# needed. Sideloadly (or AltStore) then does the actual signing, using your
+# own free Apple ID, when you install it on your iPhone.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  build-ipa:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm install
+
+      - name: Sync Capacitor + install CocoaPods deps
+        run: npx cap sync ios
+
+      - name: Archive, unsigned (no Apple Developer account needed for this step)
+        run: |
+          xcodebuild archive \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath "$PWD/build/App.xcarchive" \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO
+
+      - name: Package as .ipa
+        run: |
+          mkdir -p "$PWD/build/Payload"
+          cp -r "$PWD/build/App.xcarchive/Products/Applications/App.app" "$PWD/build/Payload/"
+          cd "$PWD/build" && zip -r -q EmberfallChronicles-unsigned.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EmberfallChronicles-unsigned-ipa
+          path: build/EmberfallChronicles-unsigned.ipa
