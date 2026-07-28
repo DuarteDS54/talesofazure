@@ -1,0 +1,17 @@
+{
+  "name": "emberfall-chronicles-mobile",
+  "version": "1.0.0",
+  "description": "Emberfall Chronicles - iOS wrapper (Capacitor)",
+  "private": true,
+  "scripts": {
+    "sync": "cap sync",
+    "open:ios": "cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.1.0",
+    "@capacitor/ios": "^6.1.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.0"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "appId": "com.yourstudio.emberfallchronicles",
+  "appName": "Emberfall Chronicles",
+  "webDir": "www",
+  "backgroundColor": "#120a05",
+  "ios": {
+    "contentInset": "always",
+    "backgroundColor": "#120a05"
+  }
+}
