@@ -2881,7 +2881,6 @@ function renderPlayerStats(){
     const wolfBadge = document.getElementById('wolfBadge');
     if(wolfBadge){
       wolfBadge.classList.toggle('ready', state.rage>=100);
-      if(state.rage>=100) wolfBadge.addEventListener('click', castWolfAttack, { once:true });
     }
   } else if(state.mode==='lock'){
     playerStatsEl.innerHTML = miniBar(state.lockMoves, 100*state.lockMoves/state.lockMovesMax, 'fill-moves');
@@ -4665,6 +4664,16 @@ async function castWolfAttack(){
   await sleep(over ? 900 : 350);
   renderAll();
 }
+// Attached once, permanently -- castWolfAttack already guards internally on
+// rage/busy/gameOver state, so this is always safe to have listening and
+// simply no-ops on a click at the wrong time. Previously this listener was
+// being re-added on every renderPlayerStats() call (which fires after every
+// single match during battle) whenever rage was at 100, with no removal --
+// since rage can sit at 100 across many renders before the player actually
+// taps it, duplicate listeners stacked up without bound over a play
+// session, which is exactly the kind of leak that degrades touch
+// responsiveness until the app needs a restart.
+document.getElementById('wolfBadge').addEventListener('click', castWolfAttack);
 
 function applyLockEffects(typeCounts, combo){
   if(typeCounts.topaz){
