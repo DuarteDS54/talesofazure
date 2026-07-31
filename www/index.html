@@ -270,21 +270,34 @@
   .cutscene-overlay.show{ opacity:1; pointer-events:auto; }
   .cutscene-scene{ flex:1; min-height:0; position:relative; overflow:hidden; cursor:pointer; display:flex; align-items:center; justify-content:center; }
   .cutscene-scene-bg{ position:absolute; inset:-4%; animation: cutsceneZoom 10s ease-in-out infinite alternate; }
+  .cutscene-scene-canvas{ position:absolute; inset:-4%; width:108%; height:108%; image-rendering:pixelated; animation: cutsceneZoom 10s ease-in-out infinite alternate; }
+  .cutscene-scene-canvas.hidden{ display:none; }
   @keyframes cutsceneZoom{ from{ transform:scale(1) translate(0,0); } to{ transform:scale(1.09) translate(-1.5%,-1%); } }
-  .cutscene-sprite{ position:relative; width:min(32vh,190px); aspect-ratio:5/6; z-index:2; filter:drop-shadow(0 14px 22px rgba(0,0,0,0.65)); }
+  .cutscene-sprite{ position:relative; width:min(32vh,190px); aspect-ratio:5/6; z-index:2; filter:drop-shadow(0 14px 22px rgba(0,0,0,0.65));
+    animation: cutsceneSpriteIn .45s cubic-bezier(.22,.9,.32,1.2) both; }
   .cutscene-sprite.left{ margin-right:auto; margin-left:6%; }
   .cutscene-sprite.right{ margin-left:auto; margin-right:6%; }
-  .cutscene-prop{ position:relative; width:min(28vh,168px); aspect-ratio:5/6; z-index:1; opacity:0.97; filter:drop-shadow(0 12px 18px rgba(0,0,0,0.55)); }
+  @keyframes cutsceneSpriteIn{ 0%{ opacity:0; transform:translateY(14px) scale(0.92); } 100%{ opacity:1; transform:translateY(0) scale(1); } }
+  .cutscene-prop{ position:relative; width:min(28vh,168px); aspect-ratio:5/6; z-index:1; opacity:0.97; filter:drop-shadow(0 12px 18px rgba(0,0,0,0.55));
+    animation: cutscenePropIn .55s ease-out both; }
   .cutscene-prop.left{ margin-right:auto; margin-left:6%; }
   .cutscene-prop.right{ margin-left:auto; margin-right:6%; }
+  @keyframes cutscenePropIn{ 0%{ opacity:0; transform:translateX(-8px); } 100%{ opacity:0.97; transform:translateX(0); } }
   .cutscene-prop.hidden{ display:none; }
   .cutscene-sprite canvas{ width:100%; height:100%; object-fit:contain; display:block; }
   .cutscene-prop canvas{ width:100%; height:100%; object-fit:contain; display:block; }
   .cutscene-hint{ position:absolute; bottom:12px; right:16px; font-family:'Press Start 2P',monospace; font-size:8px; color:rgba(255,255,255,0.55); z-index:3; letter-spacing:0.05em; }
-  .cutscene-skip{ position:absolute; top:12px; right:12px; z-index:5; font-size:9px; }
+  .cutscene-skip{ position:absolute; top:calc(12px + env(safe-area-inset-top)); right:calc(12px + env(safe-area-inset-right)); z-index:5; font-size:9px; }
   .cutscene-caption{ flex-shrink:0; padding:18px 22px calc(18px + env(safe-area-inset-bottom)) 22px; background:#0c0603; border-top:2px solid var(--panelBorder); font-family:'Pixelify Sans',sans-serif; font-style:italic; color:var(--text); font-size:clamp(12px,2.4vw,16px); text-align:center; min-height:50px; max-height:38vh; overflow-y:auto; display:flex; align-items:center; justify-content:center; line-height:1.5; cursor:pointer; }
-  .cutscene-speaker{ padding:6px 22px 0; background:#0c0603; font-family:'Press Start 2P',monospace; font-size:clamp(8px,1.6vw,11px); color:var(--gold); text-align:center; letter-spacing:0.5px; min-height:14px; }
+  .cutscene-speaker{ padding:6px 22px 0; background:#0c0603; font-family:'Press Start 2P',monospace; font-size:clamp(8px,1.6vw,11px); color:var(--gold); text-align:center; letter-spacing:0.5px; min-height:14px;
+    animation: cutsceneTextIn .3s ease .1s both; }
+  @keyframes cutsceneTextIn{ 0%{ opacity:0; transform:translateY(-4px); } 100%{ opacity:1; transform:translateY(0); } }
   .cutscene-speaker:empty{ display:none; }
+  .cutscene-scene.impact{ animation: cutsceneImpact .4s ease; }
+  @keyframes cutsceneImpact{ 0%{ transform:translate(0,0); } 15%{ transform:translate(-6px,3px); } 30%{ transform:translate(5px,-2px); } 45%{ transform:translate(-4px,2px); } 60%{ transform:translate(3px,-1px); } 75%{ transform:translate(-2px,1px); } 100%{ transform:translate(0,0); } }
+  .cutscene-flash{ position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:4; }
+  .cutscene-flash.pulse{ animation: cutsceneFlashPulse .35s ease-out; }
+  @keyframes cutsceneFlashPulse{ 0%{ opacity:0; } 20%{ opacity:0.55; } 100%{ opacity:0; } }
   .campfire-bg{ background:linear-gradient(180deg, #060a18 0%, #0d0f1c 55%, #150e0c 100%); }
   .night-stars{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
   .night-star{ position:absolute; background:#fff; animation: starTwinkle ease-in-out infinite; image-rendering:pixelated; }
@@ -856,8 +869,10 @@
   <button class="back-btn cutscene-skip" id="cutsceneSkipBtn">SKIP</button>
   <div class="cutscene-scene" id="cutsceneScene">
     <div class="cutscene-scene-bg" id="cutsceneBg"></div>
+    <canvas class="cutscene-scene-canvas hidden" id="cutsceneSceneCanvas" width="160" height="90"></canvas>
     <div class="cutscene-sprite" id="cutsceneSpriteWrap"><canvas id="cutsceneSpriteCanvas" width="20" height="24"></canvas></div>
     <div class="cutscene-prop hidden" id="cutscenePropWrap"><canvas id="cutscenePropCanvas" width="20" height="24"></canvas></div>
+    <div class="cutscene-flash" id="cutsceneFlash"></div>
     <div class="cutscene-hint">TAP TO CONTINUE</div>
   </div>
   <div class="cutscene-speaker" id="cutsceneSpeaker"></div>
@@ -1820,11 +1835,11 @@ function cutsceneSlides(){
       text:'Those Who Came Before choose one Warrior and one Animal Companion each generation, Shaba, sworn to protect all of Azure and answer any call for aid, no matter how far it carries them.' },
     { bg:'linear-gradient(180deg, #2e2412 0%, #16110a 100%)', sprite:'hero', pos:'left', prop:'banner',
       text:'Ro was the most promising recruit in a generation. Today was to be her first day carrying the title.' },
-    { bg:'linear-gradient(180deg, #2a1410 0%, #150a08 100%)', sprite:'hero', pos:'left', prop:'invaders',
+    { bg:'linear-gradient(180deg, #2a1410 0%, #150a08 100%)', sprite:'hero', pos:'left', prop:'invaders', impact:true,
       text:"Instead, invaders from the South stormed Alerra, Azure's capital and the heart of Azerian pride, before she had worn the title a single hour." },
     { bg:'linear-gradient(180deg, #241008 0%, #120804 100%)', sprite:'hero', pos:'left', prop:'debris',
       text:'The battle for Alerra is over. The field is quiet now, and quiet is worse.' },
-    { bg:'linear-gradient(180deg, #1e140a 0%, #0e0806 100%)', sprite:'wolf', pos:'right', prop:'spear',
+    { bg:'linear-gradient(180deg, #1e140a 0%, #0e0806 100%)', sprite:'wolf', pos:'right', prop:'spear', impact:true,
       text:`${getWolfName()} lies still beside her, breath shallow, wound deep: poison, and no cure within reach.` },
     { bg:'linear-gradient(180deg, #142622 0%, #0a1512 100%)', sprite:'hero', pos:'left', prop:'mountainBloom',
       text:"They say a flower blooms atop Mother's Crown, upon the Borez Cliffs, far from here, past horrors she cannot yet name." },
@@ -1898,15 +1913,90 @@ const CUTSCENE_PROPS = {
     band(ctx,9,8,11,'#3a2c1a'); band(ctx,10,7,12,'#3a2c1a'); band(ctx,11,7,12,'#3a2c1a'); band(ctx,12,8,11,'#3a2c1a');
     band(ctx,9,9,10,'#7fd1ff'); band(ctx,10,8,11,'#c9f0ff'); band(ctx,11,8,11,'#7fd1ff'); band(ctx,12,9,10,'#5ab0e0');
     for(let y=13;y<20;y++) band(ctx,y,9,10,'#4a3220');
+  },
+  web: (ctx)=>{
+    ctx.clearRect(0,0,20,24);
+    // radiating strands from an off-center anchor, plus a couple of
+    // concentric arcs -- reads as a spiderweb even at this scale
+    const cx=10, cy=8;
+    ctx.strokeStyle = '#c9c4b8'; ctx.lineWidth = 1;
+    [[3,2],[17,2],[2,18],[18,19],[10,22],[1,10],[19,9]].forEach(([x,y])=>{
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke();
+    });
+    ctx.strokeStyle = 'rgba(201,196,184,0.7)';
+    [4,7,10].forEach(r=>{
+      ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.stroke();
+    });
+    band(ctx,7,9,11,'#1a1410'); band(ctx,8,8,12,'#1a1410'); band(ctx,9,9,11,'#1a1410');
+  },
+  lakeStone: (ctx)=>{
+    ctx.clearRect(0,0,20,24);
+    const STONE = [[6,8,12],[7,7,13],[8,7,13],[9,6,14],[10,6,14],[11,6,14],[12,6,14],[13,6,14]];
+    STONE.forEach(([y,x0,x1])=> band(ctx,y,x0,x1,'#1c2e2a'));
+    STONE.forEach(([y,x0,x1])=> band(ctx,y,x0+1,x1-1,'#3a5a52'));
+    band(ctx,8,9,10,'#4a7268'); band(ctx,10,11,12,'#4a7268');
+    for(let y=14;y<18;y++) band(ctx,y,5,15,'rgba(90,150,140,0.18)');
+    band(ctx,16,3,17,'rgba(200,230,225,0.35)'); band(ctx,18,1,19,'rgba(200,230,225,0.22)');
+  },
+  castlePillar: (ctx)=>{
+    ctx.clearRect(0,0,20,24);
+    for(let y=2;y<16;y++) band(ctx,y,7,13,'#2a2830');
+    for(let y=2;y<16;y++) band(ctx,y,8,12,'#4a4650');
+    band(ctx,2,6,14,'#4a4650'); band(ctx,15,6,14,'#4a4650');
+    band(ctx,9,9,10,'#16141a'); band(ctx,10,8,9,'#16141a');
+    for(let y=16;y<20;y++) band(ctx,y,5,16,'#33302c');
+    band(ctx,17,10,10,'#0e0c0a'); band(ctx,18,10,10,'#0e0c0a'); band(ctx,19,11,11,'#0e0c0a');
+  },
+  duneBones: (ctx)=>{
+    ctx.clearRect(0,0,20,24);
+    band(ctx,10,8,11,'#c9beae'); band(ctx,11,7,12,'#c9beae');
+    for(let i=0;i<5;i++){
+      const y = 12+i;
+      band(ctx,y,6-Math.floor(i*0.4),8,'#c9beae');
+      band(ctx,y,11,13+Math.floor(i*0.4),'#c9beae');
+    }
+    for(let y=12;y<20;y++) band(ctx,y,9,10,'#a89e8e');
+    for(let x=2;x<18;x++) band(ctx,19+((x%4===0)?1:0),x,x,'#e8c96a');
   }
 };
+// Boss cutscenes don't carry an explicit biome field, but each boss lives in
+// a specific one -- reusing renderBiomeScene for their intro backdrops means
+// real rendered scenery (skyline + ambient particles) instead of a flat
+// gradient, for free, using code already built and proven for the main
+// game screens. Assigned once per sequence below (not derived per-slide),
+// since deriving it from whichever character happens to be speaking on a
+// given line would make the background flicker between the boss's biome
+// and a flat gradient every time the hero has a line.
+function restartAnim(el){
+  if(!el) return;
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = '';
+}
 function renderCutsceneSlide(){
   const slide = currentCutsceneSlides[cutsceneIndex];
-  document.getElementById('cutsceneBg').style.background = slide.bg;
-  document.getElementById('cutsceneSpeaker').textContent = slide.speaker || '';
-  document.getElementById('cutsceneCaption').textContent = slide.text;
+  const bgEl = document.getElementById('cutsceneBg');
+  const sceneCanvas = document.getElementById('cutsceneSceneCanvas');
+  const biome = slide.biome || null;
+  if(biome && BIOMES[biome]){
+    bgEl.style.background = 'transparent';
+    sceneCanvas.classList.remove('hidden');
+    renderBiomeScene(biome, 'cutsceneSceneCanvas', bgAnimTick);
+  } else {
+    sceneCanvas.classList.add('hidden');
+    delete ACTIVE_SCENE_CANVASES['cutsceneSceneCanvas'];
+    bgEl.style.background = slide.bg;
+  }
+
+  const speakerEl = document.getElementById('cutsceneSpeaker');
+  speakerEl.textContent = slide.speaker || '';
+  restartAnim(speakerEl);
+
+  typeText(document.getElementById('cutsceneCaption'), slide.text);
+
   const wrap = document.getElementById('cutsceneSpriteWrap');
   wrap.className = 'cutscene-sprite ' + slide.pos;
+  restartAnim(wrap);
   const canvas = document.getElementById('cutsceneSpriteCanvas');
   if(slide.sprite === 'wolf') drawWolfSprite(canvas.getContext('2d'), wolfCoatKey, getWolfCondition());
   else drawSprite(canvas.getContext('2d'), slide.sprite || 'hero', THEMES.ember.sprites[slide.sprite] || THEMES.ember.sprites.hero);
@@ -1915,9 +2005,22 @@ function renderCutsceneSlide(){
   if(slide.prop && CUTSCENE_PROPS[slide.prop]){
     const propPos = slide.pos==='left' ? 'right' : 'left';
     propWrap.className = 'cutscene-prop ' + propPos;
+    restartAnim(propWrap);
     CUTSCENE_PROPS[slide.prop](document.getElementById('cutscenePropCanvas').getContext('2d'));
   } else {
     propWrap.className = 'cutscene-prop hidden';
+  }
+
+  // A handful of story beats are tagged as dramatic turns (invasion,
+  // betrayal-style reveals, the wolf's wound) -- these get a screen shake
+  // and a quick white flash on top of the normal per-beat entrance, so the
+  // big moments read as bigger than routine dialogue exchanges.
+  if(slide.impact){
+    const sceneEl = document.getElementById('cutsceneScene');
+    sceneEl.classList.remove('impact'); void sceneEl.offsetWidth; sceneEl.classList.add('impact');
+    const flash = document.getElementById('cutsceneFlash');
+    flash.classList.remove('pulse'); void flash.offsetWidth; flash.classList.add('pulse');
+    playSFX('strikeImpact');
   }
 }
 function showCutscene(slides, onComplete){
@@ -1928,12 +2031,15 @@ function showCutscene(slides, onComplete){
   document.getElementById('cutsceneOverlay').classList.add('show');
 }
 function advanceCutscene(){
+  const captionEl = document.getElementById('cutsceneCaption');
+  if(captionEl._typeTimer){ captionEl._typeSkip(); return; }
   cutsceneIndex++;
   if(cutsceneIndex >= currentCutsceneSlides.length){ endCutscene(); return; }
   renderCutsceneSlide();
 }
 function endCutscene(){
   document.getElementById('cutsceneOverlay').classList.remove('show');
+  delete ACTIVE_SCENE_CANVASES['cutsceneSceneCanvas'];
   const cb = cutsceneOnComplete;
   cutsceneOnComplete = null;
   if(cb) cb();
@@ -2631,22 +2737,28 @@ window.addEventListener('resize', ()=>{
   clearTimeout(refitTimer);
   refitTimer = setTimeout(refitDynamicText, 500);
 });
-window.addEventListener('orientationchange', ()=>{
+// Forces WebKit to recompute layout without touching visibility or removing
+// any element from the render tree -- the earlier version toggled
+// document.body's display, which on mobile interrupts whatever touch/pointer
+// gesture is in progress the moment it fires. Since 'resize' fires very
+// often on mobile (keyboard show/hide, toolbar show/hide, etc), that
+// completely broke board interaction. This version only forces a layout
+// recalculation (reading offsetHeight), never hides anything.
+function forceLayoutReflow(){
+  window.scrollTo(0,0);
+  void document.body.offsetHeight;
+}
+let reflowTimer = null;
+function scheduleReflowRecovery(){
   clearTimeout(refitTimer);
   refitTimer = setTimeout(refitDynamicText, 550);
-  // WebKit has a known issue where touch coordinates can desync from the
-  // visual layout for a moment after rotating -- taps/swipes land offset
-  // from where they visually appear. Forcing a scroll reset + reflow after
-  // the rotation animation settles clears it. Belt-and-suspenders: the app
-  // is now locked to portrait at the native level, so this should rarely
-  // fire, but it's cheap insurance for edge cases like iPad multitasking.
-  setTimeout(()=>{
-    window.scrollTo(0,0);
-    document.body.style.display = 'none';
-    void document.body.offsetHeight;
-    document.body.style.display = '';
-  }, 600);
-});
+  clearTimeout(reflowTimer);
+  reflowTimer = setTimeout(forceLayoutReflow, 600);
+}
+// Scoped back to orientationchange only -- 'resize' and visualViewport
+// 'resize' fire far too often on mobile (keyboard, toolbar, etc) to be a
+// safe trigger for this, even with the disruptive display-toggle removed.
+window.addEventListener('orientationchange', scheduleReflowRecovery);
 const windowLabelEl = document.getElementById('windowLabel');
 const windowBarFillEl = document.getElementById('windowBarFill');
 const windowTallyEl = document.getElementById('windowTally');
@@ -3111,7 +3223,7 @@ let arcadePlayerMana = 0, arcadePlayerMaxMana = 50;
 let arcadeRage = 0;
 let arcadeScore = 0;
 let arcadeHighScore = 0;
-const ARCADE_KEY = 'emberfall_arcade_v1';
+const ARCADE_KEY = 'talesofazure_arcade_v1';
 function saveArcadeHighScore(){
   try{ localStorage.setItem(ARCADE_KEY, JSON.stringify({ arcadeHighScore })); }
   catch(e){ /* storage unavailable — high score still tracked for this session */ }
@@ -3136,7 +3248,7 @@ let endlessWave = 1;
 let endlessHighScore = 0;
 let endlessHighWave = 0;
 let endlessLastVariant = null;
-const ENDLESS_KEY = 'emberfall_endless_v1';
+const ENDLESS_KEY = 'talesofazure_endless_v1';
 function saveEndlessHighScore(){
   try{ localStorage.setItem(ENDLESS_KEY, JSON.stringify({ endlessHighScore, endlessHighWave })); }
   catch(e){ /* storage unavailable — high score still tracked for this session */ }
@@ -3160,7 +3272,7 @@ function resetEndlessRun(){
 // version, which deliberately does NOT reset there to test endurance).
 // A fixed high-level loadout is granted at the start rather than reading
 // the real save, so this also works as a standalone balance-testing tool.
-const BOSSRUSH_KEY = 'emberfall_bossrush_v1';
+const BOSSRUSH_KEY = 'talesofazure_bossrush_v1';
 const BOSSRUSH_BOSS_HP = 380; // meaningfully above story/endless HP, since
   // the player has max gear from turn one here, not progressive gear
 const BOSSRUSH_PLAYER_MAX_HP = 100;
@@ -3275,74 +3387,77 @@ const ENDLESS_WINDOW_CAP = 9000;
 // it transitions into the next phase with its own flavor text from Ro's
 // perspective. Only phase 3's win is a true victory. Losing any phase just
 // retries that same phase, earlier-cleared phases aren't undone.
-// TODO (placeholder lore, replace when provided): a short lore cutscene
-// plays the first time the player reaches each boss, giving a few lines
-// on who/what they are before the fight begins. Real lore for each boss
-// is still to come — the text below is a placeholder standing in for it,
-// not final. Each entry uses that boss's own sprite/variant automatically.
+// A short lore cutscene plays the first time the player reaches each boss,
+// giving a few lines on who/what they are before the fight begins. Each
+// entry uses that boss's own sprite/variant automatically.
 const BOSS_LORE = {
   manyeyed: [
     { bg:'linear-gradient(180deg, #2a1a10 0%, #150c08 100%)', sprite:'hero', pos:'left', speaker:'RO',
-      text:'[Placeholder dialogue] Something is still moving out there, among the fallen.' },
-    { bg:'linear-gradient(180deg, #2a1a10 0%, #150c08 100%)', sprite:'manyeyed', pos:'right', speaker:'THE MANY-EYED HOST',
-      text:'[Placeholder dialogue] We were soldiers, once. That word means less to us now.' },
+      text:'Something is still moving out there, among the fallen.' },
+    { bg:'linear-gradient(180deg, #2a1a10 0%, #150c08 100%)', sprite:'manyeyed', pos:'right', speaker:'THE MANY-EYED HOST', impact:true, prop:'debris',
+      text:'We were soldiers, once. That word means less to us now.' },
     { bg:'linear-gradient(180deg, #2a1a10 0%, #150c08 100%)', sprite:'hero', pos:'left', speaker:'RO',
-      text:'[Placeholder dialogue] Then let me put you to rest, all of you.' },
+      text:'Then let me put you to rest, all of you.' },
     { bg:'linear-gradient(180deg, #2a1a10 0%, #150c08 100%)', sprite:'manyeyed', pos:'right', speaker:'THE MANY-EYED HOST',
-      text:'[Placeholder dialogue] Every eye of us disagrees.' }
+      text:'Every eye of us disagrees.' }
   ],
   arachnid: [
     { bg:'linear-gradient(180deg, #16221a 0%, #0a1410 100%)', sprite:'hero', pos:'left', speaker:'RO',
-      text:"[Placeholder dialogue] The forest's gone quiet. That's never a good sign." },
-    { bg:'linear-gradient(180deg, #16221a 0%, #0a1410 100%)', sprite:'arachnid', pos:'right', speaker:'THE BRAMBLEFANG WEAVER',
-      text:'[Placeholder dialogue] Quiet is what I do best.' },
+      text:"The forest's gone quiet. That's never a good sign." },
+    { bg:'linear-gradient(180deg, #16221a 0%, #0a1410 100%)', sprite:'arachnid', pos:'right', speaker:'THE BRAMBLEFANG WEAVER', impact:true, prop:'web',
+      text:'Quiet is what I do best.' },
     { bg:'linear-gradient(180deg, #16221a 0%, #0a1410 100%)', sprite:'hero', pos:'left', speaker:'RO',
-      text:"[Placeholder dialogue] I'm not here to trade riddles. I need to pass." },
+      text:"I'm not here to trade riddles. I need to pass." },
     { bg:'linear-gradient(180deg, #16221a 0%, #0a1410 100%)', sprite:'arachnid', pos:'right', speaker:'THE BRAMBLEFANG WEAVER',
-      text:'[Placeholder dialogue] Nothing passes through my web unchanged.' }
+      text:'Nothing passes through my web unchanged.' }
   ],
   naga: [
     { bg:'linear-gradient(180deg, #0e2a24 0%, #081814 100%)', sprite:'hero', pos:'left', speaker:'RO',
-      text:'[Placeholder dialogue] The water just went still. All at once.' },
-    { bg:'linear-gradient(180deg, #0e2a24 0%, #081814 100%)', sprite:'naga', pos:'right', speaker:'THE DROWNED NAGA',
-      text:'[Placeholder dialogue] I have watched this lake since before Azure had a name for it.' },
+      text:'The water just went still. All at once.' },
+    { bg:'linear-gradient(180deg, #0e2a24 0%, #081814 100%)', sprite:'naga', pos:'right', speaker:'THE DROWNED NAGA', impact:true, prop:'lakeStone',
+      text:'I have watched this lake since before Azure had a name for it.' },
     { bg:'linear-gradient(180deg, #0e2a24 0%, #081814 100%)', sprite:'hero', pos:'left', speaker:'RO',
-      text:'[Placeholder dialogue] Then you already know I have to cross it.' },
+      text:'Then you already know I have to cross it.' },
     { bg:'linear-gradient(180deg, #0e2a24 0%, #081814 100%)', sprite:'naga', pos:'right', speaker:'THE DROWNED NAGA',
-      text:'[Placeholder dialogue] Few who enter my water leave it standing.' }
+      text:'Few who enter my water leave it standing.' }
   ],
   tentacled: [
     { bg:'linear-gradient(180deg, #1e1428 0%, #0e0a18 100%)', sprite:'hero', pos:'left', speaker:'RO',
-      text:"[Placeholder dialogue] Something's been fed down here. Fed well, by the smell of it." },
-    { bg:'linear-gradient(180deg, #1e1428 0%, #0e0a18 100%)', sprite:'tentacled', pos:'right', speaker:"THE KEEP'S HUNGER",
-      text:'[Placeholder dialogue] This castle has kept me a very long time. I intend to return the favor.' },
+      text:"Something's been fed down here. Fed well, by the smell of it." },
+    { bg:'linear-gradient(180deg, #1e1428 0%, #0e0a18 100%)', sprite:'tentacled', pos:'right', speaker:"THE KEEP'S HUNGER", impact:true, prop:'castlePillar',
+      text:'This castle has kept me a very long time. I intend to return the favor.' },
     { bg:'linear-gradient(180deg, #1e1428 0%, #0e0a18 100%)', sprite:'hero', pos:'left', speaker:'RO',
-      text:"[Placeholder dialogue] Not tonight. I've somewhere else to be." },
+      text:"Not tonight. I've somewhere else to be." },
     { bg:'linear-gradient(180deg, #1e1428 0%, #0e0a18 100%)', sprite:'tentacled', pos:'right', speaker:"THE KEEP'S HUNGER",
-      text:"[Placeholder dialogue] You'll forgive me if I'm not persuaded." }
+      text:"You'll forgive me if I'm not persuaded." }
   ],
   gianteye: [
     { bg:'linear-gradient(180deg, #2a2010 0%, #150f08 100%)', sprite:'hero', pos:'left', speaker:'RO',
-      text:"[Placeholder dialogue] These dunes have felt watched since we entered them." },
-    { bg:'linear-gradient(180deg, #2a2010 0%, #150f08 100%)', sprite:'gianteye', pos:'right', speaker:'THE UNBLINKING DUNE',
-      text:"[Placeholder dialogue] That's because they have been. I don't need to chase what I can simply wait for." },
+      text:"These dunes have felt watched since we entered them." },
+    { bg:'linear-gradient(180deg, #2a2010 0%, #150f08 100%)', sprite:'gianteye', pos:'right', speaker:'THE UNBLINKING DUNE', impact:true, prop:'duneBones',
+      text:"That's because they have been. I don't need to chase what I can simply wait for." },
     { bg:'linear-gradient(180deg, #2a2010 0%, #150f08 100%)', sprite:'hero', pos:'left', speaker:'RO',
-      text:"[Placeholder dialogue] Then you've been waiting for nothing. I'm not stopping here." },
+      text:"Then you've been waiting for nothing. I'm not stopping here." },
     { bg:'linear-gradient(180deg, #2a2010 0%, #150f08 100%)', sprite:'gianteye', pos:'right', speaker:'THE UNBLINKING DUNE',
-      text:'[Placeholder dialogue] We shall see how far patience carries against desperation.' }
+      text:'We shall see how far patience carries against desperation.' }
   ],
   finalboss: [
     { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'hero', pos:'left', speaker:'RO',
-      text:"[Placeholder dialogue] This is what guards Mother's Crown? It doesn't even have a face." },
-    { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'unmade', pos:'right', speaker:'???',
-      text:'[Placeholder dialogue] Faces are for things that want to be remembered.' },
+      text:"This is what guards Mother's Crown? It doesn't even have a face." },
+    { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'unmade', pos:'right', speaker:'???', impact:true, prop:'mountainBloom',
+      text:'Faces are for things that want to be remembered.' },
     { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'hero', pos:'left', speaker:'RO',
-      text:"[Placeholder dialogue] I don't care what you are. I care what's on the other side of you." },
+      text:"I don't care what you are. I care what's on the other side of you." },
     { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'unmade', pos:'right', speaker:'???',
-      text:'[Placeholder dialogue] Then you had better be ready to meet all of me.' }
+      text:'Then you had better be ready to meet all of me.' }
   ]
 };
 const seenBossLore = {};
+const BOSS_BIOME = { manyeyed:'battlefield', arachnid:'forest', naga:'lake', tentacled:'castle', gianteye:'desert', finalboss:'sanctuary' };
+Object.keys(BOSS_LORE).forEach(variant=>{
+  const biome = BOSS_BIOME[variant];
+  if(biome) BOSS_LORE[variant].forEach(s=> s.biome = biome);
+});
 // A quick scene-setting cutscene the first time the player enters each
 // biome after the first (Alerra/battlefield is already covered by the
 // opening cutscene). Kept deliberately atmospheric rather than naming new
@@ -3380,6 +3495,9 @@ const BIOME_LORE = {
   ]
 };
 const seenBiomeIntro = {};
+Object.keys(BIOME_LORE).forEach(biome=>{
+  BIOME_LORE[biome].forEach(s=> s.biome = biome);
+});
 let finalBossPhase = 0; // 0 = inactive
 let finalBossJustCompleted = false; // set true the instant phase 3 is won, consumed by modalBtn
 const FINAL_BOSS_PHASES = [ null,
@@ -4853,10 +4971,10 @@ let playContext = 'story'; // 'story' | 'arcade' | 'endless' — governs whether
 // and wolf customization. Wrapped in try/catch since localStorage can throw
 // in some environments (private browsing, storage disabled) — the game
 // still works fully in-memory for the current session either way.
-const SAVE_KEY = 'emberfall_save_v1';
+const SAVE_KEY = 'talesofazure_save_v1';
 // Wolf name/coat live in their OWN storage, entirely separate from campaign
 // progress. Changing them never touches — and can never reset — the save.
-const WOLF_PREFS_KEY = 'emberfall_wolf_prefs_v1';
+const WOLF_PREFS_KEY = 'talesofazure_wolf_prefs_v1';
 function saveWolfPrefs(){
   try{ localStorage.setItem(WOLF_PREFS_KEY, JSON.stringify({ wolfName, wolfCoatKey })); }
   catch(e){ /* storage unavailable — wolf choice still applies for this session */ }
@@ -4871,7 +4989,28 @@ function loadWolfPrefs(){
 let skipEnemyAttackAnim = false;
 let sfxVolume = 0.7;
 let sfxMuted = false;
-const SETTINGS_KEY = 'emberfall_settings_v1';
+const SETTINGS_KEY = 'talesofazure_settings_v1';
+// One-time migration: the storage keys used to be prefixed "emberfall_" --
+// renamed as part of dropping the old project name from the codebase. This
+// copies any existing save data across on first load under the new keys so
+// nobody's progress silently vanishes because of an internal rename.
+(function migrateStorageKeys(){
+  const pairs = [
+    ['emberfall_arcade_v1', ARCADE_KEY],
+    ['emberfall_endless_v1', ENDLESS_KEY],
+    ['emberfall_bossrush_v1', BOSSRUSH_KEY],
+    ['emberfall_save_v1', SAVE_KEY],
+    ['emberfall_wolf_prefs_v1', WOLF_PREFS_KEY],
+    ['emberfall_settings_v1', SETTINGS_KEY],
+  ];
+  try{
+    pairs.forEach(([oldKey, newKey])=>{
+      if(localStorage.getItem(newKey) === null && localStorage.getItem(oldKey) !== null){
+        localStorage.setItem(newKey, localStorage.getItem(oldKey));
+      }
+    });
+  } catch(e){ /* storage unavailable — nothing to migrate */ }
+})();
 function saveSettings(){
   try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify({ skipEnemyAttackAnim, sfxVolume, sfxMuted })); }
   catch(e){ /* storage unavailable — setting still applies for this session */ }
