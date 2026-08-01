@@ -338,6 +338,16 @@
     background:#0c0603; padding:calc(var(--cell) * 0.2); border:2px solid var(--panelBorder); box-shadow:3px 3px 0 rgba(0,0,0,0.35);
     touch-action:none; user-select:none; -webkit-user-select:none; }
   .board-fx{ position:absolute; inset:0; pointer-events:none; z-index:6; contain:strict; }
+  .combo-popup{ position:absolute; left:50%; top:36%; transform:translate(-50%,-50%); font-family:'Press Start 2P',monospace;
+    text-shadow:3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; pointer-events:none; z-index:9;
+    white-space:nowrap; animation:comboPop 0.85s cubic-bezier(.24,1.5,.4,1) forwards; }
+  @keyframes comboPop{
+    0%{ transform:translate(-50%,-50%) scale(0) rotate(-10deg); opacity:0; }
+    28%{ transform:translate(-50%,-50%) scale(1.18) rotate(4deg); opacity:1; }
+    45%{ transform:translate(-50%,-50%) scale(1) rotate(0deg); opacity:1; }
+    78%{ transform:translate(-50%,-50%) scale(1) rotate(0deg); opacity:1; }
+    100%{ transform:translate(-50%,-50%) scale(0.88) translateY(-26px); opacity:0; }
+  }
   .board.impact{ animation: boardImpact .26s cubic-bezier(.36,.07,.19,.97); }
   @keyframes boardImpact{
     0%{transform:translate(0,0) rotate(0deg);}
@@ -386,6 +396,8 @@
   .gem-emerald{ --gem-color-bg:linear-gradient(135deg,#9be8bd 50%,#278a52 50%); }
   .gem-amethyst{ --gem-color-bg:linear-gradient(135deg,#dcb3ff 50%,#8a45bf 50%); }
   .gem-topaz{ --gem-color-bg:linear-gradient(135deg,#ffe28f 50%,#c08e1f 50%); }
+  .board.lock-mode .gem-topaz::after{ content:'\1F512'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:calc(var(--cell) * 0.5); filter:drop-shadow(1.5px 1.5px 0 rgba(0,0,0,0.85)) drop-shadow(0 0 3px rgba(0,0,0,0.5)); pointer-events:none; }
 
   .fx-ring{ position:absolute; width:12px; height:12px; margin:-6px 0 0 -6px; border-radius:50%; animation:ringpulse .5s ease-out forwards; }
   @keyframes ringpulse{ from{ transform:scale(0.4); opacity:0.85; } to{ transform:scale(4); opacity:0; } }
@@ -516,6 +528,8 @@
   .shop-buy-btn{ font-family:'Press Start 2P',monospace; font-size:9.5px; padding:8px 12px; background:var(--gold); border:none; color:#1a1006; cursor:pointer; flex-shrink:0; transition:transform .1s ease; }
   .shop-buy-btn:active{ transform:translate(1px,1px); }
   .shop-buy-btn:disabled{ background:#4a4238; color:#8a8073; cursor:default; }
+  .shop-buy-btn.denied{ animation:denyShake .35s ease; }
+  @keyframes denyShake{ 0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-4px); } 40%{ transform:translateX(4px); } 60%{ transform:translateX(-3px); } 80%{ transform:translateX(3px); } }
   .shop-buy-btn.owned{ background:#3a5a44; color:#c8e8d0; animation: equipConfirmFlash .5s ease; }
   @keyframes equipConfirmFlash{ 0%{ box-shadow:0 0 0 0 rgba(143,232,173,0.9); } 100%{ box-shadow:0 0 0 8px rgba(143,232,173,0); } }
   .shop-coin{ position:fixed; width:8px; height:8px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #fff2b8, var(--gold) 70%); box-shadow:0 0 4px rgba(224,169,74,0.8); z-index:120; pointer-events:none;
@@ -971,6 +985,9 @@ function hexToRgbStr(hex){
 let bgAnimTick = 0;
 const ACTIVE_SCENE_CANVASES = {}; // canvasId -> biomeKey, whichever scenes are currently on screen
 let bgAnimTimer = null;
+function isVisible(el){
+  return !!el && el.offsetParent !== null;
+}
 function startBgAnimLoop(){
   if(bgAnimTimer) return;
   bgAnimTimer = setInterval(()=>{
@@ -978,9 +995,11 @@ function startBgAnimLoop(){
     for(const canvasId in ACTIVE_SCENE_CANVASES){
       const el = document.getElementById(canvasId);
       if(!el) { delete ACTIVE_SCENE_CANVASES[canvasId]; continue; }
+      if(!isVisible(el)) continue; // still registered, just skip the wasted redraw while off-screen
       renderBiomeScene(ACTIVE_SCENE_CANVASES[canvasId], canvasId, bgAnimTick);
     }
-    if(document.getElementById('questStripCanvas')) renderQuestStrip(bgAnimTick);
+    const stripCanvas = document.getElementById('questStripCanvas');
+    if(isVisible(stripCanvas)) renderQuestStrip(bgAnimTick);
   }, 140); // ~7fps -- chunky/retro on purpose
 }
 startBgAnimLoop();
@@ -2297,9 +2316,32 @@ function spawnCoinFly(fromEl){
     setTimeout(()=>coin.remove(), 700+i*50);
   }
 }
+// Keeps every buy button's disabled/enabled state in sync with current
+// gold immediately -- previously this only updated on the full shop
+// re-render, which is deliberately delayed ~480ms after a purchase so the
+// coin-fly/flash flourish has time to play. In that window, other buttons
+// still looked clickable even if the player could no longer afford them --
+// clicking one did nothing, silently, which read as "some options just
+// don't work."
+function refreshBuyButtonAffordability(){
+  document.querySelectorAll('#shopList [data-buy]').forEach(btn=>{
+    const id = btn.dataset.buy;
+    const item = GEAR_ITEMS.find(i=>i.id===id) || MANA_SPELLS.find(i=>i.id===id) || COMPANION_SPELLS.find(i=>i.id===id);
+    if(item) btn.disabled = totalGold < item.price;
+  });
+}
 function buyItem(id, btnEl){
   const item = GEAR_ITEMS.find(i=>i.id===id) || MANA_SPELLS.find(i=>i.id===id) || COMPANION_SPELLS.find(i=>i.id===id);
-  if(!item || ownedItems.has(id) || totalGold < item.price) return;
+  if(!item || ownedItems.has(id) || totalGold < item.price){
+    // Rejected click -- give visible feedback instead of doing nothing.
+    // Most commonly hits here during the brief window right after another
+    // purchase, before gold has visually caught up on this button yet.
+    if(btnEl){
+      playSFX('invalidSwap');
+      btnEl.classList.remove('denied'); void btnEl.offsetWidth; btnEl.classList.add('denied');
+    }
+    return;
+  }
   playSFX('purchase');
   totalGold -= item.price;
   ownedItems.add(id);
@@ -2314,12 +2356,15 @@ function buyItem(id, btnEl){
   saveGame();
   updateSpellAura();
   animateGoldTo(totalGold);
+  refreshBuyButtonAffordability();
   spawnCoinFly(btnEl);
   const card = btnEl ? btnEl.closest('.shop-item') : null;
   if(card) card.classList.add('purchased');
   // The list rebuild is what updates the button to EQUIPPED/owned -- delayed
   // just long enough for the purchase flash and coin flight to actually be
-  // seen before their DOM nodes get replaced out from under them.
+  // seen before their DOM nodes get replaced out from under them. Gold-based
+  // affordability is already handled instantly above, so nothing is stale
+  // in the meantime.
   setTimeout(renderShop, 480);
 }
 function equipSpell(id, key){
@@ -2582,6 +2627,31 @@ function cellCenter(r,c){
   const wr = boardWrapEl.getBoundingClientRect();
   return { x: cr.left - wr.left + cr.width/2, y: cr.top - wr.top + cr.height/2 };
 }
+// Bold pixel-font combo callout over the board -- size, color, and
+// punctuation all escalate with the combo tier so a 2x reads as a small
+// blip and a 6x+ reads as a genuine event. Only fires for actual chains
+// (2+), not every single ordinary match.
+const COMBO_TIERS = [
+  { min:2, size:20, color:'#ffffff', suffix:'' },
+  { min:3, size:27, color:'#ffe066', suffix:'!' },
+  { min:4, size:34, color:'#ffb03a', suffix:'!' },
+  { min:5, size:42, color:'#ff8a3a', suffix:'!!' },
+  { min:6, size:50, color:'#ff3a3a', suffix:'!!!' },
+  { min:8, size:58, color:'#ff2ad0', suffix:'!!!!' },
+  { min:10, size:66, color:'#c060ff', suffix:'!!!!!' },
+];
+function spawnComboPopup(combo){
+  if(combo < 2 || !boardFxEl) return;
+  let tier = COMBO_TIERS[0];
+  for(const t of COMBO_TIERS){ if(combo >= t.min) tier = t; }
+  const el = document.createElement('div');
+  el.className = 'combo-popup';
+  el.style.fontSize = tier.size + 'px';
+  el.style.color = tier.color;
+  el.textContent = `${combo}x COMBO${tier.suffix}`;
+  boardFxEl.appendChild(el);
+  setTimeout(()=>el.remove(), 900);
+}
 function triggerBoardImpact(intensity){
   const boardEl = document.getElementById('board');
   if(!boardEl) return;
@@ -2821,6 +2891,7 @@ function addLog(text){ state.log.push(text); if(state.log.length>40) state.log.s
 function renderLog(){ logEl.innerHTML = state.log.slice(-8).map(t=>`<div>${t}</div>`).join(''); logEl.scrollTop = logEl.scrollHeight; }
 
 function renderBoard(matchedSet, fallMap, swapMap){
+  boardEl.classList.toggle('lock-mode', state.mode==='lock');
   boardEl.innerHTML = '';
   for(let r=0;r<N;r++){ for(let c=0;c<N;c++){
     const key = r+','+c;
@@ -3045,6 +3116,7 @@ function shuffle(arr){
 // clump — needed once a biome's battle count grows past its roster size.
 function pickEnemies(biome, n){
   const table = ENEMY_TABLES[biome];
+  if(!table || table.length === 0) return []; // defensive: would otherwise spin forever below
   const result = [];
   while(result.length < n) result.push(...shuffle(table));
   return result.slice(0, n);
@@ -4172,6 +4244,7 @@ function bankBattleMatch(typeCounts, combo){
   for(const t in typeCounts){ state.bankedCounts[t] = (state.bankedCounts[t]||0) + typeCounts[t]; }
   state.bankedMatchEvents += combo;
   if(combo>1) addLog(`Chain reaction: ${combo} bursts in one strike!`);
+  spawnComboPopup(state.bankedMatchEvents);
   if(typeCounts.ruby) addLog('Your blade flares, gathering heat for the strike...');
   // Resource gains apply live, right as each match lands, instead of being
   // silently banked and only revealed when the window closes — the bars
@@ -4230,12 +4303,17 @@ function resolveBankedStrike(){
   // rather than scaling damage down. Same match output, bigger pool to
   // chew through the deeper you go -- keeps early-game numbers (which
   // tested well) completely untouched.
+  // Combo-driven by design: base per-gem damage is intentionally modest, and
+  // the real power comes from momentum compounding MULTIPLICATIVELY with
+  // every additional match banked in the window (not a small flat add-on).
+  // Same total ruby count spread across more events hits meaningfully
+  // harder than one big single match -- e.g. 4 matches + 2 more before the
+  // window closes should feel like a real x6 combo, not a minor bonus.
   const tc = state.bankedCounts, events = state.bankedMatchEvents;
-  let dmg = tc.ruby ? tc.ruby*(9+gearBonus('ruby')) : 0;
+  const momentumMult = 1 + Math.max(0, events-1)*0.3;
+  let dmg = tc.ruby ? Math.round(tc.ruby*(6+gearBonus('ruby')) * momentumMult) : 0;
   if(dmg>0 && events>1){
-    const momentum = (events-1)*7;
-    dmg += momentum;
-    addLog(`Momentum x${events}: your strikes compound!`);
+    addLog(`Combo x${events}: your strikes compound (${momentumMult.toFixed(1)}x)!`);
   }
   if(dmg>0 && state.bossDamageReduction>0) dmg = Math.round(dmg * (1-state.bossDamageReduction));
   if(dmg>0){
@@ -4273,6 +4351,7 @@ async function resolveWindow(){
   if(state.windowRAF) cancelAnimationFrame(state.windowRAF);
   while(state.busy){ await sleep(50); }
   state.resolving = true;
+  try{
   updateCompactState();
   await sleep(250);
   const over = resolveBankedStrike();
@@ -4331,7 +4410,6 @@ async function resolveWindow(){
       syncActiveResourcesFromState();
       advanceQuestOnWin();
       await sleep(700);
-      state.resolving = false;
       state.bankedCounts = {}; state.bankedMatchEvents = 0;
       updateTally();
       renderNonBoard();
@@ -4380,7 +4458,6 @@ async function resolveWindow(){
       }
     }
   }
-  state.resolving = false;
   state.bankedCounts = {}; state.bankedMatchEvents = 0;
   updateTally();
   if(!state.gameOver){
@@ -4390,6 +4467,12 @@ async function resolveWindow(){
     updateCompactState();
   }
   renderNonBoard();
+  } catch(err){
+    console.error('resolveWindow failed, recovering board state:', err);
+    renderNonBoard();
+  } finally{
+    state.resolving = false;
+  }
 }
 
 function handleTap(r,c){
@@ -4453,32 +4536,39 @@ boardEl.addEventListener('pointercancel', onPointerCancel);
 async function attemptSwap(r0,c0,r1,c1){
   if(playContext==='bossrush' && bossRushActive) bossRushTurns++;
   state.busy=true;
-  pauseShimmer(600);
-  const tmp=state.grid[r0][c0]; state.grid[r0][c0]=state.grid[r1][c1]; state.grid[r1][c1]=tmp;
-  const swapMap = new Map([
-    [r0+','+c0, {dx:(c1-c0), dy:(r1-r0)}],
-    [r1+','+c1, {dx:(c0-c1), dy:(r0-r1)}]
-  ]);
-  renderBoard(null, null, swapMap); playSFX('gemSwap'); await sleep(190);
-  let matched = findMatches(state.grid, state.mode==='battle' ? state.consumedCells : null);
-  if(matched.size===0){
-    playSFX('invalidSwap');
-    const tmp2=state.grid[r0][c0]; state.grid[r0][c0]=state.grid[r1][c1]; state.grid[r1][c1]=tmp2;
-    await sleep(80); renderBoard(null, null, swapMap);
-    await sleep(190);
-    addLog('The gems resist. No alignment found there.');
-    state.busy=false; return;
+  try{
+    pauseShimmer(600);
+    const tmp=state.grid[r0][c0]; state.grid[r0][c0]=state.grid[r1][c1]; state.grid[r1][c1]=tmp;
+    const swapMap = new Map([
+      [r0+','+c0, {dx:(c1-c0), dy:(r1-r0)}],
+      [r1+','+c1, {dx:(c0-c1), dy:(r0-r1)}]
+    ]);
+    renderBoard(null, null, swapMap); playSFX('gemSwap'); await sleep(190);
+    let matched = findMatches(state.grid, state.mode==='battle' ? state.consumedCells : null);
+    if(matched.size===0){
+      playSFX('invalidSwap');
+      const tmp2=state.grid[r0][c0]; state.grid[r0][c0]=state.grid[r1][c1]; state.grid[r1][c1]=tmp2;
+      await sleep(80); renderBoard(null, null, swapMap);
+      await sleep(190);
+      addLog('The gems resist. No alignment found there.');
+      return;
+    }
+    if(state.mode==='battle'){
+      startWindowIfNeeded();
+      const {typeCounts, combo} = await resolveCascadeStatic();
+      bankBattleMatch(typeCounts, combo);
+    } else {
+      decrementMoves();
+      const {typeCounts, combo} = await resolveCascade();
+      applyEffects(typeCounts, combo);
+    }
+    renderAll();
+  } catch(err){
+    console.error('attemptSwap failed, recovering board state:', err);
+    renderAll();
+  } finally{
+    state.busy=false;
   }
-  if(state.mode==='battle'){
-    startWindowIfNeeded();
-    const {typeCounts, combo} = await resolveCascadeStatic();
-    bankBattleMatch(typeCounts, combo);
-  } else {
-    decrementMoves();
-    const {typeCounts, combo} = await resolveCascade();
-    applyEffects(typeCounts, combo);
-  }
-  state.busy=false; renderAll();
 }
 
 // Picks the right match/cascade sound family for whichever puzzle is
@@ -4530,6 +4620,7 @@ async function resolveBattleCascade(){
     playSFX('cascade');
     matched.forEach(key=>{ const [r,c]=key.split(',').map(Number); spawnBurst(r,c,state.grid[r][c]); });
     triggerBoardImpact(iterations);
+    spawnComboPopup(iterations);
     await sleep(220);
     matched.forEach(key=>{ const [r,c]=key.split(',').map(Number); state.grid[r][c]=null; });
 
@@ -4597,6 +4688,7 @@ function applyEffects(typeCounts, combo){
 
 async function castManaSpell(){
   if(state.playerMana<state.playerMaxMana || state.busy || state.gameOver || state.resolving) return;
+  try{
   const spell = MANA_SPELLS.find(s=>s.id===equippedManaSpell) || MANA_SPELLS[0];
   state.playerMana=0;
   let dmg=spell.damage;
@@ -4630,7 +4722,11 @@ async function castManaSpell(){
     state.windowActive=false;
   }
   await sleep(over ? 900 : 350);
-  renderAll();
+  } catch(err){
+    console.error('castManaSpell failed, recovering board state:', err);
+  } finally{
+    renderAll();
+  }
 }
 async function castWolfAttack(){
   if(state.rage<100 || state.busy || state.gameOver || state.resolving) return;
@@ -4640,6 +4736,7 @@ async function castWolfAttack(){
   if(state.bossDamageReduction>0) dmg = Math.round(dmg * (1-state.bossDamageReduction));
   state.enemyHP = Math.max(0, state.enemyHP-dmg);
   addLog(`${getWolfName()} unleashes ${spell.name}: ${dmg} damage!`);
+  try{
   const wolfBadge = document.getElementById('wolfBadge');
   if(wolfBadge){
     wolfBadge.classList.remove('idle','ready');
@@ -4673,7 +4770,11 @@ async function castWolfAttack(){
     state.windowActive=false;
   }
   await sleep(over ? 900 : 350);
-  renderAll();
+  } catch(err){
+    console.error('castWolfAttack failed, recovering board state:', err);
+  } finally{
+    renderAll();
+  }
 }
 // Attached once, permanently -- castWolfAttack already guards internally on
 // rage/busy/gameOver state, so this is always safe to have listening and
@@ -5487,6 +5588,23 @@ function updateContinueButtonVisibility(){
   spawnBootEmbers();
 })();
 window.addEventListener('beforeunload', saveGame);
+// Backstop against exactly the class of bug fixed above in attemptSwap/
+// resolveWindow: if anything ELSE anywhere in the game throws uncaught
+// while state.busy/state.resolving is true, those flags -- and dragState --
+// would otherwise stay stuck forever, silently and permanently blocking
+// all board input with no visible error. This forces a recovery instead of
+// a dead board, whatever the actual cause turns out to be.
+function recoverFromStuckState(source, err){
+  console.error(`Unhandled error (${source}), forcing input recovery:`, err);
+  if(typeof state === 'object' && state){
+    state.busy = false;
+    state.resolving = false;
+  }
+  dragState = null;
+  try{ renderAll(); } catch(e){ /* best effort -- don't let recovery itself throw */ }
+}
+window.addEventListener('error', (e)=> recoverFromStuckState('window error', e.error||e.message));
+window.addEventListener('unhandledrejection', (e)=> recoverFromStuckState('unhandled promise rejection', e.reason));
 
 function showScreen(name){
   const wipe = document.getElementById('screenWipe');
