@@ -36,8 +36,12 @@
   h1, .subtitle, .log{ display:none; }
 
   /* Layout positions — set from the layout designer tool, one rule set per
-     orientation since portrait and landscape use genuinely different
-     arrangements (board above portraits vs. board flanked by portraits). */
+     CSS viewport shape. iOS is locked to portrait at the native level
+     (Info.plist), so it can never actually report as landscape here --
+     restoring this is safe for mobile and necessary for desktop/Steam,
+     where a wide window (including browser fullscreen) genuinely needs
+     the landscape arrangement instead of the portrait one being stretched
+     across it. */
   #windowHud, #instructionHud, #banner, #playerCol, #enemyCol, #boardWrap, #questPath{ position:absolute; margin:0; max-width:none;
     transition: left .45s ease, top .45s ease, width .45s ease, height .45s ease; }
   @media (orientation: portrait){
@@ -50,7 +54,10 @@
     #enemyCol{  left:51.0%; top:73.5%; width:38.0%; height:16.5%; }
   }
   @media (orientation: landscape){
-    #questPath{ left:2.0%;   top:7.8%;  width:96.0%; height:11.5%; }
+    /* Narrower and centered rather than spanning the full width -- the
+       original landscape questPath stretched nearly edge-to-edge, which
+       read as disproportionate against everything else in this layout. */
+    #questPath{ left:20.0%;  top:7.8%;  width:60.0%; height:11.5%; }
     #windowHud{ left:1.3%;   top:21.1%; width:28.8%; height:13.0%; }
     #instructionHud{ left:1.3%;   top:21.1%; width:28.8%; height:13.0%; }
     #banner{    left:69.9%;  top:21.1%; width:28.8%; height:13.0%; }
@@ -227,16 +234,28 @@
   .treasure-chest{ position:relative; width:clamp(110px,22vw,160px); height:clamp(96px,19vw,138px); cursor:pointer; transition:width .3s ease, height .3s ease; }
   .treasure-chest.boss-chest{ width:clamp(150px,30vw,220px); height:clamp(132px,26vw,190px); filter:drop-shadow(0 0 16px rgba(224,169,74,0.55)); }
   .treasure-chest.opened{ cursor:default; }
+  .boss-chest .chest-base{ background:linear-gradient(180deg,#3a2a4a,#1e1428); border:3px solid var(--gold); box-shadow:inset 0 -8px 0 rgba(0,0,0,0.3), inset 0 0 0 2px rgba(224,169,74,0.35), 3px 3px 0 rgba(0,0,0,0.5); }
+  .boss-chest .chest-lid{ background:linear-gradient(180deg,#5a3e6e,#2e1c3a); border:3px solid var(--gold); box-shadow:inset 0 6px 0 rgba(255,255,255,0.12), inset 0 0 0 2px rgba(224,169,74,0.35); }
+  .boss-chest .chest-lock{ width:26px; height:30px; background:radial-gradient(circle at 35% 30%, #fff2c9, var(--gold) 55%, #a86a1e 100%); box-shadow:0 0 14px rgba(224,169,74,0.85), inset 0 0 0 2px #2e1d0e; }
+  .boss-chest::before, .boss-chest::after{ content:''; position:absolute; width:10px; height:10px; background:var(--gold); border:2px solid #2e1d0e; z-index:4; box-shadow:0 0 6px rgba(224,169,74,0.7); }
+  .boss-chest::before{ top:-2px; left:-2px; }
+  .boss-chest::after{ top:-2px; right:-2px; }
   .chest-base{ position:absolute; bottom:0; left:0; right:0; height:60%; background:linear-gradient(180deg,#8a5a2e,#5c3a1a); border:3px solid #2e1d0e; border-radius:4px; box-shadow:inset 0 -8px 0 rgba(0,0,0,0.25), 3px 3px 0 rgba(0,0,0,0.4); }
   .chest-base::before{ content:''; position:absolute; inset:7px; border:2px solid #c98a3a; border-radius:2px; opacity:0.65; }
   .chest-lid{ position:absolute; top:0; left:0; right:0; height:46%; background:linear-gradient(180deg,#a97a3e,#6a4420); border:3px solid #2e1d0e; border-radius:10px 10px 2px 2px; box-shadow:inset 0 6px 0 rgba(255,255,255,0.08); transform-origin:bottom center; transition:transform .5s cubic-bezier(.22,.85,.3,1.2), opacity .3s ease; z-index:2; }
   .treasure-chest.opened .chest-lid{ transform:rotateX(120deg) translateY(-8px); }
+  .boss-chest.opened .chest-lid{ transition:transform .9s cubic-bezier(.18,.85,.25,1.3), opacity .3s ease; transform:rotateX(140deg) translateY(-14px); }
   .chest-lock{ position:absolute; left:50%; top:44%; transform:translate(-50%,-50%); width:18px; height:22px; background:var(--gold); border:2px solid #2e1d0e; border-radius:3px; z-index:3; box-shadow:0 0 8px rgba(224,169,74,0.6); transition:opacity .2s ease, transform .2s ease; }
   .chest-lock::after{ content:''; position:absolute; left:50%; top:52%; width:4px; height:7px; background:#2e1d0e; transform:translateX(-50%); }
   .treasure-chest.opened .chest-lock{ opacity:0; transform:translate(-50%,-50%) scale(0.4); }
   .chest-glow{ position:absolute; left:50%; top:36%; width:8px; height:8px; transform:translate(-50%,-50%); border-radius:50%; background:radial-gradient(circle, #fff6d8, var(--gold) 45%, transparent 75%); opacity:0; z-index:1; pointer-events:none; }
   .treasure-chest.opened .chest-glow{ animation:chestBurst .65s ease-out forwards; }
+  .boss-chest.opened .chest-glow{ animation:chestBurstBig 1.1s ease-out forwards; }
   @keyframes chestBurst{ 0%{ width:8px; height:8px; opacity:0.95; } 55%{ opacity:0.7; } 100%{ width:280px; height:280px; opacity:0; } }
+  @keyframes chestBurstBig{ 0%{ width:8px; height:8px; opacity:1; } 15%{ width:20px; height:20px; opacity:1; } 45%{ opacity:0.85; } 100%{ width:520px; height:520px; opacity:0; } }
+  .treasure-chest.boss-chest{ animation:bossChestAnticipate 1.4s ease-in-out infinite; }
+  .treasure-chest.boss-chest.opened{ animation:none; }
+  @keyframes bossChestAnticipate{ 0%,100%{ filter:drop-shadow(0 0 16px rgba(224,169,74,0.55)); } 50%{ filter:drop-shadow(0 0 26px rgba(224,169,74,0.85)); } }
   .treasure-prompt{ font-family:'Press Start 2P',monospace; font-size:clamp(10px,2.2vw,13px); color:var(--text); letter-spacing:0.06em; animation:bootBlink 1.3s ease-in-out infinite; }
   .treasure-prompt.hidden{ display:none; }
   .treasure-choices{ display:flex; gap:clamp(10px,2.5vw,20px); flex-wrap:wrap; justify-content:center; pointer-events:none; }
@@ -296,6 +315,7 @@
   .cutscene-speaker:empty{ display:none; }
   .cutscene-scene.impact{ animation: cutsceneImpact .4s ease; }
   @keyframes cutsceneImpact{ 0%{ transform:translate(0,0); } 15%{ transform:translate(-6px,3px); } 30%{ transform:translate(5px,-2px); } 45%{ transform:translate(-4px,2px); } 60%{ transform:translate(3px,-1px); } 75%{ transform:translate(-2px,1px); } 100%{ transform:translate(0,0); } }
+  .treasure-overlay.impact{ animation:cutsceneImpact .4s ease; }
   .cutscene-flash{ position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:4; }
   .cutscene-flash.pulse{ animation: cutsceneFlashPulse .35s ease-out; }
   @keyframes cutsceneFlashPulse{ 0%{ opacity:0; } 20%{ opacity:0.55; } 100%{ opacity:0; } }
@@ -480,8 +500,10 @@
   .screen-note{ font-family:'Pixelify Sans',sans-serif; font-style:italic; color:var(--textDim); font-size:clamp(10px,2vw,13px); text-align:center; max-width:min(85vw,440px); line-height:1.5; }
   .back-btn{ font-family:'Press Start 2P',monospace; font-size:11px; padding:10px 16px; background:var(--panel); border:2px solid var(--panelBorder); color:var(--textDim); cursor:pointer; }
   .back-btn:hover{ color:var(--gold); border-color:var(--gold); }
-  .back-btn.corner{ position:absolute; top:18px; left:10px; font-size:8px; padding:6px 9px; z-index:20; opacity:0.85; }
-  .story-lives-hud{ position:absolute; top:18px; right:10px; z-index:20; display:flex; gap:4px; font-size:16px; text-shadow:1.5px 1.5px 0 #000; }
+  .back-btn.corner{ position:absolute; top:calc(18px + env(safe-area-inset-top)); left:10px; font-size:8px; padding:6px 9px; z-index:20; opacity:0.85; }
+  .story-lives-hud{ position:absolute; top:calc(18px + env(safe-area-inset-top)); right:10px; z-index:20; display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
+  .story-lives-hud .lives-label{ font-family:'Press Start 2P',monospace; font-size:7px; color:var(--textDim); text-shadow:1px 1px 0 #000; letter-spacing:0.05em; }
+  .story-lives-hud .lives-icons{ display:flex; gap:4px; font-size:16px; text-shadow:1.5px 1.5px 0 #000; }
   .story-lives-hud .life-icon.lost{ opacity:0.28; filter:grayscale(1); }
   .character-preview{ width:min(48vw,180px); aspect-ratio:5/6; background:#0c0603; border:3px solid var(--panelBorder); box-shadow:3px 3px 0 rgba(0,0,0,0.4); }
   .character-preview canvas{ width:100%; height:100%; object-fit:contain; display:block; }
@@ -1957,6 +1979,7 @@ function cutsceneSlides(){
 }
 let cutsceneIndex = 0;
 let hasSeenIntroCutscene = false;
+let hasSeenLivesExplanation = false;
 let currentCutsceneSlides = [];
 let cutsceneOnComplete = null;
 // Small environmental props for the opening cutscene — same band() technique
@@ -2148,6 +2171,10 @@ function advanceCutscene(){
 function endCutscene(){
   document.getElementById('cutsceneOverlay').classList.remove('show');
   delete ACTIVE_SCENE_CANVASES['cutsceneSceneCanvas'];
+  document.getElementById('cutsceneScene').classList.remove('impact');
+  document.getElementById('cutsceneFlash').classList.remove('pulse');
+  document.getElementById('cutsceneCaption').textContent = '';
+  document.getElementById('cutsceneSpeaker').textContent = '';
   const cb = cutsceneOnComplete;
   cutsceneOnComplete = null;
   if(cb) cb();
@@ -2253,34 +2280,34 @@ const COMPANION_SPELLS = [
 // across the story; the gold fallback for a fully-emptied pool is now a
 // rare edge case rather than something a normal playthrough will hit.
 GEAR_ITEMS.push(
-  { id:'gear_head_x1',    slot:'head',    gem:'emerald',  name:'Sunfall Diadem',              bonus:5, storyExclusive:true },
-  { id:'gear_head_x2',    slot:'head',    gem:'emerald',  name:'Crown of the Unburnt',         bonus:6, storyExclusive:true },
-  { id:'gear_head_x3',    slot:'head',    gem:'emerald',  name:'Halo of the First Light',      bonus:7, storyExclusive:true },
-  { id:'gear_head_x4',    slot:'head',    gem:'emerald',  name:'Diadem of the Ember Star',     bonus:8, storyExclusive:true },
-  { id:'gear_armor_x1',   slot:'armor',   gem:'ruby',     name:'Dragonscale Plate',            bonus:5, storyExclusive:true },
-  { id:'gear_armor_x2',   slot:'armor',   gem:'ruby',     name:'Aegis of the Fallen Kings',    bonus:6, storyExclusive:true },
-  { id:'gear_armor_x3',   slot:'armor',   gem:'ruby',     name:'Bulwark of the Undying',       bonus:7, storyExclusive:true },
-  { id:'gear_armor_x4',   slot:'armor',   gem:'ruby',     name:"Emberking's Warplate",         bonus:8, storyExclusive:true },
-  { id:'gear_boots_x1',   slot:'boots',   gem:'sapphire', name:"Windwalker's Grace",           bonus:5, storyExclusive:true },
-  { id:'gear_boots_x2',   slot:'boots',   gem:'sapphire', name:'Tempest-Stride Sabatons',      bonus:6, storyExclusive:true },
-  { id:'gear_boots_x3',   slot:'boots',   gem:'sapphire', name:'Gale-Marked Striders',         bonus:7, storyExclusive:true },
-  { id:'gear_boots_x4',   slot:'boots',   gem:'sapphire', name:'Boots of the Last Wind',       bonus:8, storyExclusive:true },
-  { id:'gear_offhand_x1', slot:'offhand', gem:'amethyst', name:'Moonlit Fang Charm',           bonus:5, storyExclusive:true },
-  { id:'gear_offhand_x2', slot:'offhand', gem:'amethyst', name:'Relic of the First Pack',      bonus:6, storyExclusive:true },
-  { id:'gear_offhand_x3', slot:'offhand', gem:'amethyst', name:'Howling Ember Fetish',         bonus:7, storyExclusive:true },
-  { id:'gear_offhand_x4', slot:'offhand', gem:'amethyst', name:'Heart of the Eternal Pack',    bonus:8, storyExclusive:true }
+  { id:'gear_head_x1',    slot:'head',    gem:'emerald',  name:'Sunfall Diadem',              bonus:4, storyExclusive:true },
+  { id:'gear_head_x2',    slot:'head',    gem:'emerald',  name:'Crown of the Unburnt',         bonus:5, storyExclusive:true },
+  { id:'gear_head_x3',    slot:'head',    gem:'emerald',  name:'Halo of the First Light',      bonus:6, storyExclusive:true },
+  { id:'gear_head_x4',    slot:'head',    gem:'emerald',  name:'Diadem of the Ember Star',     bonus:7, storyExclusive:true },
+  { id:'gear_armor_x1',   slot:'armor',   gem:'ruby',     name:'Dragonscale Plate',            bonus:4, storyExclusive:true },
+  { id:'gear_armor_x2',   slot:'armor',   gem:'ruby',     name:'Aegis of the Fallen Kings',    bonus:5, storyExclusive:true },
+  { id:'gear_armor_x3',   slot:'armor',   gem:'ruby',     name:'Bulwark of the Undying',       bonus:6, storyExclusive:true },
+  { id:'gear_armor_x4',   slot:'armor',   gem:'ruby',     name:"Emberking's Warplate",         bonus:7, storyExclusive:true },
+  { id:'gear_boots_x1',   slot:'boots',   gem:'sapphire', name:"Windwalker's Grace",           bonus:4, storyExclusive:true },
+  { id:'gear_boots_x2',   slot:'boots',   gem:'sapphire', name:'Tempest-Stride Sabatons',      bonus:5, storyExclusive:true },
+  { id:'gear_boots_x3',   slot:'boots',   gem:'sapphire', name:'Gale-Marked Striders',         bonus:6, storyExclusive:true },
+  { id:'gear_boots_x4',   slot:'boots',   gem:'sapphire', name:'Boots of the Last Wind',       bonus:7, storyExclusive:true },
+  { id:'gear_offhand_x1', slot:'offhand', gem:'amethyst', name:'Moonlit Fang Charm',           bonus:4, storyExclusive:true },
+  { id:'gear_offhand_x2', slot:'offhand', gem:'amethyst', name:'Relic of the First Pack',      bonus:5, storyExclusive:true },
+  { id:'gear_offhand_x3', slot:'offhand', gem:'amethyst', name:'Howling Ember Fetish',         bonus:6, storyExclusive:true },
+  { id:'gear_offhand_x4', slot:'offhand', gem:'amethyst', name:'Heart of the Eternal Pack',    bonus:7, storyExclusive:true }
 );
 MANA_SPELLS.push(
-  { id:'spell_mana_x1', name:'Solar Flare',       level:6, damage:58, color:'#fff29a', storyExclusive:true },
-  { id:'spell_mana_x2', name:'Cataclysm',         level:7, damage:66, color:'#ff3a6a', storyExclusive:true },
-  { id:'spell_mana_x3', name:'Azure Requiem', level:8, damage:74, color:'#ff8a3a', storyExclusive:true },
-  { id:'spell_mana_x4', name:'Starfire Cascade',  level:9, damage:82, color:'#8affea', storyExclusive:true }
+  { id:'spell_mana_x1', name:'Solar Flare',       level:6, damage:46, color:'#fff29a', storyExclusive:true },
+  { id:'spell_mana_x2', name:'Cataclysm',         level:7, damage:52, color:'#ff3a6a', storyExclusive:true },
+  { id:'spell_mana_x3', name:'Azure Requiem', level:8, damage:58, color:'#ff8a3a', storyExclusive:true },
+  { id:'spell_mana_x4', name:'Starfire Cascade',  level:9, damage:64, color:'#8affea', storyExclusive:true }
 );
 COMPANION_SPELLS.push(
-  { id:'spell_companion_x1', name:"Alpha's Fury",  level:5, damage:78,  color:'#ff5a3a', storyExclusive:true },
-  { id:'spell_companion_x2', name:'Moonrise Howl', level:6, damage:90,  color:'#c9e8ff', storyExclusive:true },
-  { id:'spell_companion_x3', name:'Packbound Fury',level:7, damage:102, color:'#e8b8ff', storyExclusive:true },
-  { id:'spell_companion_x4', name:'The Last Howl', level:8, damage:114, color:'#f0f0f0', storyExclusive:true }
+  { id:'spell_companion_x1', name:"Alpha's Fury",  level:5, damage:58,  color:'#ff5a3a', storyExclusive:true },
+  { id:'spell_companion_x2', name:'Moonrise Howl', level:6, damage:66,  color:'#c9e8ff', storyExclusive:true },
+  { id:'spell_companion_x3', name:'Packbound Fury',level:7, damage:74, color:'#e8b8ff', storyExclusive:true },
+  { id:'spell_companion_x4', name:'The Last Howl', level:8, damage:82, color:'#f0f0f0', storyExclusive:true }
 );
 let equippedManaSpell = 'spell_mana_base';
 let equippedCompanionSpell = 'spell_companion_base';
@@ -2574,6 +2601,7 @@ function showTreasureChest(onComplete, isBoss=false){
   document.getElementById('treasureSub').textContent = isBoss
     ? "The fallen guardian's power lingers here."
     : 'Something was left behind here.';
+  if(isBoss) playMusic('boss_treasure');
   document.getElementById('treasureOverlay').classList.add('show');
 }
 function finishTreasure(){
@@ -2594,12 +2622,19 @@ function finishTreasure(){
   treasureOnComplete = null;
   treasureIsBossChest = false;
   if(cb) cb();
+  updateMusicForCurrentContext();
 }
 document.getElementById('treasureChest').addEventListener('click', ()=>{
   const chest = document.getElementById('treasureChest');
   if(chest.classList.contains('opened')) return;
+  const isBoss = chest.classList.contains('boss-chest');
   chest.classList.add('opened');
   playSFX('chestOpen');
+  if(isBoss){
+    playSFX('strikeImpact');
+    const overlayEl = document.getElementById('treasureOverlay');
+    overlayEl.classList.remove('impact'); void overlayEl.offsetWidth; overlayEl.classList.add('impact');
+  }
   document.getElementById('treasurePrompt').classList.add('hidden');
   const subEl = document.getElementById('treasureSub');
   const choicesEl = document.getElementById('treasureChoices');
@@ -4156,7 +4191,16 @@ function handleQuestAdvance(index){
   const node = QUEST_NODES[questIndex];
   if(!node) return;
   const enteringNewBiome = node.biome !== currentBiome;
+  // Known up front, before the walk even starts -- lets us go quiet for the
+  // whole walk rather than only right as the cutscene itself begins, which
+  // left leftover battle/overworld music playing jarringly through the
+  // footstep sequence leading up to it. Covers both cutscene types that can
+  // follow a walk -- biome intros, and boss encounters (which use this same
+  // travel sequence before their own cutscene starts).
+  const willShowBiomeCutscene = enteringNewBiome && BIOME_LORE[node.biome] && !seenBiomeIntro[node.biome];
+  const willShowBossCutscene = !willShowBiomeCutscene && node.boss && BOSS_LORE[node.variant] && !seenBossLore[node.variant];
   state.travelBusy = true;
+  if(willShowBiomeCutscene || willShowBossCutscene) stopMusic();
   applyBiome(node.biome);
   const overlay = document.getElementById('travelOverlay');
   const canvas = document.getElementById('travelCanvas');
@@ -4173,7 +4217,7 @@ function handleQuestAdvance(index){
     travelTimeoutId = null;
     overlay.classList.remove('show');
     state.travelBusy = false;
-    if(enteringNewBiome && BIOME_LORE[node.biome] && !seenBiomeIntro[node.biome]){
+    if(willShowBiomeCutscene){
       seenBiomeIntro[node.biome] = true;
       showCutscene(BIOME_LORE[node.biome], ()=> proceedToNode(node));
       return;
@@ -5560,11 +5604,12 @@ function trackDurationSeconds(trackDef){
 function playMusic(key){
   if(musicMuted) { currentMusicKey = key; return; }
   if(currentMusicKey === key) return;
+  const ctx = getAudioCtx();
+  if(ctx.state === 'suspended') return; // not unlocked yet (pre-first-tap) -- updateMusicForCurrentContext() runs again right after the boot tap resumes it, so this just defers rather than silently losing the track choice
   stopMusic();
   currentMusicKey = key;
   const trackDef = MUSIC_TRACKS[key];
   if(!trackDef) return;
-  const ctx = getAudioCtx();
   const fallbackLen = trackDurationSeconds(trackDef);
   // The exact AudioContext-time this loop iteration should start -- always
   // advanced by precisely loopLen from the previous iteration, never
@@ -5604,6 +5649,7 @@ function playMusicOnce(key, onDone){
   const trackDef = MUSIC_TRACKS[key];
   if(!trackDef) { if(onDone) onDone(); return; }
   const ctx = getAudioCtx();
+  if(ctx.state === 'suspended'){ if(onDone) onDone(); return; }
   const startTime = ctx.currentTime + 0.05;
   const loopLen = scheduleMusicTrack(trackDef, startTime);
   if(onDone) setTimeout(onDone, loopLen*1000);
@@ -5617,11 +5663,11 @@ function updateStoryLivesDisplay(){
   const hud = document.getElementById('storyLivesHud');
   if(!hud) return;
   if(playContext !== 'story'){ hud.innerHTML = ''; return; }
-  let html = '';
+  let icons = '';
   for(let i=0;i<STORY_MAX_LIVES;i++){
-    html += `<span class="life-icon${i>=storyLivesRemaining?' lost':''}">\u2764</span>`;
+    icons += `<span class="life-icon${i>=storyLivesRemaining?' lost':''}">\u2764</span>`;
   }
-  hud.innerHTML = html;
+  hud.innerHTML = `<div class="lives-label">LIVES</div><div class="lives-icons">${icons}</div>`;
 }
 function isShown(id){
   const el = document.getElementById(id);
@@ -5631,6 +5677,7 @@ let currentBattleVariant = 'battle';
 const BATTLE_MUSIC_VARIANTS = ['battle','battle2','battle3','battle4'];
 function updateMusicForCurrentContext(){
   if(musicMuted) return;
+  if(document.getElementById('cutsceneOverlay').classList.contains('show')) return;
   if(isShown('bootScreen') || isShown('menuScreen') || isShown('optionsScreen') || isShown('characterScreen')) { playMusic('title'); return; }
   if(isShown('shopScreen')) { playMusic('shop'); return; }
   if(isShown('gameScreen')){
@@ -5803,7 +5850,7 @@ const MUSIC_TRACKS = {
         ['A4',0.25],['C5',0.25],['D5',0.25],['F5',0.25],['E5',0.25],['C5',0.25],['A4',0.25],['E4',0.25],
         ['A4',0.25],['C5',0.25],['E5',0.25],['A5',0.25],['G5',0.25],['E5',0.25],['C5',0.25],['A4',0.25],
         ['C5',0.25],['E5',0.25],['G5',0.25],['C6',0.25],['B5',0.25],['G5',0.25],['E5',0.25],['C5',0.25],
-      ], wave:'saw', vol:0.17, gate:0.75 },
+      ], wave:'sawtooth', vol:0.17, gate:0.75 },
       { sequence: [
         ['A2',0.25],['A2',0.25],['A2',0.25],['A2',0.25],['E2',0.25],['E2',0.25],['G2',0.25],['G2',0.25],
         ['F2',0.25],['F2',0.25],['F2',0.25],['F2',0.25],['E2',0.25],['E2',0.25],['E2',0.25],['E2',0.25],
@@ -5857,7 +5904,7 @@ const MUSIC_TRACKS = {
       { sequence: [
         ['Eb4',2],[null,1],['C4',1],[null,2],
         ['Gb4',2],[null,1],['Eb4',1],[null,2],
-      ], wave:'saw', vol:0.15, gate:0.6 },
+      ], wave:'sawtooth', vol:0.15, gate:0.6 },
       { sequence: [
         ['C2',6],['Gb2',6],
       ], wave:'triangle', vol:0.20, gate:0.98 },
@@ -5875,7 +5922,7 @@ const MUSIC_TRACKS = {
       { sequence: [
         ['Eb5',0.5],['Gb5',0.5],['C5',0.5],['Eb5',0.5],['D5',0.5],['F5',0.5],['B4',0.5],['D5',0.5],
         ['C5',0.5],['Eb5',0.5],['Gb5',0.5],['C6',0.5],['Gb5',0.5],['Eb5',0.5],['C5',0.5],['G4',0.5],
-      ], wave:'saw', vol:0.20, gate:0.75 },
+      ], wave:'sawtooth', vol:0.20, gate:0.75 },
       { sequence: [
         ['C3',0.25],['C3',0.25],['G2',0.25],['G2',0.25],
         ['Ab2',0.25],['Ab2',0.25],['Eb2',0.25],['Eb2',0.25],
@@ -5918,6 +5965,25 @@ const MUSIC_TRACKS = {
       { sequence: [
         ['F4',8],['D4',8],
       ], wave:'square', vol:0.045, duty:0.5, gate:0.98 },
+    ],
+  },
+  // Warm and glowing rather than a quick fanfare -- this plays while the
+  // player is actually browsing/deciding on the boss chest's reward, so it
+  // needs to sit comfortably in the background for a while, not announce
+  // itself the way the victory jingle does.
+  boss_treasure: {
+    bpm: 104,
+    voices: [
+      { sequence: [
+        ['D5',2],['B4',2],['G5',2],['E5',2],
+        ['C5',2],['A4',2],['D5',4],
+      ], wave:'triangle', vol:0.20, gate:0.85 },
+      { sequence: [
+        ['G3',4],['E3',4],['C3',4],['D3',4],
+      ], wave:'square', vol:0.09, duty:0.4, gate:0.95 },
+      { sequence: [
+        ['G2',8],['C3',8],
+      ], wave:'triangle', vol:0.17, gate:0.97 },
     ],
   },
   victory: {
@@ -6165,7 +6231,7 @@ function saveGame(){
     persistentWindowBonus, storyLivesRemaining,
     totalGold, ownedItems: Array.from(ownedItems),
     equippedGear, equippedManaSpell, equippedCompanionSpell,
-    hasSeenIntroCutscene, skipPuzzleIntro
+    hasSeenIntroCutscene, hasSeenLivesExplanation, skipPuzzleIntro
   };
   const payload = JSON.stringify(save);
   function attempt(){
@@ -6210,6 +6276,7 @@ function applySavedGame(save){
   equippedCompanionSpell = save.equippedCompanionSpell;
   renderCharacterEquipped();
   hasSeenIntroCutscene = save.hasSeenIntroCutscene;
+  hasSeenLivesExplanation = !!save.hasSeenLivesExplanation;
   Object.assign(skipPuzzleIntro, save.skipPuzzleIntro||{});
   currentBiome = save.currentBiome;
 }
@@ -6302,6 +6369,25 @@ function showScreen(name){
   updateMusicForCurrentContext();
   updateStoryLivesDisplay();
 }
+// Single-button info variant of showConfirm, for messages that just need
+// acknowledging rather than a real yes/no choice -- reuses the same
+// overlay/markup rather than adding a whole new one for one message.
+function showInfo(text, onDismiss){
+  document.getElementById('confirmText').textContent = text;
+  document.getElementById('confirmOverlay').classList.add('show');
+  const yesBtn = document.getElementById('confirmYesBtn');
+  const noBtn = document.getElementById('confirmNoBtn');
+  const prevLabel = yesBtn.textContent;
+  yesBtn.textContent = 'GOT IT';
+  noBtn.style.display = 'none';
+  function onClick(){
+    document.getElementById('confirmOverlay').classList.remove('show');
+    yesBtn.textContent = prevLabel;
+    noBtn.style.display = '';
+    if(onDismiss) onDismiss();
+  }
+  yesBtn.addEventListener('click', onClick, { once:true });
+}
 function showConfirm(text, onYes){
   document.getElementById('confirmText').textContent = text;
   document.getElementById('confirmOverlay').classList.add('show');
@@ -6389,7 +6475,18 @@ function startFreshStory(){
   hasSeenIntroCutscene = true;
   playContext = 'story';
   showScreen('game');
-  showCutscene(cutsceneSlides(), ()=> handleQuestAdvance(questIndex));
+  stopMusic();
+  showCutscene(cutsceneSlides(), ()=>{
+    if(!hasSeenLivesExplanation){
+      hasSeenLivesExplanation = true;
+      showInfo(
+        `You have three hearts this run. Losing a battle, lock, or riddle costs one heart -- lose all three and the journey ends for good. Defeating a boss restores one.`,
+        ()=> handleQuestAdvance(questIndex)
+      );
+    } else {
+      handleQuestAdvance(questIndex);
+    }
+  });
   saveGame();
 }
 document.getElementById('menuStoryBtn').addEventListener('click', ()=>{
