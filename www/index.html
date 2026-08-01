@@ -188,7 +188,7 @@
   .quest-strip-hit.current{ cursor:pointer; }
   @keyframes questPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.08); } }
 
-  .travel-overlay{ position:fixed; inset:0; background:rgba(5,3,2,0.93); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:60; opacity:0; pointer-events:none; transition:opacity .22s ease; }
+  .travel-overlay{ position:fixed; inset:0; background:rgba(5,3,2,0.93); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:60; padding:calc(20px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left)); opacity:0; pointer-events:none; transition:opacity .22s ease; }
   .travel-overlay.show{ opacity:1; pointer-events:auto; }
   .travel-scene{ width:220px; height:90px; position:relative; overflow:hidden; border-bottom:3px solid var(--panelBorder); margin-bottom:22px; }
   .travel-scene canvas{ position:absolute; bottom:0; left:-46px; width:60px; height:72px; image-rendering:pixelated;
@@ -197,7 +197,7 @@
   @keyframes travelBob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-4px); } }
   .travel-text{ font-family:'Press Start 2P',monospace; font-size:12px; color:var(--gold); text-align:center; max-width:300px; letter-spacing:0.02em; line-height:1.6; }
 
-  .rest-overlay{ position:fixed; inset:0; background:rgba(5,3,2,0.93); display:flex; align-items:center; justify-content:center; z-index:61; padding:20px; opacity:0; pointer-events:none; transition:opacity .22s ease; }
+  .rest-overlay{ position:fixed; inset:0; background:rgba(5,3,2,0.93); display:flex; align-items:center; justify-content:center; z-index:61; padding:calc(20px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left)); opacity:0; pointer-events:none; transition:opacity .22s ease; }
   .rest-overlay.show{ opacity:1; pointer-events:auto; }
   .rest-card{ background:var(--panel); border:3px solid var(--gold); padding:26px 30px; max-width:min(90vw,420px); text-align:center; box-shadow:0 0 30px rgba(0,0,0,0.4); }
   .rest-icon{ width:56px; height:67px; margin:0 auto 12px; display:block; image-rendering:pixelated; }
@@ -205,12 +205,12 @@
   .rest-heading{ font-family:'Press Start 2P',monospace; font-size:15px; color:var(--gold); margin-bottom:14px; }
   .rest-text{ font-family:'Pixelify Sans',sans-serif; font-style:italic; color:var(--textDim); font-size:13px; line-height:1.7; margin:0 0 20px; }
 
-  .puzzle-intro-overlay{ position:fixed; inset:0; background:rgba(5,3,2,0.93); display:flex; align-items:center; justify-content:center; z-index:61; padding:20px; opacity:0; pointer-events:none; transition:opacity .22s ease; }
+  .puzzle-intro-overlay{ position:fixed; inset:0; background:rgba(5,3,2,0.93); display:flex; align-items:center; justify-content:center; z-index:61; padding:calc(20px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left)); opacity:0; pointer-events:none; transition:opacity .22s ease; }
   .puzzle-intro-overlay.show{ opacity:1; pointer-events:auto; }
   .puzzle-intro-card{ background:var(--panel); border:3px solid var(--gold); padding:26px 30px; max-width:min(90vw,440px); text-align:center; box-shadow:0 0 30px rgba(0,0,0,0.4);
     transform:scale(0.8); opacity:0; transition:transform .3s cubic-bezier(.34,1.56,.64,1), opacity .22s ease; }
   .puzzle-intro-overlay.show .puzzle-intro-card{ transform:scale(1); opacity:1; }
-  .game-over-overlay{ position:fixed; inset:0; background:#000; display:flex; align-items:center; justify-content:center; z-index:70; padding:20px; opacity:0; pointer-events:none; transition:opacity .6s ease; }
+  .game-over-overlay{ position:fixed; inset:0; background:#000; display:flex; align-items:center; justify-content:center; z-index:70; padding:calc(20px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left)); opacity:0; pointer-events:none; transition:opacity .6s ease; }
   .game-over-overlay.show{ opacity:1; pointer-events:auto; }
   .game-over-card{ text-align:center; max-width:min(90vw,440px); transform:translateY(-26px); opacity:0; transition:transform .55s cubic-bezier(.22,.9,.32,1.25), opacity .5s ease; transition-delay:.15s; }
   .game-over-overlay.show .game-over-card{ transform:translateY(0); opacity:1; }
@@ -220,7 +220,7 @@
   .puzzle-intro-text{ font-family:'Pixelify Sans',sans-serif; color:var(--text); font-size:14px; line-height:1.7; margin:0 0 18px; text-align:left; }
 
   /* ---------- treasure chest reward ---------- */
-  .treasure-overlay{ position:fixed; inset:0; background:rgba(5,3,2,0.93); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:65; padding:20px; gap:clamp(14px,3vh,26px); opacity:0; pointer-events:none; transition:opacity .22s ease; }
+  .treasure-overlay{ position:fixed; inset:0; background:rgba(5,3,2,0.93); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:65; padding:calc(20px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left)); gap:clamp(14px,3vh,26px); opacity:0; pointer-events:none; transition:opacity .22s ease; }
   .treasure-overlay.show{ opacity:1; pointer-events:auto; }
   .treasure-heading{ font-family:'Press Start 2P',monospace; font-size:clamp(14px,3vw,20px); color:var(--gold); text-align:center; text-shadow:3px 3px 0 rgba(0,0,0,0.5); }
   .treasure-sub{ font-family:'Pixelify Sans',sans-serif; font-style:italic; color:var(--textDim); font-size:clamp(11px,2vw,14px); text-align:center; margin-top:-10px; }
@@ -266,7 +266,7 @@
   .treasure-choice-name{ font-family:'Press Start 2P',monospace; font-size:11px; color:var(--gold); margin-bottom:9px; line-height:1.5; }
   .treasure-choice-desc{ font-family:'Pixelify Sans',sans-serif; font-style:italic; color:var(--textDim); font-size:11px; line-height:1.5; }
 
-  .cutscene-overlay{ position:fixed; inset:0; background:#000; display:flex; flex-direction:column; z-index:70; opacity:0; pointer-events:none; transition:opacity .22s ease; }
+  .cutscene-overlay{ position:fixed; inset:0; background:#000; display:flex; flex-direction:column; z-index:70; padding-left:env(safe-area-inset-left); padding-right:env(safe-area-inset-right); opacity:0; pointer-events:none; transition:opacity .22s ease; }
   .cutscene-overlay.show{ opacity:1; pointer-events:auto; }
   .cutscene-scene{ flex:1; min-height:0; position:relative; overflow:hidden; cursor:pointer; display:flex; align-items:center; justify-content:center; }
   .cutscene-scene-bg{ position:absolute; inset:-4%; animation: cutsceneZoom 10s ease-in-out infinite alternate; }
@@ -287,7 +287,7 @@
   .cutscene-sprite canvas{ width:100%; height:100%; object-fit:contain; display:block; }
   .cutscene-prop canvas{ width:100%; height:100%; object-fit:contain; display:block; }
   .cutscene-hint{ position:absolute; bottom:12px; right:16px; font-family:'Press Start 2P',monospace; font-size:8px; color:rgba(255,255,255,0.55); z-index:3; letter-spacing:0.05em; }
-  .cutscene-skip{ position:absolute; top:calc(12px + env(safe-area-inset-top)); right:calc(12px + env(safe-area-inset-right)); z-index:5; font-size:9px; }
+  .cutscene-skip{ position:absolute; top:calc(12px + env(safe-area-inset-top)); right:12px; z-index:5; font-size:9px; }
   .cutscene-caption{ flex-shrink:0; padding:18px 22px calc(18px + env(safe-area-inset-bottom)) 22px; background:#0c0603; border-top:2px solid var(--panelBorder); font-family:'Pixelify Sans',sans-serif; font-style:italic; color:var(--text); font-size:clamp(12px,2.4vw,16px); text-align:center; min-height:50px; max-height:38vh; overflow-y:auto; display:flex; align-items:center; justify-content:center; line-height:1.5; cursor:pointer; }
   .cutscene-speaker{ padding:6px 22px 0; background:#0c0603; font-family:'Press Start 2P',monospace; font-size:clamp(8px,1.6vw,11px); color:var(--gold); text-align:center; letter-spacing:0.5px; min-height:14px;
     animation: cutsceneTextIn .3s ease .1s both; }
@@ -412,7 +412,7 @@
   .log div{ margin-bottom:4px; }
   .log div:last-child{ color:var(--text); }
 
-  .screen{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:clamp(10px,3vh,22px); padding:20px; overflow-y:auto; opacity:1; transition:opacity .22s ease; }
+  .screen{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:clamp(10px,3vh,22px); padding:calc(20px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left)); overflow-y:auto; opacity:1; transition:opacity .22s ease; }
   .screen.hidden{ opacity:0; pointer-events:none; }
   .menu-title{ font-family:'Press Start 2P',monospace; font-size:clamp(18px,5vw,32px); color:var(--gold); text-shadow:3px 3px 0 rgba(0,0,0,0.5); text-align:center; letter-spacing:0.02em; animation:titleFloat 3.4s ease-in-out infinite; display:inline-block; }
   @keyframes titleFloat{ 0%,100%{ transform:translateY(0) rotate(0deg); } 30%{ transform:translateY(-7px) rotate(-0.6deg); } 65%{ transform:translateY(-2px) rotate(0.5deg); } }
@@ -522,7 +522,7 @@
     animation: coinFly .55s cubic-bezier(.3,.6,.4,1) forwards; }
   @keyframes coinFly{ to{ left:var(--coin-tx); top:var(--coin-ty); opacity:0.2; transform:scale(0.4); } }
 
-  .overlay{ position:fixed; inset:0; background:rgba(5,3,2,0.85); display:flex; align-items:center; justify-content:center; z-index:50; opacity:0; pointer-events:none; transition:opacity .22s ease; }
+  .overlay{ position:fixed; inset:0; background:rgba(5,3,2,0.85); display:flex; align-items:center; justify-content:center; z-index:50; padding:calc(20px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left)); opacity:0; pointer-events:none; transition:opacity .22s ease; }
   .overlay.show{ opacity:1; pointer-events:auto; }
   .modal{ background:var(--panel); border:3px solid var(--gold); padding:28px 32px; max-width:360px; text-align:center; box-shadow:0 0 30px rgba(224,169,74,0.3);
     transform:scale(0.8); opacity:0; transition:transform .3s cubic-bezier(.34,1.56,.64,1), opacity .22s ease; }
@@ -3133,6 +3133,15 @@ function buildBiomeNodes(biome, totalCount, extraNodes, forceFirstType){
 }
 // Lock and riddle puzzle nodes, one flavor per biome, so every biome gets
 // both puzzle types rather than each type living in just one place.
+// Enemy HP scaling by biome depth -- same per-biome-table convention already
+// used for riddle/lock difficulty below. Battlefield values are UNCHANGED
+// from the old flat 115/205 constants, so the approved early-game feel is
+// preserved exactly; HP grows roughly 13-17% per biome tier from there, so
+// fights get meaningfully longer/harder the deeper you go without needing
+// to touch player damage formulas at all -- the same match-3 output just
+// covers proportionally less of a bigger HP pool as you progress.
+const BATTLE_HP_BY_BIOME = { battlefield:115, forest:132, lake:150, castle:170, desert:192, sanctuary:215 };
+const BOSS_HP_BY_BIOME   = { battlefield:205, forest:230, lake:258, castle:288, desert:320, sanctuary:355 };
 const LOCK_FLAVOR = {
   battlefield:{ name:'The War Chest', banner:"A dead commander's strongbox, warded shut. Align the gold tumblers to break the seal.", moves:16, progressPerMatch:14 },
   forest:{ name:'The Root-Bound Vault', banner:'Roots have grown through an old iron door. Align the gold tumblers to force it open.', moves:15, progressPerMatch:13 },
@@ -4215,10 +4224,12 @@ function bankBattleMatch(typeCounts, combo){
   updateTally();
 }
 function resolveBankedStrike(){
-  // TODO (deferred on purpose — do not touch until testing/wrap is called):
-  // overall damage from mana spells, companion spells, and ruby/charge
-  // matches needs a final scale-down pass against current enemy HP. Left
-  // alone for now so balance testing has a stable baseline to test against.
+  // Damage formula constants below are intentionally untouched -- the
+  // "needs more challenge over time" goal is now handled by scaling enemy
+  // HP up per biome (see BATTLE_HP_BY_BIOME / BOSS_HP_BY_BIOME above)
+  // rather than scaling damage down. Same match output, bigger pool to
+  // chew through the deeper you go -- keeps early-game numbers (which
+  // tested well) completely untouched.
   const tc = state.bankedCounts, events = state.bankedMatchEvents;
   let dmg = tc.ruby ? tc.ruby*(9+gearBonus('ruby')) : 0;
   if(dmg>0 && events>1){
@@ -4890,7 +4901,8 @@ function initMode(mode, node){
       state.rage=persistentRage;
     }
     state.gold=0; state.enemyName=node?node.name:'the Bandit Chief';
-    state.enemyHP=state.enemyMaxHP = (node && node.hp) ? node.hp : (state.isBoss ? 205 : 115);
+    state.enemyHP=state.enemyMaxHP = (node && node.hp) ? node.hp :
+      (state.isBoss ? (BOSS_HP_BY_BIOME[node && node.biome] || 205) : (BATTLE_HP_BY_BIOME[node && node.biome] || 115));
   } else if(mode==='lock'){
     const mv = (node && node.moves) || 14;
     state.lockProgress=0; state.lockMoves=mv; state.lockMovesMax=mv;
