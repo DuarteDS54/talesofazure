@@ -123,6 +123,13 @@
   .portrait-frame.charge{ box-shadow:0 0 18px 4px var(--glow), 3px 3px 0 rgba(0,0,0,0.5); }
   .portrait-frame.engaged{ border-color:var(--gold); box-shadow:0 0 14px 4px var(--gold), 3px 3px 0 rgba(0,0,0,0.5); }
   .portrait-frame.victory{ box-shadow:0 0 22px 6px var(--gold), 3px 3px 0 rgba(0,0,0,0.5); }
+  .portrait-frame.trait-flash{ animation: traitFlash 0.7s ease; }
+  @keyframes traitFlash{ 0%{ box-shadow:0 0 0 0 rgba(255,60,60,0), 3px 3px 0 rgba(0,0,0,0.5); } 30%{ box-shadow:0 0 26px 9px var(--trait-flash-color, rgba(255,60,60,0.9)), 3px 3px 0 rgba(0,0,0,0.5); } 100%{ box-shadow:3px 3px 0 rgba(0,0,0,0.5); } }
+  .trait-portrait-announce{ position:absolute; inset:0; z-index:5; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; background:rgba(5,3,2,0.75); text-align:center; padding:6px; animation: traitPortraitIn 0.2s ease, traitPortraitOut 0.3s ease 0.75s forwards; }
+  .trait-portrait-title{ font-family:'Press Start 2P',monospace; font-size:clamp(9px,3.5vw,14px); color:var(--trait-color, #fff); text-shadow:2px 2px 0 #000; letter-spacing:0.04em; line-height:1.3; }
+  .trait-portrait-effect{ font-family:'Pixelify Sans',sans-serif; font-style:italic; font-size:clamp(7px,2.6vw,10px); color:#e8d0c0; text-shadow:1px 1px 0 #000; line-height:1.3; }
+  @keyframes traitPortraitIn{ from{ opacity:0; transform:scale(0.85); } to{ opacity:1; transform:scale(1); } }
+  @keyframes traitPortraitOut{ to{ opacity:0; } }
   .hero-half{ flex:3 1 0; min-width:0; height:100%; overflow:hidden; position:relative; }
   .portrait-frame.idle .hero-half canvas{ animation: bob 2.4s ease-in-out infinite; }
   .portrait-frame.hit .hero-half canvas{ animation: hitshake .5s ease; }
@@ -225,6 +232,10 @@
   .game-over-text{ font-family:'Pixelify Sans',sans-serif; color:#b0a89a; font-style:italic; margin:0 0 26px; line-height:1.5; }
   .puzzle-intro-heading{ font-family:'Press Start 2P',monospace; font-size:15px; color:var(--gold); margin-bottom:14px; }
   .puzzle-intro-text{ font-family:'Pixelify Sans',sans-serif; color:var(--text); font-size:14px; line-height:1.7; margin:0 0 18px; text-align:left; }
+  .run-summary-heading{ font-family:'Press Start 2P',monospace; font-size:16px; color:var(--gold); text-align:center; margin-bottom:18px; text-shadow:2px 2px 0 rgba(0,0,0,0.5); }
+  .run-summary-stats{ display:flex; flex-direction:column; gap:9px; margin-bottom:20px; }
+  .run-summary-row{ display:flex; justify-content:space-between; align-items:baseline; gap:12px; font-family:'Pixelify Sans',sans-serif; font-size:13px; color:var(--textDim); border-bottom:1px dashed rgba(255,255,255,0.12); padding-bottom:6px; }
+  .run-summary-row .run-summary-value{ font-family:'Press Start 2P',monospace; font-size:11px; color:var(--gold); text-align:right; }
   .stat-boost-bars{ display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
   .stat-boost-bars.hidden{ display:none; }
   .stat-boost-row{ display:flex; align-items:center; gap:8px; }
@@ -300,21 +311,37 @@
   .cutscene-overlay{ position:fixed; inset:0; background:#000; display:flex; flex-direction:column; z-index:70; padding-left:env(safe-area-inset-left); padding-right:env(safe-area-inset-right); opacity:0; pointer-events:none; transition:opacity .22s ease; }
   .cutscene-overlay.show{ opacity:1; pointer-events:auto; }
   .cutscene-scene{ flex:1; min-height:0; position:relative; overflow:hidden; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .cutscene-scene::before{ content:''; position:absolute; inset:0; z-index:3; pointer-events:none;
+    background: radial-gradient(ellipse at 50% 55%, transparent 52%, rgba(5,3,2,0.5) 100%); }
   .cutscene-scene-bg{ position:absolute; inset:-4%; animation: cutsceneZoom 10s ease-in-out infinite alternate; }
-  .cutscene-scene-canvas{ position:absolute; inset:-4%; width:108%; height:108%; image-rendering:pixelated; animation: cutsceneZoom 10s ease-in-out infinite alternate; }
+  .cutscene-scene-canvas{ position:absolute; inset:-4%; width:108%; height:108%; image-rendering:pixelated; }
   .cutscene-scene-canvas.hidden{ display:none; }
+  .camera-scaler{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; transition:transform 0.7s cubic-bezier(.22,.9,.32,1); }
+  .camera-drift{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; animation: cameraDrift 11s ease-in-out infinite alternate; }
+  @keyframes cameraDrift{ from{ transform:scale(1) translate(0,0); } to{ transform:scale(1.045) translate(-1.2%,-0.6%); } }
   @keyframes cutsceneZoom{ from{ transform:scale(1) translate(0,0); } to{ transform:scale(1.09) translate(-1.5%,-1%); } }
   .cutscene-sprite{ position:relative; width:min(32vh,190px); aspect-ratio:5/6; z-index:2; filter:drop-shadow(0 14px 22px rgba(0,0,0,0.65));
-    animation: cutsceneSpriteIn .45s cubic-bezier(.22,.9,.32,1.2) both; }
+    animation: cutsceneSpriteIn .45s cubic-bezier(.22,.9,.32,1.2) both; transition:transform 0.4s ease, filter 0.4s ease; }
   .cutscene-sprite.left{ margin-right:auto; margin-left:6%; }
   .cutscene-sprite.right{ margin-left:auto; margin-right:6%; }
   @keyframes cutsceneSpriteIn{ 0%{ opacity:0; transform:translateY(14px) scale(0.92); } 100%{ opacity:1; transform:translateY(0) scale(1); } }
   .cutscene-prop{ position:relative; width:min(28vh,168px); aspect-ratio:5/6; z-index:1; opacity:0.97; filter:drop-shadow(0 12px 18px rgba(0,0,0,0.55));
-    animation: cutscenePropIn .55s ease-out both; }
+    animation: cutscenePropIn .55s ease-out both; transition:transform 0.4s ease, filter 0.4s ease, opacity 0.4s ease; }
   .cutscene-prop.left{ margin-right:auto; margin-left:6%; }
   .cutscene-prop.right{ margin-left:auto; margin-right:6%; }
   @keyframes cutscenePropIn{ 0%{ opacity:0; transform:translateX(-8px); } 100%{ opacity:0.97; transform:translateX(0); } }
   .cutscene-prop.hidden{ display:none; }
+  .cutscene-prop.rackfocus{ filter:blur(2.5px) brightness(0.5); opacity:0.7; }
+  .cutscene-prop.propfocus{ transform:scale(1.12); filter:drop-shadow(0 12px 18px rgba(0,0,0,0.55)) brightness(1.25); opacity:1; }
+  .cutscene-sprite.emphasis{ transform:scale(1.08); filter:drop-shadow(0 14px 22px rgba(0,0,0,0.65)) brightness(1.15); }
+  .cutscene-idle-sway{ width:100%; height:100%; position:relative; }
+  .cutscene-idle-sway.sprite-sway{ animation: cutsceneIdleSway 3.4s ease-in-out 0.45s infinite; }
+  .cutscene-idle-sway.prop-sway{ animation: cutsceneIdleSway 4.1s ease-in-out 0.55s infinite reverse; }
+  @keyframes cutsceneIdleSway{ 0%,100%{ transform:translate(0,0); } 50%{ transform:translate(1.5px,-3px); } }
+  .cutscene-prop-glow{ position:absolute; left:50%; top:32%; width:46%; height:46%; transform:translate(-50%,-50%); border-radius:50%; opacity:0; pointer-events:none; z-index:0;
+    background:radial-gradient(circle, var(--prop-glow-color, transparent) 0%, transparent 72%); animation: cutscenePropGlowPulse 2.6s ease-in-out infinite; }
+  .cutscene-prop-glow.show{ opacity:0.85; }
+  @keyframes cutscenePropGlowPulse{ 0%,100%{ filter:brightness(1); } 50%{ filter:brightness(1.4); } }
   .cutscene-sprite canvas{ width:100%; height:100%; object-fit:contain; display:block; }
   .cutscene-prop canvas{ width:100%; height:100%; object-fit:contain; display:block; }
   .cutscene-hint{ position:absolute; bottom:12px; right:16px; font-family:'Press Start 2P',monospace; font-size:8px; color:rgba(255,255,255,0.55); z-index:3; letter-spacing:0.05em; }
@@ -330,6 +357,16 @@
   .cutscene-flash{ position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:4; }
   .cutscene-flash.pulse{ animation: cutsceneFlashPulse .35s ease-out; }
   @keyframes cutsceneFlashPulse{ 0%{ opacity:0; } 20%{ opacity:0.55; } 100%{ opacity:0; } }
+  .cutscene-flash.beat-pulse{ animation: cutsceneBeatFlash 0.45s ease-out; }
+  @keyframes cutsceneBeatFlash{ 0%{ opacity:0; } 30%{ opacity:0.1; } 100%{ opacity:0; } }
+  .cutscene-particle-layer{ position:absolute; inset:0; z-index:2; pointer-events:none; overflow:hidden; }
+  .cutscene-burst{ position:absolute; inset:0; z-index:5; opacity:0; pointer-events:none; }
+  .cutscene-burst line{ stroke:#fff2c0; stroke-width:1.5; }
+  .cutscene-particle{ position:absolute; bottom:0; left:0; width:3px; height:3px; border-radius:50%; opacity:0;
+    background:radial-gradient(circle, var(--particle-glow,#fff), var(--particle-color,#fa3) 60%, transparent 80%);
+    box-shadow:0 0 5px var(--particle-color,#fa3); animation-timing-function:linear; animation-iteration-count:infinite; }
+  @keyframes cutsceneParticleRise{ 0%{ transform:translateY(0) translateX(0); opacity:0; } 15%{ opacity:0.85; } 80%{ opacity:0.4; } 100%{ transform:translateY(-72%) translateX(var(--drift,10px)); opacity:0; } }
+  @keyframes cutsceneParticleFall{ 0%{ transform:translateY(-8%) translateX(0); opacity:0; } 15%{ opacity:0.8; } 80%{ opacity:0.35; } 100%{ transform:translateY(70%) translateX(var(--drift,10px)); opacity:0; } }
   .campfire-bg{ background:linear-gradient(180deg, #060a18 0%, #0d0f1c 55%, #150e0c 100%); }
   .night-stars{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
   .night-star{ position:absolute; background:#fff; animation: starTwinkle ease-in-out infinite; image-rendering:pixelated; }
@@ -414,7 +451,7 @@
   .gem.drop-in{ animation:dropIn calc(0.26s + var(--fall-dist, 2) * 0.028s) cubic-bezier(.32,1.1,.4,1) both; animation-delay: var(--drop-delay, 0s); will-change: transform, opacity; }
   .gem.matched-glow{ animation: matchpulse .32s ease-out forwards; }
   .gem.consumed.gem-exit{ transition: opacity .3s ease, transform .3s ease, box-shadow .3s ease, filter .3s ease; opacity:0; transform:scale(0.35) rotate(12deg); box-shadow:none; filter:brightness(1) saturate(1); }
-  .gem.consumed{ filter:brightness(0.88) saturate(0.85); box-shadow:0 0 0 2px rgba(224,169,74,0.9) inset; transition: box-shadow .3s ease, filter .3s ease; }
+  .gem.consumed{ filter:brightness(0.5) saturate(0.35); box-shadow:0 0 0 3px rgba(224,169,74,0.95) inset; transition: box-shadow .3s ease, filter .3s ease; }
   @keyframes dropIn{ 0%{ transform:translateY(calc(var(--cell) * -1 * var(--fall-dist, 2.2))); opacity:0.7; } 72%{ transform:translateY(calc(var(--cell) * 0.05)); opacity:1; } 100%{ transform:translateY(0); opacity:1; } }
   .gem.swap-in{ animation: swapIn .2s cubic-bezier(.3,.9,.4,1) both; will-change: transform; }
   @keyframes swapIn{
@@ -484,6 +521,12 @@
     box-shadow:0 0 6px rgba(255,138,58,0.85);
     animation: emberRise linear infinite; will-change: transform, opacity; }
   @keyframes emberRise{ 0%{ transform:translate(0,0) scale(1); opacity:0; } 12%{ opacity:0.9; } 65%{ opacity:0.55; } 100%{ transform:translate(var(--drift,10px),-72vh) scale(0.25); opacity:0; } }
+  .campfire-ember-layer{ position:absolute; left:50%; top:38%; width:1px; height:1px; pointer-events:none; overflow:visible; z-index:2; }
+  .campfire-ember-particle{ position:absolute; bottom:0; left:0; width:3px; height:3px; border-radius:50%; opacity:0;
+    background:radial-gradient(circle, #fff2b0, #ff9a3a 55%, transparent 80%);
+    box-shadow:0 0 5px rgba(255,138,58,0.8);
+    animation: campfireEmberRise linear infinite; will-change: transform, opacity; }
+  @keyframes campfireEmberRise{ 0%{ transform:translate(0,0) scale(1); opacity:0; } 15%{ opacity:0.9; } 70%{ opacity:0.5; } 100%{ transform:translate(var(--drift,8px),-52px) scale(0.2); opacity:0; } }
   .boot-title{ font-family:'Press Start 2P',monospace; font-size:clamp(22px,6.4vw,40px); color:var(--gold); text-align:center; letter-spacing:0.03em; line-height:1.3;
     text-shadow:4px 4px 0 rgba(0,0,0,0.55), 0 0 18px rgba(224,169,74,0.55);
     animation:bootTitleIn 1.1s cubic-bezier(.2,.9,.25,1.1) both, bootTitleGlow 2.8s ease-in-out 1.1s infinite; }
@@ -571,6 +614,7 @@
   @keyframes shopItemPurchased{ 0%{ background:var(--panel); } 35%{ background:rgba(224,169,74,0.35); } 100%{ background:var(--panel); } }
   .shop-item-name{ font-family:'Press Start 2P',monospace; font-size:10px; color:var(--text); }
   .shop-item-cat{ font-family:'Pixelify Sans',sans-serif; font-style:italic; font-size:10.5px; color:var(--textDim); margin-top:2px; }
+  .shop-item-flavor{ font-family:'Pixelify Sans',sans-serif; font-style:italic; font-size:9.5px; color:var(--textDim); opacity:0.7; margin-top:4px; line-height:1.4; }
   .spell-level{ font-family:'Press Start 2P',monospace; font-size:8px; color:var(--gold); margin-left:4px; }
   .spell-level.stat-up{ color:#5aff8a; }
   .spell-level.stat-down{ color:#ff5a4a; }
@@ -916,6 +960,16 @@
   </div>
 </div>
 
+<div class="puzzle-intro-overlay" id="runSummaryOverlay">
+  <div class="puzzle-intro-card" style="max-width:min(92vw,460px);">
+    <div class="run-summary-heading">JOURNEY'S END</div>
+    <div class="run-summary-stats" id="runSummaryStats"></div>
+    <div style="display:flex; gap:12px; justify-content:center;">
+      <button class="back-btn" id="runSummaryBtn">RETURN TO MENU</button>
+    </div>
+  </div>
+</div>
+
 <div class="treasure-overlay" id="treasureOverlay">
   <div class="treasure-heading">A TREASURE CHEST</div>
   <div class="treasure-sub" id="treasureSub">Something was left behind here.</div>
@@ -943,6 +997,7 @@
         <div class="campfire-flame-wrap">
           <canvas id="campfireFlameCanvas" width="20" height="24"></canvas>
           <div class="campfire-glow" id="campfireGlow"></div>
+          <div class="campfire-ember-layer" id="campfireEmberLayer"></div>
         </div>
         <div class="campfire-char-wrap"><canvas id="campfireWolfCanvas" width="20" height="24"></canvas></div>
       </div>
@@ -955,11 +1010,17 @@
 <div class="cutscene-overlay" id="cutsceneOverlay">
   <button class="back-btn cutscene-skip" id="cutsceneSkipBtn">SKIP</button>
   <div class="cutscene-scene" id="cutsceneScene">
-    <div class="cutscene-scene-bg" id="cutsceneBg"></div>
-    <canvas class="cutscene-scene-canvas hidden" id="cutsceneSceneCanvas" width="160" height="90"></canvas>
-    <div class="cutscene-sprite" id="cutsceneSpriteWrap"><canvas id="cutsceneSpriteCanvas" width="20" height="24"></canvas></div>
-    <div class="cutscene-prop hidden" id="cutscenePropWrap"><canvas id="cutscenePropCanvas" width="20" height="24"></canvas></div>
+    <div class="camera-scaler" id="cutsceneScaler">
+      <div class="camera-drift">
+        <div class="cutscene-scene-bg" id="cutsceneBg"></div>
+        <canvas class="cutscene-scene-canvas hidden" id="cutsceneSceneCanvas" width="160" height="90"></canvas>
+        <div class="cutscene-sprite" id="cutsceneSpriteWrap"><div class="cutscene-idle-sway sprite-sway"><canvas id="cutsceneSpriteCanvas" width="20" height="24"></canvas></div></div>
+        <div class="cutscene-prop hidden" id="cutscenePropWrap"><div class="cutscene-idle-sway prop-sway"><canvas id="cutscenePropCanvas" width="20" height="24"></canvas><div class="cutscene-prop-glow" id="cutscenePropGlow"></div></div></div>
+      </div>
+    </div>
     <div class="cutscene-flash" id="cutsceneFlash"></div>
+    <svg class="cutscene-burst" id="cutsceneBurst" viewBox="0 0 160 90"></svg>
+    <div class="cutscene-particle-layer" id="cutsceneParticleLayer"></div>
     <div class="cutscene-hint">TAP TO CONTINUE</div>
   </div>
   <div class="cutscene-speaker" id="cutsceneSpeaker"></div>
@@ -1026,6 +1087,19 @@ function spawnBootEmbers(){
     layer.appendChild(e);
   }
 }
+function spawnCampfireEmbers(){
+  const layer = document.getElementById('campfireEmberLayer');
+  if(!layer) return;
+  layer.innerHTML = '';
+  for(let i=0;i<6;i++){
+    const e = document.createElement('div');
+    e.className = 'campfire-ember-particle';
+    e.style.setProperty('--drift', (Math.random()*20-10)+'px');
+    e.style.animationDuration = (1.4+Math.random()*1.6)+'s';
+    e.style.animationDelay = (-Math.random()*3)+'s';
+    layer.appendChild(e);
+  }
+}
 // Pixelated background scenes: one shared renderer, a distinct "skyline"
 // silhouette per biome (a row of column heights, same trick used to keep
 // the enemy archetypes manageable — one technique, many looks).
@@ -1075,6 +1149,12 @@ function startBgAnimLoop(){
     if(isVisible(stripCanvas)) renderQuestStrip(bgAnimTick);
     const shopCanvas = document.getElementById('shopBackdropCanvas');
     if(isVisible(shopCanvas)) renderShopBackdrop(bgAnimTick);
+    const campfireCanvas = document.getElementById('campfireFlameCanvas');
+    if(isVisible(campfireCanvas)) drawCampfireFlame(campfireCanvas.getContext('2d'), bgAnimTick);
+    if(activeCutsceneBespokeScene){
+      const cutsceneCanvas = document.getElementById('cutsceneSceneCanvas');
+      if(isVisible(cutsceneCanvas)){ const c=cutsceneCanvas.getContext('2d'); CUTSCENE_BACKGROUNDS[activeCutsceneBespokeScene](c, bgAnimTick); drawCutsceneHorizonGlow(c); }
+    }
   }, 140); // ~7fps -- chunky/retro on purpose
 }
 startBgAnimLoop();
@@ -2039,37 +2119,37 @@ setInterval(()=>{
    built from what we already have, meant to be replaced with real art later. */
 function cutsceneSlides(){
   return [
-    { bg:'linear-gradient(180deg, #16281a 0%, #0c160e 100%)', sprite:'hero', pos:'left', prop:'trees',
+    { scene:'azureJungle', sprite:'hero', pos:'left', prop:'trees', fx:'default',
       text:'Azure is a lush and ancient land, home to countless peoples sheltered by jungle canopy and quiet rivers. For millennia, the Azerians have kept its old traditions, tending the land and each other in equal measure.' },
-    { bg:'linear-gradient(180deg, #221c2e 0%, #120e18 100%)', sprite:'hero', pos:'left', prop:'idol',
+    { scene:'shabaShrine', sprite:'hero', pos:'left', prop:'idol', fx:'default',
       text:'Those Who Came Before choose one Warrior and one Animal Companion each generation, Shaba, sworn to protect all of Azure and answer any call for aid, no matter how far it carries them.' },
-    { bg:'linear-gradient(180deg, #2e2412 0%, #16110a 100%)', sprite:'hero', pos:'left', prop:'banner',
+    { scene:'alerraBanners', sprite:'hero', pos:'left', prop:'banner', fx:'default',
       text:'Ro was the most promising recruit in a generation. Today was to be her first day carrying the title.' },
-    { bg:'linear-gradient(180deg, #2a1410 0%, #150a08 100%)', sprite:'hero', pos:'left', prop:'invaders', impact:true,
+    { scene:'alerraInvasion', sprite:'hero', pos:'left', prop:'invaders', impact:true, particles:'ash', fx:'punch',
       text:"Instead, invaders from the South stormed Alerra, Azure's capital and the heart of Azerian pride, before she had worn the title a single hour." },
-    { bg:'linear-gradient(180deg, #241008 0%, #120804 100%)', sprite:'hero', pos:'left', prop:'debris',
+    { scene:'alerraAftermath', sprite:'hero', pos:'left', prop:'debris', particles:'ash', fx:'rackfocus',
       text:'The battle for Alerra is over. The field is quiet now, and quiet is worse.' },
-    { bg:'linear-gradient(180deg, #1e140a 0%, #0e0806 100%)', sprite:'wolf', pos:'right', prop:'spear', impact:true,
+    { scene:'wolfWound', sprite:'wolf', pos:'right', prop:'spear', impact:true, particles:'chill', fx:'punch',
       text:`${getWolfName()} lies still beside her, breath shallow, wound deep: poison, and no cure within reach.` },
-    { bg:'linear-gradient(180deg, #142622 0%, #0a1512 100%)', sprite:'hero', pos:'left', prop:'mountainBloom',
+    { scene:'mountainDistant', sprite:'hero', pos:'left', prop:'mountainBloom', particles:'light', fx:'propfocus',
       text:"They say a flower blooms atop Mother's Crown, upon the Borez Cliffs, far from here, past horrors she cannot yet name." },
-    { bg:'linear-gradient(180deg, #1c1130 0%, #0e081a 100%)', sprite:'wolf', pos:'right', prop:'relic',
+    { scene:'relicAwakening', sprite:'wolf', pos:'right', prop:'relic', particles:'light', fx:'burst',
       text:'The Ancient Relics of Virtue stir in answer to her blood. There is no other choice. She rises. The journey begins.' }
   ];
 }
 function epilogueSlides(){
   return [
-    { bg:'linear-gradient(180deg, #2e2438 0%, #181220 100%)', sprite:'hero', pos:'left', prop:'mountainBloom',
+    { scene:'mountainPeakBloom', sprite:'hero', pos:'left', prop:'mountainBloom', particles:'light', fx:'propfocus',
       text:"The flower blooms exactly where the old stories said it would, impossibly bright against the grey stone of Mother's Crown." },
-    { bg:'linear-gradient(180deg, #2e2438 0%, #181220 100%)', sprite:'hero', pos:'left', prop:'mountainBloom',
+    { scene:'mountainPeakBloom', sprite:'hero', pos:'left', prop:'mountainBloom', particles:'light', fx:'default',
       text:'Ro cups it in both hands as though it might shatter. After everything the journey cost, it feels almost too simple to just... pick it.' },
-    { bg:'linear-gradient(180deg, #1e140a 0%, #0e0806 100%)', sprite:'wolf', pos:'right', prop:'relic',
+    { scene:'healingGlow', sprite:'wolf', pos:'right', prop:'relic', particles:'light', fx:'rackfocus',
       text:`She kneels beside ${getWolfName()} and presses the bloom against the wound that never fully closed.` },
-    { bg:'linear-gradient(180deg, #1e140a 0%, #0e0806 100%)', sprite:'wolf', pos:'right',
+    { scene:'healingGlow', sprite:'wolf', pos:'right', particles:'light', fx:'punch',
       text:`For a long moment, nothing happens. Then ${getWolfName()}'s breathing steadies, deep and even, for the first time since Alerra fell.` },
-    { bg:'linear-gradient(180deg, #16281a 0%, #0c160e 100%)', sprite:'hero', pos:'left',
+    { scene:'homeward', sprite:'hero', pos:'left', fx:'default',
       text:'Azure is not whole again. Not yet. But something that was breaking has, for now, stopped breaking.' },
-    { bg:'linear-gradient(180deg, #16281a 0%, #0c160e 100%)', sprite:'wolf', pos:'right',
+    { scene:'homeward', sprite:'wolf', pos:'right', fx:'default',
       text:'The road home is long. For the first time in a long while, Ro is not afraid of it.' }
   ];
 }
@@ -2077,13 +2157,50 @@ function epilogueSlides(){
 // cleared here (a completed run has nothing left to resume), so Continue
 // correctly disappears and Story correctly starts a brand new run with no
 // leftover confirmation prompt about losing progress that's already gone.
+function formatRunTime(ms){
+  const totalMin = Math.max(0, Math.round(ms/60000));
+  const h = Math.floor(totalMin/60), m = totalMin%60;
+  return h>0 ? `${h}h ${m}m` : `${m}m`;
+}
+function showRunSummary(onDone){
+  const gearNames = ['head','armor','boots','offhand']
+    .map(slot=>{
+      const id = equippedGear[slot];
+      const item = id ? GEAR_ITEMS.find(g=>g.id===id) : null;
+      return item ? item.name : null;
+    })
+    .filter(Boolean);
+  const manaSpell = MANA_SPELLS.find(s=>s.id===equippedManaSpell) || MANA_SPELLS[0];
+  const companionSpell = COMPANION_SPELLS.find(s=>s.id===equippedCompanionSpell) || COMPANION_SPELLS[0];
+  const rows = [
+    ['Companion', `${getWolfName()} (${WOLF_COATS[wolfCoatKey].label})`],
+    ['Time played', formatRunTime(Date.now()-runStartTime)],
+    ['Bosses defeated', '6 / 6'],
+    ['Damage dealt', totalDamageDealt.toLocaleString()],
+    ['Matches made', totalMatchesMade.toLocaleString()],
+    ['Gold in hand', totalGold.toLocaleString()],
+    ['Final gear', gearNames.length ? gearNames.join(', ') : 'None equipped'],
+    ['Final spells', `${manaSpell.name}, ${companionSpell.name}`],
+  ];
+  document.getElementById('runSummaryStats').innerHTML = rows
+    .map(([label,value])=> `<div class="run-summary-row"><span>${label}</span><span class="run-summary-value">${value}</span></div>`)
+    .join('');
+  document.getElementById('runSummaryOverlay').classList.add('show');
+  document.getElementById('runSummaryBtn').addEventListener('click', ()=>{
+    playSFX('buttonTap');
+    document.getElementById('runSummaryOverlay').classList.remove('show');
+    if(onDone) onDone();
+  }, { once:true });
+}
 function showEnding(){
   try{ localStorage.removeItem(SAVE_KEY); } catch(e){ /* best effort */ }
   playMusic('campfire');
   showCutscene(epilogueSlides(), ()=>{
-    stopMusic();
-    resetToDefaultPalette();
-    showScreen('menu');
+    showRunSummary(()=>{
+      stopMusic();
+      resetToDefaultPalette();
+      showScreen('menu');
+    });
   });
 }
 let cutsceneIndex = 0;
@@ -2094,6 +2211,308 @@ let cutsceneOnComplete = null;
 // Small environmental props for the opening cutscene — same band() technique
 // as every character sprite, but simpler and mostly single-tone, so they
 // read as scene elements standing with Ro rather than competing with her.
+// Only props that are actually meant to emit light get a glow -- keyed to
+// each one's own established color from its own drawing function, so the
+// glow reads as a property of what the object specifically is rather than
+// a generic effect applied everywhere.
+const PROP_GLOW_COLORS = { relic:'#7fd1ff', mountainBloom:'#c9a4ff' };
+let activeCutsceneBespokeScene = null;
+// Mood-matched particle styles, keyed by a short name referenced from a
+// slide's `particles` field -- tied to the actual narrative moment rather
+// than being uniform decoration across every cutscene.
+const CUTSCENE_PARTICLE_STYLES = {
+  embers: { color:'#ff9a3a', glow:'#fff2b0', dir:'up',   count:7 },
+  ash:    { color:'#8a8578', glow:'#5a564a', dir:'down', count:6 },
+  chill:  { color:'#8fd4e8', glow:'#c9f0ff', dir:'up',   count:6 },
+  dust:   { color:'#c9922e', glow:'#f0c060', dir:'up',   count:6 },
+  light:  { color:'#e8d0ff', glow:'#fff0ff', dir:'up',   count:7 },
+};
+function spawnCutsceneParticles(styleKey){
+  const layer = document.getElementById('cutsceneParticleLayer');
+  if(!layer) return;
+  layer.innerHTML = '';
+  const style = CUTSCENE_PARTICLE_STYLES[styleKey];
+  if(!style) return;
+  for(let i=0;i<style.count;i++){
+    const p = document.createElement('div');
+    p.className = 'cutscene-particle';
+    p.style.left = (Math.random()*90+5)+'%';
+    p.style.setProperty('--drift', (Math.random()*30-15)+'px');
+    p.style.setProperty('--particle-color', style.color);
+    p.style.setProperty('--particle-glow', style.glow);
+    p.style.animationName = style.dir==='down' ? 'cutsceneParticleFall' : 'cutsceneParticleRise';
+    p.style.animationDuration = (2.2+Math.random()*2.2)+'s';
+    p.style.animationDelay = (-Math.random()*4)+'s';
+    layer.appendChild(p);
+  }
+}
+// Bespoke per-moment cutscene backgrounds for the opening cutscene -- one
+// composed scene per slide (not a shared/generic backdrop), matching the
+// shop backdrop's level of intent: layered shapes with thematic detail and
+// some ambient motion, rather than a flat gradient with a zoom applied to
+// it. Each function draws at the same 160x90 resolution the biome-scene
+// canvas already uses, redrawn on the shared animation tick.
+const CUTSCENE_BACKGROUNDS = {
+  azureJungle: (ctx,t)=>{
+    const W=160,H=90,groundY=66;
+    const g=ctx.createLinearGradient(0,0,0,groundY); g.addColorStop(0,'#1c3320'); g.addColorStop(1,'#0c160e');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,groundY);
+    ctx.fillStyle='#0a120b'; ctx.fillRect(0,groundY,W,H-groundY);
+    [8,26,44,62,80,98,116,134,150].forEach((x,i)=>{
+      const h=16+(i%3)*6;
+      ctx.fillStyle='#0e2013'; ctx.beginPath(); ctx.moveTo(x,groundY-h); ctx.lineTo(x-11,groundY); ctx.lineTo(x+11,groundY); ctx.fill();
+      ctx.fillStyle='#1c3a22'; ctx.beginPath(); ctx.moveTo(x,groundY-h+3); ctx.lineTo(x-8,groundY-2); ctx.lineTo(x+8,groundY-2); ctx.fill();
+    });
+    for(let i=0;i<7;i++){
+      const fx=(i*23+Math.sin(t*0.02+i)*4)%W;
+      const fy=20+((Math.sin(t*0.03+i*2)+1)*22);
+      const a=0.4+0.4*Math.abs(Math.sin(t*0.08+i*1.7));
+      ctx.fillStyle=`rgba(200,255,150,${a.toFixed(2)})`;
+      ctx.fillRect(fx,fy,1,1);
+    }
+  },
+  shabaShrine: (ctx,t)=>{
+    const W=160,H=90,groundY=66;
+    const g=ctx.createLinearGradient(0,0,0,groundY); g.addColorStop(0,'#2a2038'); g.addColorStop(1,'#120e18');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,groundY);
+    ctx.fillStyle='#0e0a14'; ctx.fillRect(0,groundY,W,H-groundY);
+    [30,80,130].forEach((x)=>{
+      ctx.fillStyle='#1c1626'; ctx.fillRect(x-5,20,10,groundY-20);
+      ctx.fillStyle='#2e2440'; ctx.fillRect(x-4,20,8,groundY-20);
+      ctx.fillStyle='#1c1626'; ctx.fillRect(x-8,16,16,5);
+    });
+    [30,80,130].forEach((x,i)=>{
+      const flick=0.6+0.4*Math.abs(Math.sin(t*0.25+i*2));
+      ctx.fillStyle=`rgba(255,200,110,${flick.toFixed(2)})`;
+      ctx.beginPath(); ctx.arc(x,26,2.5,0,7); ctx.fill();
+    });
+    ctx.fillStyle='#e8c96a'; ctx.fillRect(78,40,4,4);
+  },
+  alerraBanners: (ctx,t)=>{
+    const W=160,H=90,groundY=66;
+    const g=ctx.createLinearGradient(0,0,0,groundY); g.addColorStop(0,'#3a2c14'); g.addColorStop(1,'#16110a');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,groundY);
+    ctx.fillStyle='#120d08'; ctx.fillRect(0,groundY,W,H-groundY);
+    for(let x=0;x<W;x+=13){ ctx.fillStyle='#241a0e'; ctx.fillRect(x,groundY-14,3,14); }
+    [20,55,90,125].forEach((x,i)=>{
+      const sway=Math.sin(t*0.06+i*1.5)*2.5;
+      ctx.fillStyle='#241a0e'; ctx.fillRect(x,10,2,groundY-10);
+      ctx.fillStyle='#8a1a1a';
+      ctx.beginPath(); ctx.moveTo(x+2,12); ctx.lineTo(x+16+sway,16); ctx.lineTo(x+2,26); ctx.fill();
+    });
+    const glow=0.3+0.15*Math.sin(t*0.1);
+    ctx.fillStyle=`rgba(224,169,74,${glow.toFixed(2)})`;
+    ctx.fillRect(0,groundY-3,W,3);
+  },
+  alerraInvasion: (ctx,t)=>{
+    const W=160,H=90,groundY=66;
+    const g=ctx.createLinearGradient(0,0,0,groundY); g.addColorStop(0,'#3a1008'); g.addColorStop(1,'#150705');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,groundY);
+    ctx.fillStyle='#0e0503'; ctx.fillRect(0,groundY,W,H-groundY);
+    [15,40,65,95,120,145].forEach((x,i)=>{
+      const h=18+(i%3)*8;
+      ctx.fillStyle='#150705'; ctx.fillRect(x-6,groundY-h,12,h);
+      const flick=0.5+0.5*Math.abs(Math.sin(t*0.3+i*3));
+      ctx.fillStyle=`rgba(255,${100+Math.round(flick*60)},40,${flick.toFixed(2)})`;
+      ctx.fillRect(x-2,groundY-h-2,4,3);
+    });
+    for(let i=0;i<10;i++){
+      const sx=(i*17+t*0.4)%W;
+      const sy=groundY-10-((t*0.6+i*8)%50);
+      const a=Math.max(0,0.5-(groundY-sy)/70);
+      ctx.fillStyle=`rgba(90,80,75,${a.toFixed(2)})`;
+      ctx.fillRect(sx,sy,2,2);
+    }
+  },
+  alerraAftermath: (ctx,t)=>{
+    const W=160,H=90,groundY=66;
+    const g=ctx.createLinearGradient(0,0,0,groundY); g.addColorStop(0,'#2a150c'); g.addColorStop(1,'#120804');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,groundY);
+    ctx.fillStyle='#0e0603'; ctx.fillRect(0,groundY,W,H-groundY);
+    [[10,8],[35,14],[60,6],[85,18],[110,9],[135,15]].forEach(([x,h])=>{
+      ctx.fillStyle='#1c130c'; ctx.fillRect(x,groundY-h,14,h);
+    });
+    ctx.fillStyle='#241810'; for(let x=0;x<W;x+=9) ctx.fillRect(x,groundY-2,5,2);
+    const mist=0.08+0.05*Math.sin(t*0.05);
+    ctx.fillStyle=`rgba(180,150,130,${mist.toFixed(2)})`;
+    ctx.fillRect(0,groundY-16,W,16);
+  },
+  wolfWound: (ctx,t)=>{
+    const W=160,H=90,groundY=66;
+    const g=ctx.createLinearGradient(0,0,0,groundY); g.addColorStop(0,'#221810'); g.addColorStop(1,'#0e0806');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,groundY);
+    ctx.fillStyle='#0a0705'; ctx.fillRect(0,groundY,W,H-groundY);
+    const moon=0.5+0.2*Math.sin(t*0.04);
+    ctx.fillStyle=`rgba(200,210,220,${moon.toFixed(2)})`;
+    ctx.beginPath(); ctx.arc(130,18,7,0,7); ctx.fill();
+    ctx.fillStyle='#120d0a'; ctx.beginPath(); ctx.arc(133,15,7,0,7); ctx.fill();
+    for(let i=0;i<4;i++){
+      const x=20+i*32; const h=10+(i%2)*5;
+      ctx.fillStyle='#150f0b'; ctx.fillRect(x,groundY-h,3,h);
+    }
+  },
+  mountainDistant: (ctx,t)=>{
+    const W=160,H=90,groundY=66;
+    const g=ctx.createLinearGradient(0,0,0,groundY); g.addColorStop(0,'#1c3630'); g.addColorStop(1,'#0a1512');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,groundY);
+    ctx.fillStyle='#08110d'; ctx.fillRect(0,groundY,W,H-groundY);
+    ctx.fillStyle='#16281f';
+    ctx.beginPath(); ctx.moveTo(80,14); ctx.lineTo(40,groundY); ctx.lineTo(120,groundY); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#22392e';
+    ctx.beginPath(); ctx.moveTo(80,14); ctx.lineTo(66,40); ctx.lineTo(94,40); ctx.closePath(); ctx.fill();
+    const bloom=0.5+0.4*Math.abs(Math.sin(t*0.12));
+    ctx.fillStyle=`rgba(240,216,255,${bloom.toFixed(2)})`;
+    ctx.fillRect(78,15,4,4);
+    [15,45,105,145].forEach((x,i)=>{
+      const h=8+(i%2)*4;
+      ctx.fillStyle='#0e1c16'; ctx.beginPath(); ctx.moveTo(x,groundY-h); ctx.lineTo(x-6,groundY); ctx.lineTo(x+6,groundY); ctx.fill();
+    });
+  },
+  relicAwakening: (ctx,t)=>{
+    const W=160,H=90,groundY=66;
+    const g=ctx.createLinearGradient(0,0,0,groundY); g.addColorStop(0,'#241a38'); g.addColorStop(1,'#0e081a');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,groundY);
+    ctx.fillStyle='#0a0614'; ctx.fillRect(0,groundY,W,H-groundY);
+    const pulse=0.4+0.35*Math.abs(Math.sin(t*0.14));
+    const grad=ctx.createRadialGradient(80,42,2,80,42,30);
+    grad.addColorStop(0,`rgba(180,220,255,${pulse.toFixed(2)})`);
+    grad.addColorStop(1,'rgba(180,220,255,0)');
+    ctx.fillStyle=grad; ctx.fillRect(50,12,60,60);
+    ctx.fillStyle='#c9f0ff'; ctx.fillRect(78,40,4,4);
+    for(let i=0;i<8;i++){
+      const ang=t*0.02+i*(Math.PI/4);
+      const r=18+Math.sin(t*0.05+i)*3;
+      const px=80+Math.cos(ang)*r, py=42+Math.sin(ang)*r*0.6;
+      ctx.fillStyle='rgba(200,230,255,0.7)';
+      ctx.fillRect(px,py,1,1);
+    }
+  },
+  forestEntrance: (ctx,t)=>{
+    const W=160,H=90,groundY=66;
+    const g=ctx.createLinearGradient(0,0,0,groundY); g.addColorStop(0,'#0e1c10'); g.addColorStop(1,'#070d08');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,groundY);
+    ctx.fillStyle='#050a06'; ctx.fillRect(0,groundY,W,H-groundY);
+    [4,20,36,54,72,92,110,128,146].forEach((x,i)=>{
+      const h=30+(i%4)*7;
+      ctx.fillStyle='#050c06'; ctx.fillRect(x,groundY-h,5,h);
+      ctx.fillStyle='#0e1c10'; ctx.beginPath(); ctx.moveTo(x+2,groundY-h-6); ctx.lineTo(x-8,groundY-h+16); ctx.lineTo(x+12,groundY-h+16); ctx.fill();
+    });
+    const sway = Math.sin(t*0.03)*1.5;
+    for(let i=0;i<3;i++){
+      const ex=40+i*40+sway, ey=30+i*8;
+      const glint=0.4+0.5*Math.abs(Math.sin(t*0.2+i*3));
+      ctx.fillStyle=`rgba(255,220,140,${glint.toFixed(2)})`;
+      ctx.fillRect(ex,ey,1,1);
+    }
+  },
+  lakeStill: (ctx,t)=>{
+    const W=160,H=90,groundY=66;
+    const g=ctx.createLinearGradient(0,0,0,groundY); g.addColorStop(0,'#0a2a24'); g.addColorStop(1,'#061410');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,groundY);
+    const wg=ctx.createLinearGradient(0,groundY,0,H); wg.addColorStop(0,'#0e2420'); wg.addColorStop(1,'#030a08');
+    ctx.fillStyle=wg; ctx.fillRect(0,groundY,W,H-groundY);
+    for(let x=0;x<W;x+=6){
+      const ripple = Math.sin(t*0.02+x*0.1)*0.5+0.5;
+      ctx.fillStyle=`rgba(120,200,190,${(0.05+ripple*0.06).toFixed(2)})`;
+      ctx.fillRect(x,groundY+2+Math.round(ripple*2),5,1);
+    }
+    const moon=0.35+0.1*Math.sin(t*0.03);
+    ctx.fillStyle=`rgba(210,225,220,${moon.toFixed(2)})`;
+    ctx.beginPath(); ctx.arc(120,16,6,0,7); ctx.fill();
+    ctx.fillStyle=`rgba(210,225,220,${(moon*0.3).toFixed(2)})`;
+    ctx.fillRect(118,groundY+3,4,10);
+  },
+  castleRuins: (ctx,t)=>{
+    const W=160,H=90,groundY=66;
+    const g=ctx.createLinearGradient(0,0,0,groundY); g.addColorStop(0,'#241c30'); g.addColorStop(1,'#100c18');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,groundY);
+    ctx.fillStyle='#0c0912'; ctx.fillRect(0,groundY,W,H-groundY);
+    ctx.fillStyle='#160f20';
+    ctx.fillRect(40,20,14,groundY-20); ctx.fillRect(90,14,16,groundY-14); ctx.fillRect(120,26,10,groundY-26);
+    ctx.fillStyle='#0e0a16';
+    [40,90,120].forEach((x,i)=>{ ctx.fillRect(x-2,[20,14,26][i]-6,[14,16,10][i]+4,6); });
+    const flick=0.3+0.25*Math.abs(Math.sin(t*0.15));
+    ctx.fillStyle=`rgba(180,140,220,${flick.toFixed(2)})`;
+    ctx.fillRect(96,30,3,3);
+  },
+  desertDunes: (ctx,t)=>{
+    const W=160,H=90,groundY=66;
+    const g=ctx.createLinearGradient(0,0,0,groundY); g.addColorStop(0,'#3a2e14'); g.addColorStop(1,'#1a1408');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,groundY);
+    ctx.fillStyle='#140f06'; ctx.fillRect(0,groundY,W,H-groundY);
+    ctx.fillStyle='#241c0e';
+    ctx.beginPath(); ctx.moveTo(0,groundY); ctx.quadraticCurveTo(50,groundY-18,110,groundY-8); ctx.lineTo(160,groundY-14); ctx.lineTo(160,groundY); ctx.fill();
+    for(let i=0;i<6;i++){
+      const hx=(i*28+t*0.5)%(W+20)-10;
+      const hy=groundY-30-i*4;
+      const a=0.06+0.03*Math.sin(t*0.04+i);
+      ctx.fillStyle=`rgba(240,200,140,${a.toFixed(2)})`;
+      ctx.fillRect(hx,hy,20,2);
+    }
+  },
+  sanctuaryCliffs: (ctx,t)=>{
+    const W=160,H=90,groundY=66;
+    const g=ctx.createLinearGradient(0,0,0,groundY); g.addColorStop(0,'#342a48'); g.addColorStop(1,'#161022');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,groundY);
+    ctx.fillStyle='#0e0a18'; ctx.fillRect(0,groundY,W,H-groundY);
+    ctx.fillStyle='#241c38';
+    ctx.beginPath(); ctx.moveTo(20,groundY); ctx.lineTo(50,10); ctx.lineTo(80,groundY); ctx.fill();
+    ctx.fillStyle='#2e2444';
+    ctx.beginPath(); ctx.moveTo(70,groundY); ctx.lineTo(110,4); ctx.lineTo(150,groundY); ctx.fill();
+    const bloom=0.4+0.35*Math.abs(Math.sin(t*0.1));
+    ctx.fillStyle=`rgba(230,210,255,${bloom.toFixed(2)})`;
+    ctx.fillRect(108,6,4,4);
+  },
+  mountainPeakBloom: (ctx,t)=>{
+    const W=160,H=90,groundY=66;
+    const g=ctx.createLinearGradient(0,0,0,groundY); g.addColorStop(0,'#3a2c50'); g.addColorStop(1,'#181228');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,groundY);
+    ctx.fillStyle='#100a1a'; ctx.fillRect(0,groundY,W,H-groundY);
+    ctx.fillStyle='#4a3a64';
+    ctx.beginPath(); ctx.moveTo(80,10); ctx.lineTo(35,groundY); ctx.lineTo(125,groundY); ctx.closePath(); ctx.fill();
+    const bloom=0.55+0.35*Math.abs(Math.sin(t*0.13));
+    const grad=ctx.createRadialGradient(80,26,1,80,26,14);
+    grad.addColorStop(0,`rgba(255,240,255,${bloom.toFixed(2)})`);
+    grad.addColorStop(1,'rgba(255,240,255,0)');
+    ctx.fillStyle=grad; ctx.fillRect(66,12,28,28);
+    ctx.fillStyle='#f0d8ff'; ctx.fillRect(78,24,4,4);
+  },
+  healingGlow: (ctx,t)=>{
+    const W=160,H=90,groundY=66;
+    const g=ctx.createLinearGradient(0,0,0,groundY); g.addColorStop(0,'#241810'); g.addColorStop(1,'#0e0806');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,groundY);
+    ctx.fillStyle='#0a0604'; ctx.fillRect(0,groundY,W,H-groundY);
+    const pulse=0.5+0.35*Math.abs(Math.sin(t*0.16));
+    const grad=ctx.createRadialGradient(80,48,2,80,48,26);
+    grad.addColorStop(0,`rgba(255,210,150,${pulse.toFixed(2)})`);
+    grad.addColorStop(1,'rgba(255,210,150,0)');
+    ctx.fillStyle=grad; ctx.fillRect(54,22,52,52);
+  },
+  homeward: (ctx,t)=>{
+    const W=160,H=90,groundY=66;
+    const g=ctx.createLinearGradient(0,0,0,groundY); g.addColorStop(0,'#2a4020'); g.addColorStop(1,'#101c0c');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,groundY);
+    ctx.fillStyle='#0a1408'; ctx.fillRect(0,groundY,W,H-groundY);
+    [10,30,50,110,130,150].forEach((x,i)=>{
+      const h=14+(i%3)*6;
+      ctx.fillStyle='#122010'; ctx.beginPath(); ctx.moveTo(x,groundY-h); ctx.lineTo(x-9,groundY); ctx.lineTo(x+9,groundY); ctx.fill();
+    });
+    const dawn=0.3+0.15*Math.sin(t*0.06);
+    ctx.fillStyle=`rgba(255,220,160,${dawn.toFixed(2)})`;
+    ctx.beginPath(); ctx.arc(80,50,16,0,7); ctx.fill();
+  },
+};
+// Applied uniformly after every bespoke scene draws, regardless of its
+// individual content -- a consistent warm seam right at the shared
+// horizon line, so the 8 scenes read as one matching set rather than 8
+// independently-styled images with varying contrast and detail levels.
+function drawCutsceneHorizonGlow(ctx){
+  const grad = ctx.createLinearGradient(0,60,0,68);
+  grad.addColorStop(0,'rgba(255,200,140,0)');
+  grad.addColorStop(1,'rgba(255,200,140,0.14)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,60,160,8);
+}
 const CUTSCENE_PROPS = {
   trees: (ctx)=>{
     ctx.clearRect(0,0,20,24);
@@ -2218,11 +2637,21 @@ function renderCutsceneSlide(){
   const bgEl = document.getElementById('cutsceneBg');
   const sceneCanvas = document.getElementById('cutsceneSceneCanvas');
   const biome = slide.biome || null;
-  if(biome && BIOMES[biome]){
+  if(slide.scene && CUTSCENE_BACKGROUNDS[slide.scene]){
+    activeCutsceneBespokeScene = slide.scene;
+    delete ACTIVE_SCENE_CANVASES['cutsceneSceneCanvas'];
+    bgEl.style.background = 'transparent';
+    sceneCanvas.classList.remove('hidden');
+    const sc = sceneCanvas.getContext('2d');
+    CUTSCENE_BACKGROUNDS[slide.scene](sc, bgAnimTick);
+    drawCutsceneHorizonGlow(sc);
+  } else if(biome && BIOMES[biome]){
+    activeCutsceneBespokeScene = null;
     bgEl.style.background = 'transparent';
     sceneCanvas.classList.remove('hidden');
     renderBiomeScene(biome, 'cutsceneSceneCanvas', bgAnimTick);
   } else {
+    activeCutsceneBespokeScene = null;
     sceneCanvas.classList.add('hidden');
     delete ACTIVE_SCENE_CANVASES['cutsceneSceneCanvas'];
     bgEl.style.background = slide.bg;
@@ -2232,7 +2661,13 @@ function renderCutsceneSlide(){
   speakerEl.textContent = slide.speaker || '';
   restartAnim(speakerEl);
 
-  typeText(document.getElementById('cutsceneCaption'), slide.text);
+  const captionEl = document.getElementById('cutsceneCaption');
+  captionEl.style.height = 'auto';
+  captionEl.textContent = slide.text;
+  const neededHeight = Math.max(50, Math.min(captionEl.scrollHeight, window.innerHeight*0.38));
+  captionEl.textContent = '';
+  captionEl.style.height = neededHeight + 'px';
+  typeText(captionEl, slide.text);
 
   const wrap = document.getElementById('cutsceneSpriteWrap');
   wrap.className = 'cutscene-sprite ' + slide.pos;
@@ -2242,13 +2677,62 @@ function renderCutsceneSlide(){
   else drawSprite(canvas.getContext('2d'), slide.sprite || 'hero', THEMES.ember.sprites[slide.sprite] || THEMES.ember.sprites.hero);
 
   const propWrap = document.getElementById('cutscenePropWrap');
+  const propGlow = document.getElementById('cutscenePropGlow');
   if(slide.prop && CUTSCENE_PROPS[slide.prop]){
     const propPos = slide.pos==='left' ? 'right' : 'left';
     propWrap.className = 'cutscene-prop ' + propPos;
     restartAnim(propWrap);
     CUTSCENE_PROPS[slide.prop](document.getElementById('cutscenePropCanvas').getContext('2d'));
+    const glowColor = PROP_GLOW_COLORS[slide.prop];
+    if(glowColor){
+      propGlow.style.setProperty('--prop-glow-color', glowColor);
+      propGlow.classList.add('show');
+    } else {
+      propGlow.classList.remove('show');
+    }
   } else {
     propWrap.className = 'cutscene-prop hidden';
+    propGlow.classList.remove('show');
+  }
+  spawnCutsceneParticles(slide.particles);
+
+  // Camera fx: zoom origin is derived from wherever the subject actually
+  // sits (left/right), never a fixed point -- this is what keeps the
+  // subject centered in frame during a punch-in rather than risking it
+  // being pushed toward an edge. Applied on top of the always-on ambient
+  // camera-drift (a separate wrapper, so the two can never conflict).
+  const scaler = document.getElementById('cutsceneScaler');
+  scaler.style.transform = '';
+  propWrap.classList.remove('rackfocus','propfocus');
+  wrap.classList.remove('emphasis');
+
+  // Origin is derived from each element's actual rendered position, not a
+  // guessed percentage -- the sprite/prop are positioned via flexbox
+  // auto-margins, so a fixed 34%/66% assumption doesn't reliably land on
+  // them across different screen sizes. Measuring the real bounding rect
+  // (before any zoom is applied) is what actually keeps the zoom
+  // converging on the correct element regardless of layout specifics.
+  const sceneRectEl = document.getElementById('cutsceneScene').getBoundingClientRect();
+  function elementOrigin(el){
+    const r = el.getBoundingClientRect();
+    const px = sceneRectEl.width ? ((r.left+r.width/2-sceneRectEl.left)/sceneRectEl.width)*100 : 50;
+    const py = sceneRectEl.height ? ((r.top+r.height/2-sceneRectEl.top)/sceneRectEl.height)*100 : 50;
+    return `${Math.max(0,Math.min(100,px)).toFixed(1)}% ${Math.max(0,Math.min(100,py)).toFixed(1)}%`;
+  }
+  scaler.style.transformOrigin = elementOrigin(wrap);
+
+  if(slide.fx==='punch'){
+    scaler.style.transform = 'scale(1.16)';
+  } else if(slide.fx==='rackfocus'){
+    scaler.style.transform = 'scale(1.14)';
+    propWrap.classList.add('rackfocus');
+    wrap.classList.add('emphasis');
+  } else if(slide.fx==='propfocus'){
+    scaler.style.transformOrigin = elementOrigin(propWrap);
+    scaler.style.transform = 'scale(1.14)';
+    propWrap.classList.add('propfocus');
+  } else if(slide.fx==='burst'){
+    setTimeout(fireCutsceneBurst, 300);
   }
 
   // A handful of story beats are tagged as dramatic turns (invasion,
@@ -2261,7 +2745,39 @@ function renderCutsceneSlide(){
     const flash = document.getElementById('cutsceneFlash');
     flash.classList.remove('pulse'); void flash.offsetWidth; flash.classList.add('pulse');
     playSFX('strikeImpact');
+  } else {
+    // A much softer version of the same flash, timed to the caption
+    // starting to type, so the visuals read as connected to the dialogue
+    // beginning rather than sitting as a separate layer next to it.
+    const flash = document.getElementById('cutsceneFlash');
+    flash.classList.remove('beat-pulse'); void flash.offsetWidth; flash.classList.add('beat-pulse');
   }
+}
+// Quick radiating burst of lines from the scene's focal point -- reserved
+// for the single most climactic non-impact beat in a sequence, not a
+// general-purpose effect. Overusing this would cheapen it.
+let cutsceneBurstHideTimer = null;
+function fireCutsceneBurst(){
+  const svg = document.getElementById('cutsceneBurst');
+  if(!svg) return;
+  if(cutsceneBurstHideTimer) clearTimeout(cutsceneBurstHideTimer);
+  svg.innerHTML = '';
+  const cx=80, cy=42;
+  for(let i=0;i<14;i++){
+    const ang = i*(Math.PI*2/14);
+    const x2 = cx+Math.cos(ang)*70, y2 = cy+Math.sin(ang)*70;
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',cx); line.setAttribute('y1',cy);
+    line.setAttribute('x2',cx); line.setAttribute('y2',cy);
+    svg.appendChild(line);
+    setTimeout(()=>{
+      line.style.transition='all 0.4s ease-out';
+      line.setAttribute('x2',x2); line.setAttribute('y2',y2);
+      line.style.opacity='0';
+    },20);
+  }
+  svg.style.opacity='1';
+  cutsceneBurstHideTimer = setTimeout(()=>{ svg.style.opacity='0'; cutsceneBurstHideTimer=null; }, 500);
 }
 function showCutscene(slides, onComplete){
   currentCutsceneSlides = slides;
@@ -2280,9 +2796,19 @@ function advanceCutscene(){
 function endCutscene(){
   document.getElementById('cutsceneOverlay').classList.remove('show');
   delete ACTIVE_SCENE_CANVASES['cutsceneSceneCanvas'];
+  activeCutsceneBespokeScene = null;
+  const scalerEl = document.getElementById('cutsceneScaler');
+  scalerEl.style.transform = '';
+  scalerEl.style.transformOrigin = '';
   document.getElementById('cutsceneScene').classList.remove('impact');
   document.getElementById('cutsceneFlash').classList.remove('pulse');
-  document.getElementById('cutsceneCaption').textContent = '';
+  if(cutsceneBurstHideTimer){ clearTimeout(cutsceneBurstHideTimer); cutsceneBurstHideTimer=null; }
+  const burstEl = document.getElementById('cutsceneBurst');
+  burstEl.style.opacity = '0';
+  burstEl.innerHTML = '';
+  const captionEl = document.getElementById('cutsceneCaption');
+  captionEl.textContent = '';
+  captionEl.style.height = 'auto';
   document.getElementById('cutsceneSpeaker').textContent = '';
   const cb = cutsceneOnComplete;
   cutsceneOnComplete = null;
@@ -2369,17 +2895,17 @@ function gearBonus(gem){
 // — buying a new one auto-equips it, but owned spells can be re-equipped
 // freely afterward. Level scales damage; color drives the cast portrait effect.
 const MANA_SPELLS = [
-  { id:'spell_mana_base', name:'Ember Bolt',      level:1, damage:20, color:'#ff8a3a', free:true },
-  { id:'spell_mana_1',    name:'Frost Needle',    level:2, damage:28, color:'#5ab8ff', price:15, minIndex:0 },
-  { id:'spell_mana_2',    name:'Thorn Volley',    level:3, damage:34, color:'#5aff8a', price:20, minIndex:7 },
-  { id:'spell_mana_3',    name:'Ember Lance',     level:4, damage:42, color:'#ff4a3a', price:50, minIndex:34 },
-  { id:'spell_mana_4',    name:'Wildfire Bloom',  level:5, damage:50, color:'#c9f04a', price:70, minIndex:45 }
+  { id:'spell_mana_base', name:'Ember Bolt',      level:1, damage:17, color:'#ff8a3a', free:true },
+  { id:'spell_mana_1',    name:'Frost Needle',    level:2, damage:24, color:'#5ab8ff', price:15, minIndex:0 },
+  { id:'spell_mana_2',    name:'Thorn Volley',    level:3, damage:29, color:'#5aff8a', price:20, minIndex:7 },
+  { id:'spell_mana_3',    name:'Ember Lance',     level:4, damage:36, color:'#ff4a3a', price:50, minIndex:34 },
+  { id:'spell_mana_4',    name:'Wildfire Bloom',  level:5, damage:42, color:'#c9f04a', price:70, minIndex:45 }
 ];
 const COMPANION_SPELLS = [
-  { id:'spell_companion_base', name:'Wolf Lunge',      level:1, damage:35, color:'#e8e2d8', free:true },
-  { id:'spell_companion_1',    name:'Howling Charge',  level:2, damage:45, color:'#a8d8ff', price:40, minIndex:15 },
-  { id:'spell_companion_2',    name:'Fang Strike',     level:3, damage:55, color:'#9aa0a6', price:45, minIndex:24 },
-  { id:'spell_companion_3',    name:'Rending Howl',    level:4, damage:65, color:'#c060ff', price:60, minIndex:34 }
+  { id:'spell_companion_base', name:'Wolf Lunge',      level:1, damage:28, color:'#e8e2d8', free:true },
+  { id:'spell_companion_1',    name:'Howling Charge',  level:2, damage:36, color:'#a8d8ff', price:40, minIndex:15 },
+  { id:'spell_companion_2',    name:'Fang Strike',     level:3, damage:44, color:'#9aa0a6', price:45, minIndex:24 },
+  { id:'spell_companion_3',    name:'Rending Howl',    level:4, damage:52, color:'#c060ff', price:60, minIndex:34 }
 ];
 // Treasure-chest-only rewards, found after lock/riddle puzzles — never sold
 // in the shop (renderShop filters storyExclusive out). Four tiers per gear
@@ -2407,16 +2933,16 @@ GEAR_ITEMS.push(
   { id:'gear_offhand_x4', slot:'offhand', gem:'amethyst', name:'Heart of the Eternal Pack',    bonus:6, minIndex:50, storyExclusive:true }
 );
 MANA_SPELLS.push(
-  { id:'spell_mana_x1', name:'Solar Flare',       level:6, damage:46, color:'#fff29a', minIndex:15, storyExclusive:true },
-  { id:'spell_mana_x2', name:'Cataclysm',         level:7, damage:52, color:'#ff3a6a', minIndex:30, storyExclusive:true },
-  { id:'spell_mana_x3', name:'Azure Requiem', level:8, damage:58, color:'#ff8a3a', minIndex:40, storyExclusive:true },
-  { id:'spell_mana_x4', name:'Starfire Cascade',  level:9, damage:64, color:'#8affea', minIndex:50, storyExclusive:true }
+  { id:'spell_mana_x1', name:'Solar Flare',       level:6, damage:39, color:'#fff29a', minIndex:15, storyExclusive:true },
+  { id:'spell_mana_x2', name:'Cataclysm',         level:7, damage:44, color:'#ff3a6a', minIndex:30, storyExclusive:true },
+  { id:'spell_mana_x3', name:'Azure Requiem', level:8, damage:49, color:'#ff8a3a', minIndex:40, storyExclusive:true },
+  { id:'spell_mana_x4', name:'Starfire Cascade',  level:9, damage:54, color:'#8affea', minIndex:50, storyExclusive:true }
 );
 COMPANION_SPELLS.push(
-  { id:'spell_companion_x1', name:"Alpha's Fury",  level:5, damage:58,  color:'#ff5a3a', minIndex:15, storyExclusive:true },
-  { id:'spell_companion_x2', name:'Moonrise Howl', level:6, damage:66,  color:'#c9e8ff', minIndex:30, storyExclusive:true },
-  { id:'spell_companion_x3', name:'Packbound Fury',level:7, damage:74, color:'#e8b8ff', minIndex:40, storyExclusive:true },
-  { id:'spell_companion_x4', name:'The Last Howl', level:8, damage:82, color:'#f0f0f0', minIndex:50, storyExclusive:true }
+  { id:'spell_companion_x1', name:"Alpha's Fury",  level:5, damage:46,  color:'#ff5a3a', minIndex:15, storyExclusive:true },
+  { id:'spell_companion_x2', name:'Moonrise Howl', level:6, damage:53,  color:'#c9e8ff', minIndex:30, storyExclusive:true },
+  { id:'spell_companion_x3', name:'Packbound Fury',level:7, damage:59, color:'#e8b8ff', minIndex:40, storyExclusive:true },
+  { id:'spell_companion_x4', name:'The Last Howl', level:8, damage:66, color:'#f0f0f0', minIndex:50, storyExclusive:true }
 );
 // ---------- procedural shop scaling ----------
 // The hand-authored tiers above are a fixed pool -- eventually exhausted by
@@ -2431,23 +2957,68 @@ COMPANION_SPELLS.push(
 // so buying/equipping/gearBonus/etc. all work on them with zero changes
 // anywhere else in the game.
 const SLOT_GEM = { head:'emerald', armor:'ruby', boots:'sapphire', offhand:'amethyst' };
-const PROCEDURAL_GEAR_NAMES = {
-  head:    ["Masterwork Circlet","Veteran's Coronet","Elder's Diadem","Legendary Crown","Mythic Halo"],
-  armor:   ["Masterwork Plate","Veteran's Cuirass","Elder's Bulwark","Legendary Aegis","Mythic Warplate"],
-  boots:   ["Masterwork Greaves","Veteran's Striders","Elder's Sabatons","Legendary Treads","Mythic Windstep"],
-  offhand: ["Masterwork Talisman","Veteran's Charm","Elder's Relic","Legendary Ward","Mythic Icon"]
+const PROCEDURAL_ADJECTIVES = [
+  "Masterwork","Veteran's","Elder's","Legendary","Mythic",
+  "Storm-Forged","Sunless","Void-Touched","Ember-Wrought","Ancient"
+];
+const PROCEDURAL_GEAR_NOUNS = {
+  head:    ["Circlet","Coronet","Diadem","Crown","Halo","Tiara"],
+  armor:   ["Plate","Cuirass","Bulwark","Aegis","Warplate","Breastplate"],
+  boots:   ["Greaves","Striders","Sabatons","Treads","Windstep","Boots"],
+  offhand: ["Talisman","Charm","Relic","Ward","Icon","Fetish"]
 };
-const PROCEDURAL_SPELL_NAMES = {
-  mana:      ["Arcane Surge","Veteran's Blast","Elder's Fury","Legendary Nova","Mythic Cataclysm"],
-  companion: ["Veteran's Bite","Elder's Roar","Legendary Ferocity","Mythic Onslaught","Primal Fury"]
+const PROCEDURAL_SPELL_ADJECTIVES = [
+  "Arcane","Veteran's","Elder's","Legendary","Mythic",
+  "Storm-Wrought","Void-Born","Ember-Kissed","Ancient","Primal"
+];
+const PROCEDURAL_SPELL_NOUNS = {
+  mana:      ["Surge","Blast","Fury","Nova","Cataclysm","Requiem"],
+  companion: ["Bite","Roar","Ferocity","Onslaught","Fury","Howl"]
 };
+// One-line flavor text specifically for procedural items, since their
+// generated names don't carry the same specificity hand-authored items
+// get from unique naming alone. Deterministic index from tier, same
+// reasoning as the naming system -- reconstruction from a saved ID must
+// stay exact.
+const PROCEDURAL_GEAR_FLAVOR = [
+  "Forged in the last quiet days before the invasion.",
+  "Recovered from a fallen guardian's hoard, still warm with old magic.",
+  "Bears no maker's mark, only the weight of every road it's traveled.",
+  "Its true origin is lost somewhere behind you on the path.",
+  "Carries a strength that has nothing left to prove.",
+  "Marked with symbols no living scholar can read anymore.",
+  "Feels heavier than it should, in a way that isn't unwelcome.",
+  "Something in it remembers being something else, once."
+];
+const PROCEDURAL_SPELL_FLAVOR = [
+  "Learned from watching what the guardians left behind.",
+  "Not taught, exactly -- more like remembered.",
+  "Comes easier now than it should. That should worry you a little.",
+  "Every casting costs something you can't quite name.",
+  "Feels less like a spell and more like an old debt called in.",
+  "You're not entirely sure where you learned this. It works anyway.",
+  "Something ancient recognizes this shape of power.",
+  "It answers to you now. It didn't always."
+];
 function proceduralGearName(slot, bonus){
-  const names = PROCEDURAL_GEAR_NAMES[slot];
-  return names[Math.min(names.length-1, Math.max(0, bonus-7))];
+  const nouns = PROCEDURAL_GEAR_NOUNS[slot];
+  const tier = Math.max(0, bonus-7);
+  const adj = PROCEDURAL_ADJECTIVES[tier % PROCEDURAL_ADJECTIVES.length];
+  const noun = nouns[Math.floor(tier/PROCEDURAL_ADJECTIVES.length) % nouns.length];
+  return `${adj} ${noun}`;
+}
+function proceduralGearFlavor(bonus){
+  return PROCEDURAL_GEAR_FLAVOR[Math.max(0,bonus-7) % PROCEDURAL_GEAR_FLAVOR.length];
 }
 function proceduralSpellName(category, level){
-  const names = PROCEDURAL_SPELL_NAMES[category];
-  return names[Math.min(names.length-1, Math.max(0, level-10))];
+  const nouns = PROCEDURAL_SPELL_NOUNS[category];
+  const tier = Math.max(0, level-10);
+  const adj = PROCEDURAL_SPELL_ADJECTIVES[tier % PROCEDURAL_SPELL_ADJECTIVES.length];
+  const noun = nouns[Math.floor(tier/PROCEDURAL_SPELL_ADJECTIVES.length) % nouns.length];
+  return `${adj} ${noun}`;
+}
+function proceduralSpellFlavor(level){
+  return PROCEDURAL_SPELL_FLAVOR[Math.max(0,level-10) % PROCEDURAL_SPELL_FLAVOR.length];
 }
 // Pure ID -> item reconstruction, no external state needed beyond the name
 // pools above -- this is what lets an already-owned/equipped procedural
@@ -2458,6 +3029,7 @@ function reconstructProceduralGearItem(id){
   if(!m) return null;
   const slot = m[1], bonus = parseInt(m[2],10);
   return { id, slot, gem:SLOT_GEM[slot], bonus, name:proceduralGearName(slot,bonus),
+    flavor: proceduralGearFlavor(bonus),
     price: 25 + bonus*20, minIndex:0, procedural:true };
 }
 // Damage formulas are tuned to continue each spell type's own hand-authored
@@ -2468,8 +3040,9 @@ function reconstructProceduralSpellItem(id){
   const m = /^spell_(mana|companion)_scaled_(\d+)$/.exec(id||'');
   if(!m) return null;
   const category = m[1], level = parseInt(m[2],10);
-  const damage = category==='mana' ? Math.round(10+level*6) : Math.round(18+level*8);
+  const damage = category==='mana' ? Math.round(0+level*6) : Math.round(2+level*8);
   return { id, name:proceduralSpellName(category,level), level, damage,
+    flavor: proceduralSpellFlavor(level),
     price: Math.round(30+damage*1.2), procedural:true };
 }
 // Called on save load for every currently-equipped slot/spell -- if it's a
@@ -2506,10 +3079,12 @@ function ensureProceduralGearStock(slot){
   for(let i=1;i<=needed;i++){
     const id = `gear_${slot}_scaled_${maxKnownBonus+i}`;
     ensureGearItemRegistered(id);
-    // adding a bonus tier that still isn't a real upgrade (shouldn't
-    // happen given maxKnownBonus is always >= currentBonus) would loop
-    // forever below -- bail defensively rather than risk that
-    if(GEAR_ITEMS.find(g=>g.id===id).bonus <= currentBonus) break;
+    const registered = GEAR_ITEMS.find(g=>g.id===id);
+    // Guards against a malformed id or a future change to
+    // ensureGearItemRegistered breaking this invariant silently -- the loop
+    // itself is already bounded by `needed`, so this isn't an infinite-loop
+    // risk, just a safety net against acting on a missing/broken entry.
+    if(!registered || registered.bonus <= currentBonus) break;
   }
 }
 function ensureProceduralSpellStock(category){
@@ -2583,6 +3158,7 @@ const gearHtml = GEAR_ITEMS
         <div>
           <div class="shop-item-name">${item.name} ${gearStatCompareHtml(item)}</div>
           <div class="shop-item-cat">Gear: ${item.slot.toUpperCase()} · ${GEM_LABEL[item.gem]}</div>
+          ${item.flavor ? `<div class="shop-item-flavor">${item.flavor}</div>` : ''}
         </div>
         ${btnHtml}
       </div>`;
@@ -2608,6 +3184,7 @@ const gearHtml = GEAR_ITEMS
         <div>
           <div class="shop-item-name">${item.name} <span class="spell-level">Lv.${item.level}</span></div>
           <div class="shop-item-cat">${label}: ${item.damage} damage</div>
+          ${item.flavor ? `<div class="shop-item-flavor">${item.flavor}</div>` : ''}
         </div>
         ${btnHtml}
       </div>`;
@@ -2765,6 +3342,34 @@ function equipGear(id){
 // rolled. Picking one owns + auto-equips it immediately, same as a shop
 // purchase. Falls back to a small gold bonus on the rare chest opened
 // after every story-exclusive item has already been claimed.
+// Generates a properly-scaled item for a treasure chest when nothing
+// hand-authored is eligible (already owned, or not yet unlocked by
+// minIndex) -- reuses the same procedural stock system the shop uses
+// rather than authoring fixed fallback content, so the generated item is
+// correctly powered for wherever the player currently is. Falls back from
+// gear to spells (or vice versa) if the first category comes up empty,
+// which in practice should be essentially impossible given the stock
+// system always tops up to at least 2 real upgrades when called.
+function generateTreasureFallbackItem(wantGear, excludeIds){
+  if(wantGear){
+    const slot = ['head','armor','boots','offhand'][Math.floor(Math.random()*4)];
+    ensureProceduralGearStock(slot);
+    const equippedId = equippedGear[slot];
+    const equippedItem = equippedId ? GEAR_ITEMS.find(g=>g.id===equippedId) : null;
+    const currentBonus = equippedItem ? equippedItem.bonus : 0;
+    const candidates = GEAR_ITEMS.filter(g=> g.slot===slot && !ownedItems.has(g.id) && g.bonus>currentBonus && !excludeIds.includes(g.id));
+    if(candidates.length) return candidates[Math.floor(Math.random()*candidates.length)];
+    return generateTreasureFallbackItem(false, excludeIds);
+  }
+  const category = Math.random()<0.5 ? 'mana' : 'companion';
+  ensureProceduralSpellStock(category);
+  const arr = category==='mana' ? MANA_SPELLS : COMPANION_SPELLS;
+  const equippedId = category==='mana' ? equippedManaSpell : equippedCompanionSpell;
+  const equippedItem = arr.find(s=>s.id===equippedId);
+  const currentDamage = equippedItem ? equippedItem.damage : 0;
+  const candidates = arr.filter(s=> !ownedItems.has(s.id) && s.damage>currentDamage && !excludeIds.includes(s.id));
+  return candidates.length ? candidates[Math.floor(Math.random()*candidates.length)] : null;
+}
 function pickTreasureOptions(){
   const gearPool = GEAR_ITEMS.filter(g=>g.storyExclusive && !ownedItems.has(g.id) && questIndex >= (g.minIndex||0));
   const spellPool = [...MANA_SPELLS, ...COMPANION_SPELLS].filter(s=>s.storyExclusive && !ownedItems.has(s.id) && questIndex >= (s.minIndex||0));
@@ -2773,8 +3378,8 @@ function pickTreasureOptions(){
     const primary = (wantGear ? gearPool : spellPool).filter(i=>!excludeIds.includes(i.id));
     const fallback = (wantGear ? spellPool : gearPool).filter(i=>!excludeIds.includes(i.id));
     const pool = primary.length ? primary : fallback;
-    if(!pool.length) return null;
-    return pool[Math.floor(Math.random()*pool.length)];
+    if(pool.length) return pool[Math.floor(Math.random()*pool.length)];
+    return generateTreasureFallbackItem(wantGear, excludeIds);
   };
   const first = pickOne([]);
   if(!first) return [];
@@ -2809,22 +3414,29 @@ function treasureChoiceMeta(item){
     iconStyle:`background:radial-gradient(circle at 35% 30%, #fff, ${item.color} 70%); box-shadow:0 0 10px ${item.color};`
   };
 }
+// The window-time/HP/Mana growth is meant to be a guaranteed per-boss
+// reward, not contingent on whether the chest happens to have an item left
+// to give -- called from both the normal item-pick path and the gold-
+// fallback path (pickTreasureOptions() can return empty if everything's
+// already owned or not yet unlocked), so it always fires exactly once per
+// boss defeated regardless of which path the chest actually takes.
+function applyBossChestBonus(){
+  persistentWindowBonus += WINDOW_BONUS_PER_BOSS_MS;
+  const hpGain = treasureIsFinalBossChest ? HP_BONUS_FINAL_BOSS : HP_BONUS_PER_REGULAR_BOSS;
+  const hpOld = persistentPlayerMaxHP, manaOld = persistentPlayerMaxMana;
+  persistentPlayerMaxHP += hpGain;
+  persistentPlayerHP += hpGain;
+  persistentPlayerMaxMana += MANA_BONUS_PER_BOSS;
+  persistentPlayerMana += MANA_BONUS_PER_BOSS;
+  lastBossRewardStats = { hpOld, hpNew: persistentPlayerMaxHP, manaOld, manaNew: persistentPlayerMaxMana };
+}
 function claimTreasureItem(item){
   ownedItems.add(item.id);
   if(item.slot) equippedGear[item.slot] = item.id;
   else if(MANA_SPELLS.includes(item)) equippedManaSpell = item.id;
   else if(COMPANION_SPELLS.includes(item)) equippedCompanionSpell = item.id;
   renderCharacterEquipped();
-  if(treasureIsBossChest){
-    persistentWindowBonus += WINDOW_BONUS_PER_BOSS_MS;
-    const hpGain = treasureIsFinalBossChest ? HP_BONUS_FINAL_BOSS : HP_BONUS_PER_REGULAR_BOSS;
-    const hpOld = persistentPlayerMaxHP, manaOld = persistentPlayerMaxMana;
-    persistentPlayerMaxHP += hpGain;
-    persistentPlayerHP += hpGain;
-    persistentPlayerMaxMana += MANA_BONUS_PER_BOSS;
-    persistentPlayerMana += MANA_BONUS_PER_BOSS;
-    lastBossRewardStats = { hpOld, hpNew: persistentPlayerMaxHP, manaOld, manaNew: persistentPlayerMaxMana };
-  }
+  if(treasureIsBossChest) applyBossChestBonus();
   saveGame();
   updateSpellAura();
 }
@@ -2933,6 +3545,7 @@ document.getElementById('treasureChest').addEventListener('click', ()=>{
     if(options.length===0){
       const bonus = 40;
       totalGold += bonus;
+      if(treasureIsBossChest) applyBossChestBonus();
       subEl.textContent = `Every relic here has already found its way to you. ${bonus} gold instead.`;
       playSFX('chestFallback');
       saveGame();
@@ -3099,6 +3712,32 @@ function spawnComboPopup(combo){
   el.textContent = `${combo}x COMBO${tier.suffix}`;
   boardFxEl.appendChild(el);
   setTimeout(()=>el.remove(), 650);
+}
+// Unified visual/audio cue for any enemy special ability activating -- the
+// ability's name and a short effect summary appear directly on the enemy
+// portrait for about a second, plus a matching border flash and a distinct
+// sound, so it reads as a clearly signaled event at its actual source
+// rather than an unexplained stat change or a popup disconnected from the
+// enemy. Used by both the archetype traits (Desperate, Ambush) and the
+// existing boss traits (heal, damage reduction, counter, enrage, steal),
+// which previously only had a log message with no visual feedback at all.
+function announceEnemyTrait(label, effect, color){
+  const enemyFrame = document.getElementById('enemyFrame');
+  if(enemyFrame){
+    const existing = enemyFrame.querySelector('.trait-portrait-announce');
+    if(existing) existing.remove();
+    const el = document.createElement('div');
+    el.className = 'trait-portrait-announce';
+    el.style.setProperty('--trait-color', color);
+    el.innerHTML = `<div class="trait-portrait-title">${label}</div><div class="trait-portrait-effect">${effect}</div>`;
+    enemyFrame.appendChild(el);
+    setTimeout(()=> el.remove(), 1100);
+    enemyFrame.style.setProperty('--trait-flash-color', color);
+    enemyFrame.classList.remove('trait-flash');
+    void enemyFrame.offsetWidth;
+    enemyFrame.classList.add('trait-flash');
+  }
+  playSFX('enemyTraitActivate');
 }
 function triggerBoardImpact(intensity){
   const boardEl = document.getElementById('board');
@@ -3675,9 +4314,45 @@ const ENEMY_DMG_BY_BIOME = {
   battlefield:{ base:6, range:9 }, forest:{ base:7, range:10 }, lake:{ base:8, range:11 },
   castle:{ base:10, range:13 }, desert:{ base:12, range:15 }, sanctuary:{ base:14, range:18 },
 };
+// Light shared traits per enemy archetype, not per individual enemy --
+// applies to regular (non-boss) enemies only, grouped by their existing
+// variant sprite rather than adding a whole new per-enemy data layer.
+// Sanctuary intentionally has no trait yet -- it's getting rebuilt as a
+// proper level with its own enemies later, no point tuning it twice.
+const ENEMY_ARCHETYPE_TRAITS = {
+  straggler:'desperate', looter:'desperate', bearer:'desperate', cyclops:'desperate', skeletal:'desperate',
+  bandit:'ambush', wraith:'ambush', stalker:'ambush', thornspike:'ambush', twisted:'ambush',
+  drowned:'dragunder', crawler:'dragunder', serpent:'dragunder', longneck:'dragunder',
+  raider:'sunbaked', sandwraith:'sunbaked', handler:'sunbaked', shellback:'sunbaked',
+};
+const ENEMY_DISCIPLINED_VARIANTS = new Set(['guard','assassin','zealot','wingedimp','crownregal']);
+const MIN_WINDOW_DURATION_MS = 2500;
 function enemyAttackDamage(){
   const t = ENEMY_DMG_BY_BIOME[state.biome] || ENEMY_DMG_BY_BIOME.battlefield;
-  return Math.round((t.base + Math.floor(Math.random()*t.range)) * state.bossEnrageMultiplier);
+  let dmg = Math.round((t.base + Math.floor(Math.random()*t.range)) * state.bossEnrageMultiplier);
+  if(!state.isBoss){
+    const trait = ENEMY_ARCHETYPE_TRAITS[enemyVariant];
+    if(trait === 'desperate' && state.enemyHP > 0 && state.enemyHP < state.enemyMaxHP*0.3){
+      dmg = Math.round(dmg * 1.35);
+      addLog(`${state.enemyName}, cornered and desperate, strikes with everything left.`);
+      announceEnemyTrait('DESPERATE!', 'Cornered, hits harder', '#ff6a4a');
+    } else if(trait === 'ambush' && !state.ambushConsumed){
+      state.ambushConsumed = true;
+      dmg = Math.round(dmg * 1.4);
+      addLog(`${state.enemyName} strikes from ambush before you can react.`);
+      announceEnemyTrait('AMBUSH!', 'First strike empowered', '#a563d9');
+    } else if(trait === 'dragunder' && state.windowDuration > MIN_WINDOW_DURATION_MS){
+      state.windowDuration = Math.max(MIN_WINDOW_DURATION_MS, state.windowDuration - 300);
+      addLog(`${state.enemyName} drags at your resolve, the window narrows.`);
+      announceEnemyTrait('DRAG UNDER!', 'Strike window shortened', '#3f86d6');
+    } else if(trait === 'sunbaked' && state.enemyHP > 0 && state.enemyHP < state.enemyMaxHP){
+      const heal = Math.round(state.enemyMaxHP*0.04);
+      state.enemyHP = Math.min(state.enemyMaxHP, state.enemyHP+heal);
+      addLog(`${state.enemyName} draws resilience from the heat. Recovers ${heal} HP.`);
+      announceEnemyTrait('SUNBAKED!', `+${heal} HP restored`, '#f0c060');
+    }
+  }
+  return dmg;
 }
 const LOCK_FLAVOR = {
   battlefield:{ name:'The War Chest', banner:"A dead commander's strongbox, warded shut. Align the gold tumblers to break the seal.", moves:16, progressPerMatch:14 },
@@ -3751,6 +4426,12 @@ let questIndex = 0;
 // Persistent across encounters — banked from state.gold once a battle concludes,
 // not reset by initMode the way state.gold is. Spent at the shop.
 let totalGold = 0;
+// Lightweight run-tracking for the post-game summary screen -- cheap to
+// maintain, no new save-schema needed since these only ever get read once,
+// right at the story's actual ending.
+let runStartTime = 0;
+let totalDamageDealt = 0;
+let totalMatchesMade = 0;
 // Player HP now persists across encounters too, so campfires and the Grotto
 // have something real to restore — battles no longer reset you to full.
 let persistentPlayerHP = 60;
@@ -4011,33 +4692,33 @@ Object.keys(BOSS_LORE).forEach(variant=>{
 // places, since specific lore for the middle biomes is still to come.
 const BIOME_LORE = {
   forest: [
-    { bg:'linear-gradient(180deg, #16281a 0%, #0c160e 100%)', sprite:'hero', pos:'left', prop:'trees',
+    { scene:'forestEntrance', sprite:'hero', pos:'left', prop:'trees', fx:'default',
       text:'The road narrows, then vanishes beneath root and canopy. The forest does not announce itself. It simply closes overhead.' },
-    { bg:'linear-gradient(180deg, #16281a 0%, #0c160e 100%)', sprite:'wolf', pos:'right', prop:'trees',
+    { scene:'forestEntrance', sprite:'wolf', pos:'right', prop:'trees', fx:'rackfocus',
       text:`${getWolfName()} tenses at the treeline. Something in here has been watching the road for longer than either of them.` }
   ],
   lake: [
-    { bg:'linear-gradient(180deg, #0e2a24 0%, #081814 100%)', sprite:'hero', pos:'left',
+    { scene:'lakeStill', sprite:'hero', pos:'left', fx:'default',
       text:'The water opens ahead of them, black and mirror-still, giving nothing away.' },
-    { bg:'linear-gradient(180deg, #0e2a24 0%, #081814 100%)', sprite:'hero', pos:'left',
+    { scene:'lakeStill', sprite:'hero', pos:'left', fx:'punch',
       text:'No birds. No wind on the surface. Whatever lives beneath it has claimed the quiet as its own.' }
   ],
   castle: [
-    { bg:'linear-gradient(180deg, #1e1428 0%, #0e0a18 100%)', sprite:'hero', pos:'left', prop:'debris',
+    { scene:'castleRuins', sprite:'hero', pos:'left', prop:'debris', particles:'dust', fx:'default',
       text:'The keep rises out of the dark, half-ruin and half-throne, still standing out of pure stubbornness.' },
-    { bg:'linear-gradient(180deg, #1e1428 0%, #0e0a18 100%)', sprite:'hero', pos:'left',
+    { scene:'castleRuins', sprite:'hero', pos:'left', particles:'dust', fx:'punch',
       text:'Whatever held this castle once is long gone. Something else answers for it now.' }
   ],
   desert: [
-    { bg:'linear-gradient(180deg, #2a2010 0%, #150f08 100%)', sprite:'hero', pos:'left',
+    { scene:'desertDunes', sprite:'hero', pos:'left', particles:'dust', fx:'default',
       text:'Heat rises off the dunes in visible sheets. There is no shade here, and no cover either.' },
-    { bg:'linear-gradient(180deg, #2a2010 0%, #150f08 100%)', sprite:'wolf', pos:'right',
+    { scene:'desertDunes', sprite:'wolf', pos:'right', particles:'dust', fx:'default',
       text:`${getWolfName()} walks close to her heel, tired but steady. Neither of them is built for this heat. Neither of them has a choice.` }
   ],
   sanctuary: [
-    { bg:'linear-gradient(180deg, #2e2438 0%, #181220 100%)', sprite:'hero', pos:'left', prop:'mountainBloom',
+    { scene:'sanctuaryCliffs', sprite:'hero', pos:'left', prop:'mountainBloom', particles:'light', fx:'propfocus',
       text:"The Borez Cliffs rise ahead at last, and somewhere above them, Mother's Crown. Closer now than at any point in the journey." },
-    { bg:'linear-gradient(180deg, #2e2438 0%, #181220 100%)', sprite:'wolf', pos:'right',
+    { scene:'sanctuaryCliffs', sprite:'wolf', pos:'right', particles:'light', fx:'punch',
       text:`${getWolfName()}'s breathing has grown shallower with every mile. There is no more road left to spend. Only the climb.` }
   ]
 };
@@ -4099,38 +4780,45 @@ const BOSS_TRAITS = {
     state.enemyHP = Math.min(state.enemyMaxHP, state.enemyHP+heal);
     addLog(`${name} closes ranks, a dozen eyes knitting the wound shut. Recovers ${heal} HP!`);
     playSFX('bossCommanderHeal');
+    announceEnemyTrait('REGENERATING!', `+${heal} HP restored`, '#5aff8a');
   }},
   arachnid:{ threshold:0.5, oneTime:true, apply:(name)=>{
     state.bossDamageReduction = 0.3;
     addLog(`${name}'s carapace hardens into living armor. Incoming damage reduced from here on.`);
     playSFX('bossThornlordReduce');
+    announceEnemyTrait('HARDENING!', 'Takes 30% less damage', '#8a90a0');
   }},
   naga:{ threshold:0.5, oneTime:true, apply:(name)=>{
     state.bossExtraCounter = true;
     addLog(`${name} coils tighter, a second strike is coming.`);
     playSFX('bossLeviathanCounter');
+    announceEnemyTrait('COILING!', 'A second strike incoming', '#4aaa8a');
   }},
   tentacled:{ threshold:0.33, oneTime:true, apply:(name)=>{
     state.bossEnrageMultiplier = 1.5;
     addLog(`${name}, cornered, thrashes with reckless fury. Counterattacks hit harder now.`);
     playSFX('bossBanditEnrage');
+    announceEnemyTrait('ENRAGED!', 'Counters hit harder', '#ff3a3a');
   }},
   gianteye:{ threshold:0.5, oneTime:true, apply:(name)=>{
     if(playContext==='bossrush'){
       addLog(`${name} perceives exactly where your gold is kept. There's nothing here to take.`);
       playSFX('bossDuneSteal');
+      announceEnemyTrait('PERCEIVING!', 'Nothing here to take', '#e0a94a');
       return;
     }
     const stolen = Math.min(totalGold, Math.round(totalGold*0.2));
     totalGold -= stolen;
     addLog(`${name} perceives exactly where your gold is kept, and it is simply... gone. Steals ${stolen} gold!`);
     playSFX('bossDuneSteal');
+    announceEnemyTrait('STEALING!', 'Your gold is gone', '#e0a94a');
   }},
   groveheart:{ threshold:0.5, oneTime:false, apply:(name)=>{
     const heal = Math.round(state.enemyMaxHP*0.06);
     state.enemyHP = Math.min(state.enemyMaxHP, state.enemyHP+heal);
     addLog(`${name} draws deep from the grove's roots. Recovers ${heal} HP.`);
     playSFX('bossGroveRegen');
+    announceEnemyTrait('REGENERATING!', `+${heal} HP restored`, '#5aff8a');
   }}
 };
 function checkBossTrait(){
@@ -4628,18 +5316,24 @@ function renderNightStars(){
     container.appendChild(star);
   }
 }
-function drawCampfireFlame(ctx){
+function drawCampfireFlame(ctx, t){
+  t = t || 0;
   ctx.clearRect(0,0,20,24);
   // Logs at the base
   band(ctx,20,3,16,'#3a2818'); band(ctx,21,4,15,'#2a1c10');
+  // Each row's horizontal offset jitters independently via layered sine
+  // waves -- the flame's internal shape genuinely flickers frame to frame
+  // now, rather than being one static silhouette only ever moved as a
+  // rigid whole by the CSS wobble.
+  const jx = (y)=> Math.round(Math.sin(t*0.15+y*0.5)*1.2 + Math.sin(t*0.31+y)*0.6);
   // Flame, tapering from a wide base to a point, warmest at the core
   const OUTER = [[9,9,10],[10,7,12],[11,6,13],[12,6,13],[13,5,14],[14,5,14],[15,4,15],[16,4,15],[17,4,15],[18,4,15],[19,4,15]];
-  OUTER.forEach(([y,x0,x1])=> band(ctx,y,x0,x1,'#8a1a10'));
+  OUTER.forEach(([y,x0,x1])=> band(ctx,y,x0+jx(y),x1+jx(y),'#8a1a10'));
   const MID = [[10,8,11],[11,7,12],[12,7,12],[13,6,13],[14,6,13],[15,6,13],[16,6,13],[17,6,13],[18,6,13]];
-  MID.forEach(([y,x0,x1])=> band(ctx,y,x0,x1,'#e0641a'));
+  MID.forEach(([y,x0,x1])=> band(ctx,y,x0+jx(y),x1+jx(y),'#e0641a'));
   const CORE = [[12,9,10],[13,8,11],[14,8,11],[15,8,11],[16,8,11],[17,8,11]];
-  CORE.forEach(([y,x0,x1])=> band(ctx,y,x0,x1,'#ffcf4a'));
-  band(ctx,14,9,10,'#fff0c0'); band(ctx,15,9,10,'#fff0c0');
+  CORE.forEach(([y,x0,x1])=> band(ctx,y,x0+jx(y),x1+jx(y),'#ffcf4a'));
+  band(ctx,14,9+jx(14),10+jx(14),'#fff0c0'); band(ctx,15,9+jx(15),10+jx(15),'#fff0c0');
 }
 function showCampfireNode(node){
   campfireHealAmt = Math.max(1, Math.round(persistentPlayerMaxHP*0.4));
@@ -4648,6 +5342,7 @@ function showCampfireNode(node){
   drawWolfSprite(document.getElementById('campfireWolfCanvas').getContext('2d'), wolfCoatKey, getWolfCondition());
   drawCampfireFlame(document.getElementById('campfireFlameCanvas').getContext('2d'));
   document.getElementById('campfireGlow').classList.remove('stoked');
+  spawnCampfireEmbers();
   renderNightStars();
   document.getElementById('campfireCaption').textContent = getCampfireCaption(campfireHealAmt);
   document.getElementById('campfireOverlay').classList.add('show');
@@ -4794,6 +5489,7 @@ function resolveBankedStrike(){
   if(dmg>0 && state.bossDamageReduction>0) dmg = Math.round(dmg * (1-state.bossDamageReduction));
   if(dmg>0){
     state.enemyHP = Math.max(0, state.enemyHP-dmg);
+    if(playContext==='story') totalDamageDealt += dmg;
     addLog(`The window closes. Your combined assault deals ${dmg} damage to ${state.enemyName}!`);
     react('player','attack'); react('enemy','hit');
     playSFX('strikeImpact');
@@ -5029,6 +5725,7 @@ async function attemptSwap(r0,c0,r1,c1){
       addLog('The gems resist. No alignment found there.');
       return;
     }
+    if(playContext==='story') totalMatchesMade++;
     if(state.mode==='battle'){
       startWindowIfNeeded();
       const {typeCounts, combo} = await resolveCascadeStatic();
@@ -5100,10 +5797,11 @@ async function resolveBattleCascade(){
     await sleep(220);
     matched.forEach(key=>{ const [r,c]=key.split(',').map(Number); state.grid[r][c]=null; });
 
-    let cdmg = typeCounts.ruby ? typeCounts.ruby*(9+gearBonus('ruby')) : 0;
+    let cdmg = typeCounts.ruby ? typeCounts.ruby*(6+gearBonus('ruby')) : 0;
     if(cdmg>0 && state.bossDamageReduction>0) cdmg = Math.round(cdmg*(1-state.bossDamageReduction));
     if(cdmg>0){
       state.enemyHP = Math.max(0, state.enemyHP-cdmg);
+      if(playContext==='story') totalDamageDealt += cdmg;
       addLog(`The falling gems catch ${state.enemyName} off guard, a cascading match deals ${cdmg} damage!`);
       spawnFloatingNumber(document.getElementById('enemyFrame'), '-'+cdmg, 'dmg');
       checkBossTrait();
@@ -5170,6 +5868,7 @@ async function castManaSpell(){
   let dmg=spell.damage;
   if(state.bossDamageReduction>0) dmg = Math.round(dmg * (1-state.bossDamageReduction));
   state.enemyHP = Math.max(0, state.enemyHP-dmg);
+  if(playContext==='story') totalDamageDealt += dmg;
   addLog(`You cast ${spell.name}: ${dmg} damage!`);
   react('player','attack');
   playSFX('manaCast');
@@ -5211,6 +5910,7 @@ async function castWolfAttack(){
   let dmg=spell.damage;
   if(state.bossDamageReduction>0) dmg = Math.round(dmg * (1-state.bossDamageReduction));
   state.enemyHP = Math.max(0, state.enemyHP-dmg);
+  if(playContext==='story') totalDamageDealt += dmg;
   addLog(`${getWolfName()} unleashes ${spell.name}: ${dmg} damage!`);
   try{
   const wolfBadge = document.getElementById('wolfBadge');
@@ -5450,7 +6150,12 @@ function initMode(mode, node){
   state.biome = node ? node.biome : currentBiome;
   state.bossVariant = node ? node.variant : null;
   state.bossTraitFired = false;
+  state.ambushConsumed = false;
   state.bossDamageReduction = 0;
+  if(!state.isBoss && ENEMY_DISCIPLINED_VARIANTS.has(enemyVariant)){
+    state.bossDamageReduction = 0.15;
+    setTimeout(()=> announceEnemyTrait('DISCIPLINED!', 'Takes 15% less damage', '#8a90a0'), 600);
+  }
   state.bossEnrageMultiplier = 1;
   if(mode === 'battle' && !state.isBoss){
     const options = BATTLE_MUSIC_VARIANTS.filter(k=>k!==currentBattleVariant);
@@ -5555,9 +6260,11 @@ document.getElementById('modalBtn').addEventListener('click', ()=>{
       storyLivesRemaining = Math.max(0, storyLivesRemaining - 1);
       updateStoryLivesDisplay();
       saveGame();
+      playSFX('lifeLost');
       if(storyLivesRemaining <= 0){
         triggerStoryGameOver();
       } else {
+        playMusic('retry_prompt');
         const livesWord = storyLivesRemaining === 1 ? 'life' : 'lives';
         showRetryPrompt(`Try again? ${storyLivesRemaining} ${livesWord} remaining.`, retryStoryNode, triggerStoryGameOver);
       }
@@ -6340,6 +7047,23 @@ const MUSIC_TRACKS = {
       ], wave:'triangle', vol:0.18, gate:0.95 },
     ],
   },
+  // A tense, looping sting for the "try again?" decision point specifically
+  // -- distinct from the one-shot gameover jingle, since the player may
+  // sit on this prompt for a moment weighing whether to retry or give up,
+  // and needs something that can loop comfortably rather than a fanfare.
+  retry_prompt: {
+    bpm: 100,
+    voices: [
+      { sequence: [
+        ['D4',1],[null,1],['C4',1],[null,1],
+        ['D4',1],[null,1],['Bb3',1],[null,1],
+      ], wave:'triangle', vol:0.18, gate:0.6 },
+      { sequence: [
+        ['D2',4],['Bb1',4],
+      ], wave:'triangle', vol:0.2, gate:0.95 },
+      { sequence: Array(8).fill(0).flatMap(()=>[['D2',0.3],[null,0.7]]), wave:'square', vol:0.14, duty:0.3, gate:0.4 },
+    ],
+  },
 };
 
 const SFX_RECIPES = {
@@ -6390,6 +7114,8 @@ const SFX_RECIPES = {
   bossBanditEnrage: (ctx,out)=> sweepFat(ctx,out,ctx.currentTime,200,500,0.25,{wave:'square',vol:0.3}),
   bossDuneSteal: (ctx,out)=> notesSeq(ctx,out,[NOTE.E6,NOTE.C6,NOTE.A5],0.05,{wave:'triangle',vol:0.24,fat:false}),
   bossGroveRegen: (ctx,out)=> notesSeq(ctx,out,[NOTE.G5,NOTE.C6,NOTE.G5],0.09,{wave:'sine',vol:0.2,fat:false}),
+  enemyTraitActivate: (ctx,out)=>{ sweepFat(ctx,out,ctx.currentTime,180,420,0.3,{wave:'sawtooth',vol:0.22}); crunchNoise(ctx,out,ctx.currentTime+0.05,0.15,{vol:0.15,lo:200,hi:2000,decay:10}); },
+  lifeLost: (ctx,out)=>{ const t=ctx.currentTime; sweepFat(ctx,out,t,300,80,0.5,{wave:'triangle',vol:0.26}); thump(ctx,out,t+0.1,0.3,{vol:0.3,f0:120,f1:40}); },
 
   // Lock puzzle — mechanical: metal clicks and tumbler/bolt sounds, not tones
   lockTick: (ctx,out)=> metalClick(ctx,out,ctx.currentTime,{vol:0.34,ringFreq:2100,dur:0.09}),
@@ -6561,7 +7287,8 @@ function saveGame(){
     persistentWindowBonus, storyLivesRemaining,
     totalGold, ownedItems: Array.from(ownedItems),
     equippedGear, equippedManaSpell, equippedCompanionSpell,
-    hasSeenIntroCutscene, hasSeenLivesExplanation, skipPuzzleIntro
+    hasSeenIntroCutscene, hasSeenLivesExplanation, skipPuzzleIntro,
+    seenBossLore, seenBiomeIntro
   };
   const payload = JSON.stringify(save);
   function attempt(){
@@ -6611,6 +7338,8 @@ function applySavedGame(save){
   hasSeenIntroCutscene = save.hasSeenIntroCutscene;
   hasSeenLivesExplanation = !!save.hasSeenLivesExplanation;
   Object.assign(skipPuzzleIntro, save.skipPuzzleIntro||{});
+  Object.assign(seenBossLore, save.seenBossLore||{});
+  Object.assign(seenBiomeIntro, save.seenBiomeIntro||{});
   currentBiome = save.currentBiome;
 }
 function updateContinueButtonVisibility(){
@@ -6775,7 +7504,7 @@ function showBossRewardConfirmation(text, hpOld, hpNew, manaOld, manaNew, onDism
   }
   yesBtn.addEventListener('click', onClick, { once:true });
 }
-function showConfirm(text, onYes){
+function showConfirm(text, onYes, onNo){
   document.getElementById('confirmText').textContent = text;
   document.getElementById('confirmOverlay').classList.add('show');
   const yesBtn = document.getElementById('confirmYesBtn');
@@ -6788,6 +7517,7 @@ function showConfirm(text, onYes){
   function onNoClick(){
     document.getElementById('confirmOverlay').classList.remove('show');
     yesBtn.removeEventListener('click', onYesClick);
+    if(onNo) onNo();
   }
   yesBtn.addEventListener('click', onYesClick, { once:true });
   noBtn.addEventListener('click', onNoClick, { once:true });
@@ -6809,7 +7539,12 @@ function showRetryPrompt(text, onRetry, onGiveUp){
   function onGiveUpClick(){
     document.getElementById('retryOverlay').classList.remove('show');
     yesBtn.removeEventListener('click', onRetryClick);
-    showConfirm('Give up for good? Your progress will be lost and you\'ll return to the main menu. This can\'t be undone.', onGiveUp);
+    showConfirm('Give up for good? Your progress will be lost and you\'ll return to the main menu. This can\'t be undone.', onGiveUp, ()=>{
+      playMusic('retry_prompt');
+      document.getElementById('retryOverlay').classList.add('show');
+      yesBtn.addEventListener('click', onRetryClick, { once:true });
+      noBtn.addEventListener('click', onGiveUpClick, { once:true });
+    });
   }
   yesBtn.addEventListener('click', onRetryClick, { once:true });
   noBtn.addEventListener('click', onGiveUpClick, { once:true });
@@ -6860,6 +7595,9 @@ function startFreshStory(){
   Object.keys(skipPuzzleIntro).forEach(k=> skipPuzzleIntro[k]=false);
   currentBiome = 'battlefield';
   hasSeenIntroCutscene = true;
+  runStartTime = Date.now();
+  totalDamageDealt = 0;
+  totalMatchesMade = 0;
   playContext = 'story';
   showScreen('game');
   showCutscene(cutsceneSlides(), ()=>{
