@@ -385,6 +385,8 @@
   #campfireWolfWrap{ cursor:pointer; }
   #campfireWolfWrap.petted{ animation: wolfPetHappy 0.6s ease; }
   @keyframes wolfPetHappy{ 0%,100%{ transform:translateY(0) rotate(0deg); } 25%{ transform:translateY(-4px) rotate(-3deg); } 50%{ transform:translateY(0) rotate(3deg); } 75%{ transform:translateY(-2px) rotate(-2deg); } }
+  #campfireWolfWrap.excited{ animation: wolfExcitedSpin 0.9s ease; }
+  @keyframes wolfExcitedSpin{ 0%{ transform:rotate(0deg) scale(1); } 20%{ transform:rotate(-20deg) scale(1.2); } 100%{ transform:rotate(340deg) scale(1); } }
   .pet-heart-layer{ position:absolute; inset:0; pointer-events:none; z-index:6; overflow:hidden; }
   .pet-heart{ position:absolute; bottom:0; font-size:12px; opacity:0; animation: petHeartRise 1.4s ease-out forwards; }
   @keyframes petHeartRise{ 0%{ transform:translateY(0) scale(0.6); opacity:0; } 20%{ opacity:0.95; } 100%{ transform:translateY(-60px) scale(1.15); opacity:0; } }
@@ -571,6 +573,12 @@
   .menu-btn:active{ transform:translate(1px,1px); box-shadow:2px 2px 0 rgba(0,0,0,0.4); }
   .screen-heading{ font-family:'Press Start 2P',monospace; font-size:clamp(13px,3vw,20px); color:var(--gold); text-align:center; }
   .screen-note{ font-family:'Silkscreen',monospace; color:var(--textDim); font-size:clamp(10px,2vw,13px); text-align:center; max-width:min(85vw,440px); line-height:1.5; }
+  .codex-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; width:100%; max-width:720px; overflow-y:auto; padding:4px; }
+  .codex-card{ background:var(--panel); border:2px solid var(--panelBorder); border-radius:6px; padding:10px; display:flex; flex-direction:column; gap:5px; min-height:80px; }
+  .codex-card.locked{ opacity:0.45; align-items:center; justify-content:center; text-align:center; }
+  .codex-card-name{ font-family:'Press Start 2P',monospace; font-size:9px; color:var(--text); line-height:1.4; display:flex; align-items:center; gap:6px; }
+  .codex-card-flavor{ font-family:'Silkscreen',monospace; font-style:italic; font-size:10px; color:var(--textDim); line-height:1.4; }
+  .codex-card-swatch{ display:inline-block; width:8px; height:8px; border-radius:50%; flex-shrink:0; box-shadow:0 0 0 1.5px rgba(0,0,0,0.6); }
   .back-btn{ font-family:'Press Start 2P',monospace; font-size:11px; padding:10px 16px; background:var(--panel); border:2px solid var(--panelBorder); color:var(--textDim); cursor:pointer; }
   .back-btn:hover{ color:var(--gold); border-color:var(--gold); }
   .back-btn.corner{ position:absolute; top:calc(6px + env(safe-area-inset-top)); left:10px; font-size:8px; padding:6px 9px; z-index:20; opacity:0.85; }
@@ -602,7 +610,9 @@
   .wolf-name-input:focus{ outline:none; border-color:var(--gold); }
   .companion-ability-slot{ flex:1; min-width:0; aspect-ratio:auto; font-size:6px; padding:4px 3px; line-height:1.3; }
   .coat-swatches{ display:flex; gap:6px; }
-  .coat-swatch{ width:20px; height:20px; border-radius:50%; border:2px solid #000; cursor:pointer; flex-shrink:0; }
+  .coat-swatch{ width:20px; height:20px; border-radius:50%; border:2px solid #000; cursor:pointer; flex-shrink:0; position:relative; }
+  .coat-swatch.locked{ filter:grayscale(0.7) brightness(0.5); cursor:not-allowed; }
+  .coat-lock-icon{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:10px; }
   .coat-swatch.active{ box-shadow:0 0 0 2px var(--gold); }
 
   .shop-backdrop{ position:absolute; inset:0; width:100%; height:100%; z-index:-1; image-rendering:pixelated; opacity:0.85; }
@@ -694,6 +704,7 @@
       <button class="menu-btn" id="menuModesBtn">MODES</button>
       <button class="menu-btn" id="menuCharacterBtn">CHARACTER</button>
       <button class="menu-btn" id="menuShopBtn">SHOP</button>
+      <button class="menu-btn" id="menuCodexBtn">CODEX</button>
       <button class="menu-btn" id="menuOptionsBtn">OPTIONS</button>
     </div>
   </div>
@@ -706,6 +717,13 @@
       <button class="menu-btn" id="modesEndlessBtn">ENDLESS</button>
       <button class="menu-btn" id="modesBossRushBtn">BOSS RUSH</button>
     </div>
+    <button class="back-btn" data-back="menu">&larr; BACK</button>
+  </div>
+
+  <div class="screen hidden" id="codexScreen">
+    <div class="screen-heading">CODEX</div>
+    <div class="screen-note" id="codexProgress">0 / 0 discovered</div>
+    <div class="codex-grid" id="codexGrid"></div>
     <button class="back-btn" data-back="menu">&larr; BACK</button>
   </div>
 
@@ -994,6 +1012,7 @@
       <button class="back-btn" data-difficulty="easy" style="width:100%;">EASY: a gentler road</button>
       <button class="back-btn" data-difficulty="medium" style="width:100%;">MEDIUM: the road as written</button>
       <button class="back-btn" data-difficulty="hard" style="width:100%;">HARD: no mercy</button>
+      <button class="back-btn hidden" id="legendDifficultyBtn" data-difficulty="legend" style="width:100%;">LEGEND: you asked for this</button>
     </div>
   </div>
 </div>
@@ -1164,6 +1183,35 @@ let bgAnimTimer = null;
 function isVisible(el){
   return !!el && el.offsetParent !== null;
 }
+// Blinking, scoped to the campfire (hero + wolf) and the player's own
+// battle portrait, since those are the contexts where a player actually
+// looks at a face long enough for it to matter. An irregular interval
+// (not a fixed tick) reads more natural than blinking on a metronome.
+let blinking = false;
+function scheduleBlink(){
+  const delay = 2800 + Math.random()*3200;
+  setTimeout(()=>{
+    blinking = true;
+    redrawBlinkTargets();
+    setTimeout(()=>{
+      blinking = false;
+      redrawBlinkTargets();
+      scheduleBlink();
+    }, 120);
+  }, delay);
+}
+function redrawBlinkTargets(){
+  const campfireHero = document.getElementById('campfireHeroCanvas');
+  if(campfireHero && isVisible(campfireHero)) drawSprite(campfireHero.getContext('2d'), 'hero', THEMES.ember.sprites.hero, blinking);
+  const campfireWolf = document.getElementById('campfireWolfCanvas');
+  if(campfireWolf && isVisible(campfireWolf)) drawWolfSprite(campfireWolf.getContext('2d'), wolfCoatKey, getWolfCondition(), false, blinking);
+  const playerCanvas = document.getElementById('playerCanvas');
+  if(playerCanvas && isVisible(playerCanvas) && playerVariant==='hero'){
+    const themeSprites = THEMES[currentTheme].sprites;
+    drawSprite(playerCanvas.getContext('2d'), 'hero', themeSprites.hero || THEMES.ember.sprites.hero, blinking);
+  }
+}
+scheduleBlink();
 function startBgAnimLoop(){
   if(bgAnimTimer) return;
   bgAnimTimer = setInterval(()=>{
@@ -1585,14 +1633,14 @@ function drawBase(ctx, outer, pal){
 // character in the game shares this silhouette.
 const REGAL_SHAPE = [[5,8,11],[6,7,12],[7,7,12],[8,7,12],[9,8,11],[10,8,11],[11,6,13],[12,5,14],
   [13,5,14],[14,5,14],[15,5,14],[16,5,14],[17,4,15],[18,3,16],[19,3,16],[20,3,16],[21,3,16],[22,3,16],[23,3,16]];
-function drawHero(ctx, pal){
+function drawHero(ctx, pal, blinking=false){
   drawBase(ctx, REGAL_SHAPE, pal);
   // Locs, not a hood point
   band(ctx,4,7,12,pal.outline); band(ctx,4,7,12,pal.hoodShadow);
   [7,9,11].forEach(x=>{ for(let y=5;y<10;y++) band(ctx,y,x,x,pal.hoodShadow); });
   // Face
   band(ctx,7,8,11,pal.skin); band(ctx,8,8,11,pal.skin);
-  band(ctx,7,9,9,pal.eye); band(ctx,7,10,10,pal.eye);
+  band(ctx,7,9,9,blinking?pal.skin:pal.eye); band(ctx,7,10,10,blinking?pal.skin:pal.eye);
   band(ctx,9,8,11,pal.cloakShadow);
   // High ceremonial collar
   band(ctx,6,6,13,pal.accent);
@@ -1827,7 +1875,7 @@ function drawDuneTyrant(ctx, pal){
 // actually read, following the same widen-with-height logic as HUMANOID and
 // friends, just generated at a larger scale with a distinct "knees drawn up"
 // flare partway down instead of one continuous taper.
-function drawWolf(ctx, pal, condition='wounded', earTwitch=false){
+function drawWolf(ctx, pal, condition='wounded', earTwitch=false, blinking=false){
   drawBase(ctx, MONSTROUS, pal);
   // pointed ears, slightly bolder tips for more presence -- earTwitch folds
   // the right ear down a row for one brief redraw, a quick idle flick
@@ -1847,7 +1895,7 @@ function drawWolf(ctx, pal, condition='wounded', earTwitch=false){
   band(ctx,10,8,11,pal.skin);
   band(ctx,11,7,12,pal.skin); band(ctx,12,7,12,pal.skin); band(ctx,13,7,12,pal.skin); band(ctx,14,8,11,pal.skin);
   // eyes and nose
-  band(ctx,9,7,7,pal.eye); band(ctx,9,12,12,pal.eye);
+  band(ctx,9,7,7,blinking?pal.hoodShadow:pal.eye); band(ctx,9,12,12,blinking?pal.hoodShadow:pal.eye);
   band(ctx,14,9,10,pal.accent);
   // wound marker on the flank — grows more severe as the journey wears on
   if(condition==='wounded'){
@@ -2054,7 +2102,7 @@ function preloadSpriteImages(){
 }
 // Drop-in replacement for calling DRAWERS[key] directly — use this everywhere
 // a sprite gets drawn, so real art is picked up automatically once present.
-function drawSprite(ctx, key, pal){
+function drawSprite(ctx, key, pal, blinking=false){
   const img = spriteImages[key];
   if(img){
     ctx.clearRect(0,0,20,24);
@@ -2063,11 +2111,11 @@ function drawSprite(ctx, key, pal){
     return;
   }
   const fn = DRAWERS[key];
-  if(fn) fn(ctx, pal);
+  if(fn) fn(ctx, pal, blinking);
 }
 // The wolf needs its own dispatcher since its image key depends on BOTH
 // coat and wound condition, not just a single DRAWERS slot name.
-function drawWolfSprite(ctx, coatKey, condition, earTwitch=false){
+function drawWolfSprite(ctx, coatKey, condition, earTwitch=false, blinking=false){
   const img = spriteImages['wolf_'+coatKey+'_'+condition];
   if(img){
     ctx.clearRect(0,0,20,24);
@@ -2075,7 +2123,7 @@ function drawWolfSprite(ctx, coatKey, condition, earTwitch=false){
     ctx.drawImage(img, 0, 0, 20, 24);
     return;
   }
-  DRAWERS.wolf(ctx, WOLF_COATS[coatKey] ? { ...THEMES.ember.sprites.wolf, ...WOLF_COATS[coatKey] } : THEMES.ember.sprites.wolf, condition, earTwitch);
+  DRAWERS.wolf(ctx, WOLF_COATS[coatKey] ? { ...THEMES.ember.sprites.wolf, ...WOLF_COATS[coatKey] } : THEMES.ember.sprites.wolf, condition, earTwitch, blinking);
 }
 let enemyVariant = 'bandit';
 
@@ -2083,6 +2131,15 @@ let enemyVariant = 'bandit';
 const WOLF_NAME_LIMIT = 10;
 let wolfName = '';
 let wolfCoatKey = 'white';
+// Lifetime flag, not tied to any single save -- survives starting a brand
+// new story. This is what New Game+ content (the exclusive coat, the
+// Legend difficulty tier) unlocks against, loaded once at boot.
+let hasCompletedStory = false;
+try{ hasCompletedStory = localStorage.getItem('talesofazure_completed_v1') === 'true'; }catch(e){ /* best effort */ }
+function markStoryCompleted(){
+  hasCompletedStory = true;
+  try{ localStorage.setItem('talesofazure_completed_v1', 'true'); }catch(e){ /* best effort */ }
+}
 const WOLF_COATS = {
   white: { label:'White', hoodMain:'#e8e2d8', hoodShadow:'#b8b0a0', cloakMain:'#d8d0c0', cloakShadow:'#a89e88' },
   grey:  { label:'Grey',  hoodMain:'#9aa0a8', hoodShadow:'#6a7078', cloakMain:'#8a9098', cloakShadow:'#5a6068' },
@@ -2090,7 +2147,8 @@ const WOLF_COATS = {
   brown: { label:'Brown', hoodMain:'#8a6a4a', hoodShadow:'#5c4530', cloakMain:'#7a5a3e', cloakShadow:'#4a3624' },
   red:   { label:'Red',   hoodMain:'#b8623a', hoodShadow:'#7a3f22', cloakMain:'#a8522e', cloakShadow:'#6a3318' },
   ember: { label:'Ember', hoodMain:'#d9822e', hoodShadow:'#a35e1a', cloakMain:'#c97426', cloakShadow:'#8a4f16' },
-  frost: { label:'Frost', hoodMain:'#c5e0ea', hoodShadow:'#8fb8c9', cloakMain:'#a8d0dd', cloakShadow:'#7aa8b8' }
+  frost: { label:'Frost', hoodMain:'#c5e0ea', hoodShadow:'#8fb8c9', cloakMain:'#a8d0dd', cloakShadow:'#7aa8b8' },
+  bloomtouched: { label:'Bloomtouched', hoodMain:'#e8d0ff', hoodShadow:'#b894e0', cloakMain:'#d8b8f5', cloakShadow:'#a578d0', locked:true }
 };
 preloadSpriteImages();
 function getWolfName(){
@@ -2232,6 +2290,7 @@ function showRunSummary(onDone){
   }, { once:true });
 }
 function showEnding(){
+  markStoryCompleted();
   try{ localStorage.removeItem(SAVE_KEY); } catch(e){ /* best effort */ }
   playMusic('campfire');
   showCutscene(epilogueSlides(), ()=>{
@@ -2863,11 +2922,15 @@ document.getElementById('cutsceneSkipBtn').addEventListener('click', ()=>{ playS
 function renderCoatSwatches(){
   const el = document.getElementById('coatSwatches');
   if(!el) return;
-  el.innerHTML = Object.entries(WOLF_COATS).map(([key,coat])=>
-    `<div class="coat-swatch ${key===wolfCoatKey?'active':''}" data-coat="${key}" title="${coat.label}" style="background:${coat.hoodMain}"></div>`
-  ).join('');
+  el.innerHTML = Object.entries(WOLF_COATS).map(([key,coat])=>{
+    const isLocked = coat.locked && !hasCompletedStory;
+    const title = isLocked ? `${coat.label} (complete the story to unlock)` : coat.label;
+    return `<div class="coat-swatch ${key===wolfCoatKey?'active':''} ${isLocked?'locked':''}" data-coat="${key}" title="${title}" style="background:${coat.hoodMain}">${isLocked?'<span class="coat-lock-icon">&#128274;</span>':''}</div>`;
+  }).join('');
   el.querySelectorAll('.coat-swatch').forEach(sw=>{
     sw.addEventListener('click', ()=>{
+      const coat = WOLF_COATS[sw.dataset.coat];
+      if(coat.locked && !hasCompletedStory) { playSFX('lockFail'); return; }
       playSFX('wolfCoatSelect');
       wolfCoatKey = sw.dataset.coat;
       renderCoatSwatches();
@@ -3031,7 +3094,15 @@ const PROCEDURAL_GEAR_FLAVOR = [
   "Carries a strength that has nothing left to prove.",
   "Marked with symbols no living scholar can read anymore.",
   "Feels heavier than it should, in a way that isn't unwelcome.",
-  "Something in it remembers being something else, once."
+  "Something in it remembers being something else, once.",
+  "Traded for something the previous owner never named.",
+  "Still smells faintly of a fire that went out long ago.",
+  "Worn smooth in places that suggest years, not miles.",
+  "Doesn't match anything else you own, and never quite settles in.",
+  "Was clearly made for someone taller. It works anyway.",
+  "Hums, very faintly, when the wind picks up.",
+  "Older than the road it was found on.",
+  "Feels borrowed, even though no one's asked for it back."
 ];
 const PROCEDURAL_SPELL_FLAVOR = [
   "Learned from watching what the guardians left behind.",
@@ -3041,7 +3112,15 @@ const PROCEDURAL_SPELL_FLAVOR = [
   "Feels less like a spell and more like an old debt called in.",
   "You're not entirely sure where you learned this. It works anyway.",
   "Something ancient recognizes this shape of power.",
-  "It answers to you now. It didn't always."
+  "It answers to you now. It didn't always.",
+  "Leaves a taste like static long after it's cast.",
+  "Doesn't feel like yours yet. Getting there.",
+  "Borrowed from something that isn't using it anymore.",
+  "Quieter than it should be, for what it does.",
+  "Took longer to learn than you'd admit to anyone.",
+  "Works better when you don't think too hard about how.",
+  "Answers faster each time. That's not always a comfort.",
+  "Feels like it's been waiting for you specifically."
 ];
 function proceduralGearName(slot, bonus){
   const nouns = PROCEDURAL_GEAR_NOUNS[slot];
@@ -3050,8 +3129,13 @@ function proceduralGearName(slot, bonus){
   const noun = nouns[Math.floor(tier/PROCEDURAL_ADJECTIVES.length) % nouns.length];
   return `${adj} ${noun}`;
 }
-function proceduralGearFlavor(bonus){
-  return PROCEDURAL_GEAR_FLAVOR[Math.max(0,bonus-7) % PROCEDURAL_GEAR_FLAVOR.length];
+// Each slot gets its own fixed offset into the pool, so two items at the
+// same tier in different slots land on different flavor entries instead
+// of showing identical text -- previously the index only used the tier.
+const GEAR_FLAVOR_SLOT_OFFSET = { head:0, armor:4, boots:8, offhand:12 };
+function proceduralGearFlavor(slot, bonus){
+  const offset = GEAR_FLAVOR_SLOT_OFFSET[slot] || 0;
+  return PROCEDURAL_GEAR_FLAVOR[(Math.max(0,bonus-7) + offset) % PROCEDURAL_GEAR_FLAVOR.length];
 }
 function proceduralSpellName(category, level){
   const nouns = PROCEDURAL_SPELL_NOUNS[category];
@@ -3060,8 +3144,10 @@ function proceduralSpellName(category, level){
   const noun = nouns[Math.floor(tier/PROCEDURAL_SPELL_ADJECTIVES.length) % nouns.length];
   return `${adj} ${noun}`;
 }
-function proceduralSpellFlavor(level){
-  return PROCEDURAL_SPELL_FLAVOR[Math.max(0,level-10) % PROCEDURAL_SPELL_FLAVOR.length];
+const SPELL_FLAVOR_CATEGORY_OFFSET = { mana:0, companion:8 };
+function proceduralSpellFlavor(category, level){
+  const offset = SPELL_FLAVOR_CATEGORY_OFFSET[category] || 0;
+  return PROCEDURAL_SPELL_FLAVOR[(Math.max(0,level-10) + offset) % PROCEDURAL_SPELL_FLAVOR.length];
 }
 // Pure ID -> item reconstruction, no external state needed beyond the name
 // pools above -- this is what lets an already-owned/equipped procedural
@@ -3072,7 +3158,7 @@ function reconstructProceduralGearItem(id){
   if(!m) return null;
   const slot = m[1], bonus = parseInt(m[2],10);
   return { id, slot, gem:SLOT_GEM[slot], bonus, name:proceduralGearName(slot,bonus),
-    flavor: proceduralGearFlavor(bonus),
+    flavor: proceduralGearFlavor(slot, bonus),
     price: 25 + bonus*20, minLevel:0, procedural:true };
 }
 // Damage formulas are tuned to continue each spell type's own hand-authored
@@ -3089,7 +3175,7 @@ function reconstructProceduralSpellItem(id){
   const base = category==='mana' ? 17 : 25, step = category==='mana' ? 6 : 8;
   const tier = Math.max(0, Math.round((damage-base)/step));
   return { id, name:proceduralSpellName(category,10+tier), level:10+tier, damage,
-    flavor: proceduralSpellFlavor(10+tier),
+    flavor: proceduralSpellFlavor(category, 10+tier),
     price: Math.round(30+damage*1.2), procedural:true };
 }
 // Called on save load for every currently-equipped slot/spell -- if it's a
@@ -3159,6 +3245,16 @@ const KEEPER_LINES = [
   "\"Ah, a traveler! Gold's no good buried in a pocket. Let's see what I've got.\"",
   "\"Everything here's honest goods. Mostly. Don't ask about the buckler.\"",
   "\"Spend it while you're breathing, I always say. Rare comfort, this line of work.\""
+];
+const KEEPER_PURCHASE_LINES = [
+  "\"Pleasure doing business. Try not to die in it.\"",
+  "\"Excellent choice. I definitely didn't just make that up.\"",
+  "\"No refunds. Especially not after it's covered in... whatever that ends up being covered in.\"",
+  "\"That'll toughen you up. Or it won't. We'll see!\"",
+  "\"I've been told that one's cursed. Probably fine.\"",
+  "\"A wise purchase. Or a desperate one. Same thing, really.\"",
+  "\"Don't thank me. Thank whoever I acquired it from.\"",
+  "\"That's the good stuff. Well, better stuff. Stuff, at least.\""
 ];
 function renderShop(){
   renderShopBackdrop(bgAnimTick);
@@ -3345,6 +3441,8 @@ function buyItem(id, btnEl){
   playSFX('purchase');
   totalGold -= item.price;
   ownedItems.add(id);
+  const keeperEl = document.getElementById('keeperDialogue');
+  if(keeperEl) typeText(keeperEl, KEEPER_PURCHASE_LINES[Math.floor(Math.random()*KEEPER_PURCHASE_LINES.length)]);
   if(item.slot){
     equippedGear[item.slot] = id;
   } else if(MANA_SPELLS.includes(item)){
@@ -3762,6 +3860,16 @@ function spawnComboPopup(combo){
   el.textContent = `${combo}x COMBO${tier.suffix}`;
   boardFxEl.appendChild(el);
   setTimeout(()=>el.remove(), 650);
+}
+function spawnPerfectTimingPopup(){
+  if(!boardFxEl) return;
+  const el = document.createElement('div');
+  el.className = 'combo-popup perfect-timing-popup';
+  el.style.fontSize = 'clamp(20px,6vw,32px)';
+  el.style.color = '#ffe066';
+  el.textContent = 'PERFECT!';
+  boardFxEl.appendChild(el);
+  setTimeout(()=>el.remove(), 700);
 }
 // Unified visual/audio cue for any enemy special ability activating -- the
 // ability's name and a short effect summary appear directly on the enemy
@@ -4498,7 +4606,7 @@ let playerLevel = 1;
 // careful specific tuning this session and multiplying the ways a
 // difficulty setting could interact with them risks undoing that work.
 let difficulty = 'medium';
-const DIFFICULTY_MULT = { easy:0.8, medium:1.0, hard:1.25 };
+const DIFFICULTY_MULT = { easy:0.8, medium:1.0, hard:1.25, legend:1.6 };
 function enemyDifficultyPoints(maxHP, isBoss){
   return Math.round(maxHP/15) * (isBoss ? 2 : 1);
 }
@@ -4906,6 +5014,31 @@ const BOSS_TRAITS = {
     announceEnemyTrait('REGENERATING!', `+${heal} HP restored`, '#5aff8a');
   }}
 };
+// Pure narrative flavor, no mechanical effect -- keeps bosses feeling like
+// a character in the fight itself, not just at the opening banner. Kept
+// deliberately separate from BOSS_TRAITS, which has real gameplay impact.
+const BOSS_TAUNTS = {
+  manyeyed: { 0.5:"A hundred eyes, and not one of them blinks.", 0.2:"Even scattered, we are still watching." },
+  arachnid: { 0.5:"You've torn the web. It will mend.", 0.2:"Every thread you cut, I have spun a hundred more." },
+  naga: { 0.5:"The water remembers every thing it swallows.", 0.2:"Sink with me, then." },
+  tentacled: { 0.5:"I have been hungry longer than your bloodline has existed.", 0.2:"Feed me, then, if you think you're enough." },
+  gianteye: { 0.5:"I have watched a thousand travelers cross these dunes. None looked back.", 0.2:"You will not be the exception you think you are." },
+  groveheart: { 0.5:"The grove does not forget what's taken root in it.", 0.2:"Even cut down, I will grow back." },
+  colossaleye: { 0.5:"You are further than any before you. It changes nothing.", 0.2:"The flower is not yours to take." },
+};
+function checkBossTaunt(){
+  if(!state.isBoss || !state.bossVariant || state.enemyHP<=0) return;
+  const taunts = BOSS_TAUNTS[state.bossVariant];
+  if(!taunts) return;
+  const frac = state.enemyHP / state.enemyMaxHP;
+  if(!state.bossTauntsFired) state.bossTauntsFired = {};
+  [0.5, 0.2].forEach(threshold=>{
+    if(frac <= threshold && !state.bossTauntsFired[threshold]){
+      state.bossTauntsFired[threshold] = true;
+      addLog(`"${taunts[threshold]}"`);
+    }
+  });
+}
 function checkBossTrait(){
   if(!state.isBoss || !state.bossVariant || state.enemyHP<=0) return;
   const trait = BOSS_TRAITS[state.bossVariant];
@@ -4936,6 +5069,19 @@ function arcadeAwardPoints(){
 // Builds the victory/defeat modal text for whichever context is active —
 // story keeps its scene-specific flavor text, arcade and endless each get
 // their own score readout (endless additionally reports the wave reached).
+const VICTORY_FLOURISH = [
+  'The road ahead clears.',
+  'The path is yours again.',
+  'The way forward opens.',
+  'For a moment, the road feels a little less dangerous.',
+  'You allow yourself one breath before moving on.',
+  'The road remembers this.',
+  'The silence after feels almost peaceful.',
+  'Onward.',
+];
+function randomVictoryFlourish(){
+  return VICTORY_FLOURISH[Math.floor(Math.random()*VICTORY_FLOURISH.length)];
+}
 function victoryResultText(storyText){
   if(playContext==='arcade') return `${state.enemyName} falls! Score: ${arcadeScore}`;
   if(playContext==='endless') return `${state.enemyName} falls! Wave ${endlessWave} cleared. Score: ${endlessScore}`;
@@ -5402,23 +5548,29 @@ function renderNightStars(){
   }
 }
 let wolfPetCooldown = false;
+let wolfPetCount = 0;
 function petWolf(e){
   e.stopPropagation();
   if(wolfPetCooldown) return;
   wolfPetCooldown = true;
   setTimeout(()=>{ wolfPetCooldown = false; }, 700);
-  playSFX('wolfPet');
+  wolfPetCount++;
+  const excited = wolfPetCount > 10;
+  playSFX(excited ? 'wolfPetExcited' : 'wolfPet');
   const wrap = document.getElementById('campfireWolfWrap');
-  wrap.classList.remove('petted'); void wrap.offsetWidth; wrap.classList.add('petted');
+  wrap.classList.remove('petted','excited'); void wrap.offsetWidth;
+  wrap.classList.add(excited ? 'excited' : 'petted');
   const layer = document.getElementById('petHeartLayer');
-  for(let i=0;i<3;i++){
+  const heartCount = excited ? 9 : 3;
+  for(let i=0;i<heartCount;i++){
     const h = document.createElement('div');
     h.className = 'pet-heart';
     h.textContent = '\u2665';
-    h.style.left = (35+Math.random()*30)+'%';
+    h.style.left = (excited ? 15+Math.random()*70 : 35+Math.random()*30)+'%';
     h.style.bottom = '35%';
     h.style.color = ['#ff8a9a','#ffb0c0','#ff6a80'][i%3];
-    h.style.animationDelay = (i*0.12)+'s';
+    h.style.animationDelay = (i*0.1)+'s';
+    if(excited) h.style.fontSize = (12+Math.random()*8)+'px';
     layer.appendChild(h);
     setTimeout(()=> h.remove(), 1600);
   }
@@ -5510,6 +5662,7 @@ function startWindowIfNeeded(){
   state.windowStartTime = performance.now();
   state.windowDeadline = state.windowStartTime + state.windowDuration;
   state.bankedCounts = {}; state.bankedMatchEvents = 0; state.consumedCells = new Set();
+  state.lastBankTime = state.windowStartTime;
   state.windowLowPlayed = false;
   updateTally();
   updateCompactState();
@@ -5526,6 +5679,7 @@ function tickWindow(){
   state.windowRAF = requestAnimationFrame(tickWindow);
 }
 function bankBattleMatch(typeCounts, combo){
+  state.lastBankTime = performance.now();
   for(const t in typeCounts){ state.bankedCounts[t] = (state.bankedCounts[t]||0) + typeCounts[t]; }
   state.bankedMatchEvents += combo;
   if(combo>1) addLog(`Chain reaction: ${combo} bursts in one strike!`);
@@ -5597,6 +5751,18 @@ function resolveBankedStrike(){
   const tc = state.bankedCounts, events = state.bankedMatchEvents;
   const momentumMult = 1 + Math.max(0, events-1)*0.18;
   let dmg = tc.ruby ? Math.round(tc.ruby*(6+gearBonus('ruby')) * momentumMult) : 0;
+  // Perfect timing: the final banked match landed within 400ms of the
+  // window actually closing -- rewards deliberately using the full window
+  // rather than banking early and passively waiting it out. Only fires if
+  // there was actually a strike to enhance (dmg>0), and only once combos
+  // are already in play (events>1), so it's a skill flourish on top of
+  // real play, not a trivial bonus for a single lucky late match.
+  const perfectTiming = dmg>0 && events>1 && (state.windowDeadline - state.lastBankTime) <= 400 && (state.windowDeadline - state.lastBankTime) >= -50;
+  if(perfectTiming){
+    dmg = Math.round(dmg * 1.15);
+    spawnPerfectTimingPopup();
+    playSFX('perfectTiming');
+  }
   if(dmg>0 && events>1){
     addLog(`Combo x${events}: your strikes compound (${momentumMult.toFixed(1)}x)!`);
   }
@@ -5612,6 +5778,7 @@ function resolveBankedStrike(){
     addLog('The window closes without a single blow struck.');
   }
   checkBossTrait();
+  checkBossTaunt();
 
   if(state.enemyHP<=0){
     state.gameOver=true; state.won=true;
@@ -5621,7 +5788,7 @@ function resolveBankedStrike(){
       finalBossPhase = 0; finalBossJustCompleted = true;
       state.resultText = "The eye closes. Whatever it was, it doesn't rise again.";
     } else {
-      state.resultText = victoryResultText(`${state.enemyName} falls before you. The keep's gate stands open.`);
+      state.resultText = victoryResultText(`${state.enemyName} falls before you. ${randomVictoryFlourish()}`);
     }
     react('enemy','defeat'); react('player','victory');
     playSFX('victory');
@@ -5690,7 +5857,7 @@ async function resolveWindow(){
         finalBossPhase = 0; finalBossJustCompleted = true;
         state.resultText = "The eye closes, undone by a chain reaction. Whatever it was, it doesn't rise again.";
       } else {
-        state.resultText = victoryResultText(`${state.enemyName} falls before you, undone by a chain reaction. The keep's gate stands open.`);
+        state.resultText = victoryResultText(`${state.enemyName} falls before you, undone by a chain reaction. ${randomVictoryFlourish()}`);
       }
       react('enemy','defeat'); react('player','victory');
       playSFX('victory');
@@ -5921,6 +6088,7 @@ async function resolveBattleCascade(){
       addLog(`The falling gems catch ${state.enemyName} off guard, a cascading match deals ${cdmg} damage!`);
       spawnFloatingNumber(document.getElementById('enemyFrame'), '-'+cdmg, 'dmg');
       checkBossTrait();
+  checkBossTaunt();
     }
     if(typeCounts.sapphire){
       const m = typeCounts.sapphire*(4+gearBonus('sapphire'));
@@ -5993,6 +6161,7 @@ async function castManaSpell(){
   spawnSpellEffect(document.getElementById('playerFrame'), spell.color);
   spawnFloatingNumber(document.getElementById('enemyFrame'), '-'+dmg, 'dmg');
   checkBossTrait();
+  checkBossTaunt();
   let over = false;
   if(state.enemyHP<=0){
     over = true;
@@ -6003,7 +6172,7 @@ async function castManaSpell(){
       finalBossPhase = 0; finalBossJustCompleted = true;
       state.resultText = `The eye closes, undone by ${spell.name}. Whatever it was, it doesn't rise again.`;
     } else {
-      state.resultText = victoryResultText(`${state.enemyName} falls, undone by ${spell.name}. Victory.`);
+      state.resultText = victoryResultText(`${state.enemyName} falls, undone by ${spell.name}. ${randomVictoryFlourish()}`);
     }
     react('enemy','defeat'); react('player','victory');
     playSFX('victory');
@@ -6043,6 +6212,7 @@ async function castWolfAttack(){
   playSFX('companionImpact');
   spawnFloatingNumber(document.getElementById('enemyFrame'), '-'+dmg, 'dmg');
   checkBossTrait();
+  checkBossTaunt();
   let over = false;
   if(state.enemyHP<=0){
     over = true;
@@ -6053,7 +6223,7 @@ async function castWolfAttack(){
       finalBossPhase = 0; finalBossJustCompleted = true;
       state.resultText = "The eye closes, driven back by fang and claw. Whatever it was, it doesn't rise again.";
     } else {
-      state.resultText = victoryResultText(`${state.enemyName} falls, driven back by fang and claw. Victory.`);
+      state.resultText = victoryResultText(`${state.enemyName} falls, driven back by fang and claw. ${randomVictoryFlourish()}`);
     }
     react('enemy','defeat'); react('player','victory');
     playSFX('victory');
@@ -6268,6 +6438,7 @@ function initMode(mode, node){
   state.biome = node ? node.biome : currentBiome;
   state.bossVariant = node ? node.variant : null;
   state.bossTraitFired = false;
+  state.bossTauntsFired = {};
   state.ambushConsumed = false;
   state.fadingAnnounced = false;
   state.bossDamageReduction = 0;
@@ -7247,6 +7418,8 @@ const SFX_RECIPES = {
   enemyTraitActivate: (ctx,out)=>{ sweepFat(ctx,out,ctx.currentTime,180,420,0.3,{wave:'sawtooth',vol:0.22}); crunchNoise(ctx,out,ctx.currentTime+0.05,0.15,{vol:0.15,lo:200,hi:2000,decay:10}); },
   lifeLost: (ctx,out)=>{ const t=ctx.currentTime; sweepFat(ctx,out,t,300,80,0.5,{wave:'triangle',vol:0.26}); thump(ctx,out,t+0.1,0.3,{vol:0.3,f0:120,f1:40}); },
   wolfPet: (ctx,out)=>{ const t=ctx.currentTime; notesSeq(ctx,out,[NOTE.A4,NOTE.C5],0.11,{wave:'sine',vol:0.18,fat:false}); },
+  wolfPetExcited: (ctx,out)=>{ const t=ctx.currentTime; notesSeq(ctx,out,[NOTE.A4,NOTE.C5,NOTE.E5,NOTE.A5],0.09,{wave:'sine',vol:0.2,fat:false}); },
+  perfectTiming: (ctx,out)=>{ const t=ctx.currentTime; notesSeq(ctx,out,[NOTE.E5,NOTE.A5],0.08,{wave:'square',vol:0.16,fat:false}); mysticShimmer(ctx,out,t+0.05,1318.51,0.4,{vol:0.14,echo:false}); },
 
   // Lock puzzle — mechanical: metal clicks and tumbler/bolt sounds, not tones
   lockTick: (ctx,out)=> metalClick(ctx,out,ctx.currentTime,{vol:0.34,ringFreq:2100,dur:0.09}),
@@ -7769,6 +7942,7 @@ document.getElementById('menuStoryBtn').addEventListener('click', ()=>{
   }
 });
 function showDifficultySelect(){
+  document.getElementById('legendDifficultyBtn').classList.toggle('hidden', !hasCompletedStory);
   document.getElementById('difficultyOverlay').classList.add('show');
 }
 document.querySelectorAll('#difficultyOverlay [data-difficulty]').forEach(btn=>{
@@ -7790,6 +7964,35 @@ document.getElementById('menuModesBtn').addEventListener('click', ()=>{
   playSFX('screenTransition');
   showScreen('modes');
 });
+document.getElementById('menuCodexBtn').addEventListener('click', ()=>{
+  playSFX('screenTransition');
+  renderCodex();
+  showScreen('codex');
+});
+function renderCodex(){
+  // Only hand-authored items (32 gear + 16 spell = 48) -- procedural items
+  // have no fixed end point, so they don't fit a "silhouette until found"
+  // collection target the way a bounded set does.
+  const gearEntries = GEAR_ITEMS.filter(g=>!g.procedural);
+  const spellEntries = [...MANA_SPELLS, ...COMPANION_SPELLS].filter(s=>!s.procedural);
+  const all = [...gearEntries, ...spellEntries];
+  const ownedCount = all.filter(i=>i.free || ownedItems.has(i.id)).length;
+  document.getElementById('codexProgress').textContent = `${ownedCount} / ${all.length} discovered`;
+  const grid = document.getElementById('codexGrid');
+  grid.innerHTML = all.map(item=>{
+    const owned = item.free || ownedItems.has(item.id);
+    if(!owned){
+      return `<div class="codex-card locked">?</div>`;
+    }
+    const isGear = !!item.slot;
+    const swatchColor = isGear ? GEM_BRIGHT[item.gem] : (item.color || '#e0a94a');
+    const detail = isGear ? `+${item.bonus} ${GEM_LABEL[item.gem]}` : `${item.damage} damage`;
+    return `<div class="codex-card">
+      <div class="codex-card-name"><span class="codex-card-swatch" style="background:${swatchColor}"></span>${item.name}</div>
+      <div class="codex-card-flavor">${item.flavor || detail}</div>
+    </div>`;
+  }).join('');
+}
 document.getElementById('modesArcadeBtn').addEventListener('click', ()=>{
   playSFX('screenTransition');
   showScreen('arcade');
