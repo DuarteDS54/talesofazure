@@ -125,7 +125,7 @@
   .character-body{ flex:1 1 auto; min-height:0; display:flex; flex-direction:row; gap:clamp(2px,1.2cqw,6px); }
   #enemyCol .character-body{ flex-direction:row-reverse; }
   .portrait-col{ flex:3 1 0; min-width:0; height:100%; display:flex; flex-direction:column; gap:clamp(2px,1cqh,5px); }
-  .portrait-frame{ position:relative; flex:1 1 auto; min-width:0; min-height:0; width:100%; background:#0c0603; border:3px solid var(--panelBorder); box-shadow:3px 3px 0 rgba(0,0,0,0.5), inset 0 0 0 2px #000; overflow:hidden; display:flex; flex-direction:row; contain:layout paint style; }
+  .portrait-frame{ position:relative; flex:1 1 auto; min-width:0; min-height:0; width:100%; background:#0c0603; border:3px solid var(--panelBorder); box-shadow:3px 3px 0 rgba(0,0,0,0.5), inset 0 0 0 2px #000; overflow:hidden; display:flex; flex-direction:row; contain:layout paint style; container-type:inline-size; container-name:portraitbox; }
   .portrait-frame canvas{ width:100%; height:100%; object-fit:contain; display:block; position:relative; z-index:2; }
   .portrait-frame.hit::after{ content:''; position:absolute; inset:0; background:rgba(255,60,40,0.6); animation:flash .45s ease forwards; z-index:3; }
   .portrait-frame.charge{ box-shadow:0 0 18px 4px var(--glow), 3px 3px 0 rgba(0,0,0,0.5); }
@@ -133,9 +133,9 @@
   .portrait-frame.victory{ box-shadow:0 0 22px 6px var(--gold), 3px 3px 0 rgba(0,0,0,0.5); }
   .portrait-frame.trait-flash{ animation: traitFlash 0.7s ease; }
   @keyframes traitFlash{ 0%{ box-shadow:0 0 0 0 rgba(255,60,60,0), 3px 3px 0 rgba(0,0,0,0.5); } 30%{ box-shadow:0 0 26px 9px var(--trait-flash-color, rgba(255,60,60,0.9)), 3px 3px 0 rgba(0,0,0,0.5); } 100%{ box-shadow:3px 3px 0 rgba(0,0,0,0.5); } }
-  .trait-portrait-announce{ position:absolute; inset:0; z-index:5; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; background:rgba(5,3,2,0.75); text-align:center; padding:6px; animation: traitPortraitIn 0.2s ease, traitPortraitOut 0.3s ease 0.75s forwards; }
-  .trait-portrait-title{ font-family:'Press Start 2P',monospace; font-size:clamp(7px,2.6vw,10px); color:var(--trait-color, #fff); text-shadow:2px 2px 0 #000; letter-spacing:0.02em; line-height:1.3; }
-  .trait-portrait-effect{ font-family:'Silkscreen',monospace; font-size:clamp(6px,2vw,8px); color:#e8d0c0; text-shadow:1px 1px 0 #000; line-height:1.3; }
+  .trait-portrait-announce{ position:absolute; inset:0; z-index:5; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; background:rgba(5,3,2,0.75); text-align:center; padding:4px; animation: traitPortraitIn 0.2s ease, traitPortraitOut 0.3s ease 0.75s forwards; }
+  .trait-portrait-title{ font-family:'Press Start 2P',monospace; font-size:clamp(6px,9cqw,9px); color:var(--trait-color, #fff); text-shadow:1.5px 1.5px 0 #000; letter-spacing:0.01em; line-height:1.3; word-break:break-word; }
+  .trait-portrait-effect{ font-family:'Silkscreen',monospace; font-size:clamp(6px,7cqw,8px); color:#e8d0c0; text-shadow:1px 1px 0 #000; line-height:1.3; word-break:break-word; }
   @keyframes traitPortraitIn{ from{ opacity:0; transform:scale(0.85); } to{ opacity:1; transform:scale(1); } }
   @keyframes traitPortraitOut{ to{ opacity:0; } }
   .hero-half{ flex:3 1 0; min-width:0; height:100%; overflow:hidden; position:relative; }
@@ -332,12 +332,12 @@
     animation: cutsceneSpriteIn .45s cubic-bezier(.22,.9,.32,1.2) both; transition:transform 0.4s ease, filter 0.4s ease; }
   .cutscene-sprite.left{ margin-right:auto; margin-left:6%; }
   .cutscene-sprite.right{ margin-left:auto; margin-right:6%; }
-  @keyframes cutsceneSpriteIn{ 0%{ opacity:0; transform:translateY(14px) scale(0.92); } 100%{ opacity:1; transform:translateY(0) scale(1); } }
+  @keyframes cutsceneSpriteIn{ 0%{ transform:translateY(14px) scale(0.92); } 100%{ transform:translateY(0) scale(1); } }
   .cutscene-prop{ position:relative; width:min(28vh,168px); aspect-ratio:5/6; z-index:1; opacity:0.97; filter:drop-shadow(0 12px 18px rgba(0,0,0,0.55));
     animation: cutscenePropIn .55s ease-out both; transition:transform 0.4s ease, filter 0.4s ease, opacity 0.4s ease; }
   .cutscene-prop.left{ margin-right:auto; margin-left:6%; }
   .cutscene-prop.right{ margin-left:auto; margin-right:6%; }
-  @keyframes cutscenePropIn{ 0%{ opacity:0; transform:translateX(-8px); } 100%{ opacity:0.97; transform:translateX(0); } }
+  @keyframes cutscenePropIn{ 0%{ transform:translateX(-8px); } 100%{ transform:translateX(0); } }
   .cutscene-prop.hidden{ display:none; }
   .cutscene-prop.rackfocus{ filter:blur(2.5px) brightness(0.5); opacity:0.7; }
   .cutscene-prop.propfocus{ transform:scale(1.12); filter:drop-shadow(0 12px 18px rgba(0,0,0,0.55)) brightness(1.25); opacity:1; }
@@ -382,6 +382,12 @@
   .campfire-trio{ position:relative; z-index:2; display:flex; align-items:flex-end; justify-content:center; filter:drop-shadow(0 14px 22px rgba(0,0,0,0.65)); }
   .campfire-chars{ display:flex; align-items:flex-end; justify-content:center; gap:clamp(6px,2vh,14px); }
   .campfire-char-wrap{ position:relative; width:min(30vh,180px); aspect-ratio:5/6; }
+  #campfireWolfWrap{ cursor:pointer; }
+  #campfireWolfWrap.petted{ animation: wolfPetHappy 0.6s ease; }
+  @keyframes wolfPetHappy{ 0%,100%{ transform:translateY(0) rotate(0deg); } 25%{ transform:translateY(-4px) rotate(-3deg); } 50%{ transform:translateY(0) rotate(3deg); } 75%{ transform:translateY(-2px) rotate(-2deg); } }
+  .pet-heart-layer{ position:absolute; inset:0; pointer-events:none; z-index:6; overflow:hidden; }
+  .pet-heart{ position:absolute; bottom:0; font-size:12px; opacity:0; animation: petHeartRise 1.4s ease-out forwards; }
+  @keyframes petHeartRise{ 0%{ transform:translateY(0) scale(0.6); opacity:0; } 20%{ opacity:0.95; } 100%{ transform:translateY(-60px) scale(1.15); opacity:0; } }
   .campfire-char-wrap canvas{ width:100%; height:100%; image-rendering:pixelated; display:block; object-fit:contain; }
   .campfire-flame-wrap{ position:relative; width:min(13vh,78px); aspect-ratio:5/6; transform-origin:bottom center; animation:campfireFlameWobble 2.2s ease-in-out infinite; }
   .campfire-flame-wrap canvas{ width:100%; height:100%; image-rendering:pixelated; display:block; }
@@ -621,6 +627,7 @@
   .shop-item.purchased{ animation: shopItemPurchased .5s ease; }
   @keyframes shopItemPurchased{ 0%{ background:var(--panel); } 35%{ background:rgba(224,169,74,0.35); } 100%{ background:var(--panel); } }
   .shop-item-name{ font-family:'Press Start 2P',monospace; font-size:10px; color:var(--text); }
+  .shop-gem-swatch{ display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; box-shadow:0 0 0 1.5px rgba(0,0,0,0.6), 0 0 4px currentColor; vertical-align:middle; }
   .shop-item-cat{ font-family:'Silkscreen',monospace; font-size:10.5px; color:var(--textDim); margin-top:2px; }
   .shop-item-flavor{ font-family:'Silkscreen',monospace; font-size:12.5px; color:#c9baa6; margin-top:4px; line-height:1.5; }
   .spell-level{ font-family:'Press Start 2P',monospace; font-size:8px; color:var(--gold); margin-left:4px; }
@@ -662,9 +669,6 @@
   <div class="rotate-lock-text">PLEASE ROTATE YOUR DEVICE<br>TALES OF AZURE PLAYS IN PORTRAIT</div>
 </div>
 <div class="wrap">
-  <h1>TALES OF AZURE</h1>
-  <p class="subtitle">16-bit match-3 RPG prototype, split stat panels, reactive portraits</p>
-
   <div class="screen" id="bootScreen">
     <canvas class="biome-scene" id="bootSceneCanvas" width="64" height="36"></canvas>
     <div class="ambient-layer" id="bootAmbientLayer"></div>
@@ -673,7 +677,7 @@
     <div class="ember-layer" id="bootEmberLayer"></div>
     <div class="boot-content">
       <div class="boot-title">TALES OF<br>AZURE</div>
-      <div class="boot-subtitle">Tales of Azure: A Match-3 RPG Odyssey</div>
+      <div class="boot-subtitle">A Match-3 RPG Odyssey</div>
       <div class="boot-prompt">TAP TO START</div>
     </div>
   </div>
@@ -683,7 +687,7 @@
     <canvas class="biome-scene" id="menuSceneCanvas" width="64" height="36"></canvas>
     <div class="ambient-layer" id="menuAmbientLayer"></div>
     <div class="menu-title">TALES OF<br>AZURE</div>
-    <div class="menu-tagline">Tales of Azure: A Match-3 RPG Odyssey</div>
+    <div class="menu-tagline">A Match-3 RPG Odyssey</div>
     <div class="menu-buttons">
       <button class="menu-btn hidden" id="menuContinueBtn">CONTINUE</button>
       <button class="menu-btn" id="menuStoryBtn">STORY</button>
@@ -821,7 +825,7 @@
         <div class="gear-slot equip-slot-companion">WOLF LUNGE</div>
       </div>
     </div>
-    <div class="shop-gold">Gold: <span id="shopGoldDisplay">0</span></div>
+    <div class="shop-gold">Gold: <span id="shopGoldDisplay">0</span> &nbsp;·&nbsp; Level: <span id="shopLevelDisplay">1</span> &nbsp;·&nbsp; <span id="shopDifficultyDisplay">Medium</span></div>
     <div class="shop-list" id="shopList"></div>
     <button class="back-btn" id="shopBackBtn">&larr; BACK</button>
   </div>
@@ -982,6 +986,18 @@
   </div>
 </div>
 
+<div class="puzzle-intro-overlay" id="difficultyOverlay">
+  <div class="puzzle-intro-card" style="max-width:min(92vw,420px);">
+    <div class="run-summary-heading">CHOOSE YOUR PATH</div>
+    <p class="puzzle-intro-text" style="text-align:center;">How much of a fight do you want from Azure?</p>
+    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:6px;">
+      <button class="back-btn" data-difficulty="easy" style="width:100%;">EASY: a gentler road</button>
+      <button class="back-btn" data-difficulty="medium" style="width:100%;">MEDIUM: the road as written</button>
+      <button class="back-btn" data-difficulty="hard" style="width:100%;">HARD: no mercy</button>
+    </div>
+  </div>
+</div>
+
 <div class="treasure-overlay" id="treasureOverlay">
   <div class="treasure-heading">A TREASURE CHEST</div>
   <div class="treasure-sub" id="treasureSub">Something was left behind here.</div>
@@ -1011,10 +1027,11 @@
           <div class="campfire-glow" id="campfireGlow"></div>
           <div class="campfire-ember-layer" id="campfireEmberLayer"></div>
         </div>
-        <div class="campfire-char-wrap"><canvas id="campfireWolfCanvas" width="20" height="24"></canvas></div>
+        <div class="campfire-char-wrap" id="campfireWolfWrap"><canvas id="campfireWolfCanvas" width="20" height="24"></canvas></div>
       </div>
     </div>
     <div class="cutscene-hint">TAP TO STOKE THE FIRE</div>
+    <div class="pet-heart-layer" id="petHeartLayer"></div>
   </div>
   <div class="cutscene-caption" id="campfireCaption"></div>
 </div>
@@ -2142,19 +2159,19 @@ setInterval(()=>{
 function cutsceneSlides(){
   return [
     { scene:'azureJungle', sprite:'hero', pos:'left', prop:'trees', fx:'default',
-      text:'Azure is a lush and ancient land, home to countless peoples sheltered by jungle canopy and quiet rivers. For millennia, the Azerians have kept its old traditions, tending the land and each other in equal measure.' },
+      text:'Azure is ancient and lush, home to countless peoples sheltered by jungle and river. For millennia, the Azerians have tended their land and each other in equal measure.' },
     { scene:'shabaShrine', sprite:'hero', pos:'left', prop:'idol', fx:'default',
-      text:'Those Who Came Before choose one Warrior and one Animal Companion each generation, Shaba, sworn to protect all of Azure and answer any call for aid, no matter how far it carries them.' },
+      text:'Those Who Came Before choose one Warrior and one Companion each generation, Shaba, sworn to protect Azure and answer any call, no matter how far it carries them.' },
     { scene:'alerraBanners', sprite:'hero', pos:'left', prop:'banner', fx:'default',
-      text:'Ro was the most promising recruit in a generation. Today was to be her first day carrying the title.' },
+      text:'Ro was the most promising recruit in a generation. Today was her first day carrying the title.' },
     { scene:'alerraInvasion', sprite:'hero', pos:'left', prop:'invaders', impact:true, particles:'ash', fx:'punch',
-      text:"Instead, invaders from the South stormed Alerra, Azure's capital and the heart of Azerian pride, before she had worn the title a single hour." },
+      text:"Instead, invaders from the South stormed Alerra, Azure's capital and its beating heart, before she'd worn the title a single hour." },
     { scene:'alerraAftermath', sprite:'hero', pos:'left', prop:'debris', particles:'ash', fx:'rackfocus',
       text:'The battle for Alerra is over. The field is quiet now, and quiet is worse.' },
     { scene:'wolfWound', sprite:'wolf', pos:'right', prop:'spear', impact:true, particles:'chill', fx:'punch',
       text:`${getWolfName()} lies still beside her, breath shallow, wound deep: poison, and no cure within reach.` },
     { scene:'mountainDistant', sprite:'hero', pos:'left', prop:'mountainBloom', particles:'light', fx:'propfocus',
-      text:"They say a flower blooms atop Mother's Crown, upon the Borez Cliffs, far from here, past horrors she cannot yet name." },
+      text:"They say a flower blooms atop Mother's Crown, upon the Borez Cliffs, past horrors she cannot yet name." },
     { scene:'relicAwakening', sprite:'wolf', pos:'right', prop:'relic', particles:'light', fx:'burst',
       text:'The Ancient Relics of Virtue stir in answer to her blood. There is no other choice. She rises. The journey begins.' }
   ];
@@ -2162,17 +2179,17 @@ function cutsceneSlides(){
 function epilogueSlides(){
   return [
     { scene:'mountainPeakBloom', sprite:'hero', pos:'left', prop:'mountainBloom', particles:'light', fx:'propfocus',
-      text:"The flower blooms exactly where the old stories said it would, impossibly bright against the grey stone of Mother's Crown." },
+      text:"The flower blooms exactly where the old stories said, impossibly bright against the grey stone of Mother's Crown." },
     { scene:'mountainPeakBloom', sprite:'hero', pos:'left', prop:'mountainBloom', particles:'light', fx:'default',
-      text:'Ro cups it in both hands as though it might shatter. After everything the journey cost, it feels almost too simple to just... pick it.' },
+      text:'Ro cups it in both hands as though it might shatter. After everything the journey cost, it feels too simple to just... pick it.' },
     { scene:'healingGlow', sprite:'wolf', pos:'right', prop:'relic', particles:'light', fx:'rackfocus',
       text:`She kneels beside ${getWolfName()} and presses the bloom against the wound that never fully closed.` },
     { scene:'healingGlow', sprite:'wolf', pos:'right', particles:'light', fx:'punch',
       text:`For a long moment, nothing happens. Then ${getWolfName()}'s breathing steadies, deep and even, for the first time since Alerra fell.` },
     { scene:'homeward', sprite:'hero', pos:'left', fx:'default',
-      text:'Azure is not whole again. Not yet. But something that was breaking has, for now, stopped breaking.' },
+      text:'Azure is not whole again. Not yet. But something that was breaking has stopped, for now.' },
     { scene:'homeward', sprite:'wolf', pos:'right', fx:'default',
-      text:'The road home is long. For the first time in a long while, Ro is not afraid of it.' }
+      text:'The road home is long. For the first time in a long while, Ro isn\'t afraid of it.' }
   ];
 }
 // Plays the ending cutscene, then resets cleanly to the menu -- the save is
@@ -2650,9 +2667,12 @@ const CUTSCENE_PROPS = {
 // and a flat gradient every time the hero has a line.
 function restartAnim(el){
   if(!el) return;
+  el.style.transition = 'none';
   el.style.animation = 'none';
   void el.offsetWidth;
   el.style.animation = '';
+  void el.offsetWidth;
+  el.style.transition = '';
 }
 function renderCutsceneSlide(){
   const slide = currentCutsceneSlides[cutsceneIndex];
@@ -2865,32 +2885,33 @@ wolfNameInputEl.addEventListener('input', ()=>{
 });
 
 /* ---------- shop ---------- */
-// minIndex gates each item behind quest progress — thresholds line up with
-// biome boundaries (Battlefield ends at 7, Forest at 15, Lake at 24, Castle
-// at 34, Desert at 45) so the shop visibly grows richer as the road gets harder.
+// minLevel gates each item behind the player's earned combat level rather
+// than story progress -- level is derived from actual enemy difficulty
+// defeated (see awardDifficultyXP), so the shop grows richer as the
+// player proves they can handle harder fights, not just as they walk further.
 // Four gear slots, each tied to exactly one gem type — equipping that piece
 // adds +1 to that gem's yield per gem matched (healing, damage, mana, charge).
 const GEAR_ITEMS = [
   // Head — Emerald (Wisdom)
-  { id:'gear_head_1', slot:'head', gem:'emerald', name:"Traveler's Hood",    price:25,  minIndex:0,  bonus:1 },
-  { id:'gear_head_2', slot:'head', gem:'emerald', name:"Sage's Circlet",     price:45,  minIndex:15, bonus:2 },
-  { id:'gear_head_3', slot:'head', gem:'emerald', name:'Crown of Insight',   price:70,  minIndex:30, bonus:3 },
-  { id:'gear_head_4', slot:'head', gem:'emerald', name:'Diadem of the Grove',price:100, minIndex:45, bonus:4 },
+  { id:'gear_head_1', slot:'head', gem:'emerald', name:"Traveler's Hood",    price:25,  minLevel:0,  bonus:1, flavor:"Patched more times than anyone's bothered to count." },
+  { id:'gear_head_2', slot:'head', gem:'emerald', name:"Sage's Circlet",     price:45,  minLevel:5, bonus:2, flavor:"Cool to the touch, even in the desert sun." },
+  { id:'gear_head_3', slot:'head', gem:'emerald', name:'Crown of Insight',   price:70,  minLevel:9, bonus:3, flavor:"Wearing it feels like remembering something you never learned." },
+  { id:'gear_head_4', slot:'head', gem:'emerald', name:'Diadem of the Grove',price:100, minLevel:14, bonus:4, flavor:"Threaded with living root that hasn't noticed it's no longer in the ground." },
   // Armor — Ruby (Strength)
-  { id:'gear_armor_1', slot:'armor', gem:'ruby', name:'Boiled Leather Vest',   price:35,  minIndex:0,  bonus:1 },
-  { id:'gear_armor_2', slot:'armor', gem:'ruby', name:'Reinforced Cuirass',    price:55,  minIndex:15, bonus:2 },
-  { id:'gear_armor_3', slot:'armor', gem:'ruby', name:'Warplate of the Fallen',price:80,  minIndex:30, bonus:3 },
-  { id:'gear_armor_4', slot:'armor', gem:'ruby', name:'Emberforged Plate',     price:110, minIndex:45, bonus:4 },
+  { id:'gear_armor_1', slot:'armor', gem:'ruby', name:'Boiled Leather Vest',   price:35,  minLevel:0,  bonus:1, flavor:"Stiff, ugly, and it's kept more soldiers alive than prettier armor ever has." },
+  { id:'gear_armor_2', slot:'armor', gem:'ruby', name:'Reinforced Cuirass',    price:55,  minLevel:5, bonus:2, flavor:"Dented in exactly the places that matter most." },
+  { id:'gear_armor_3', slot:'armor', gem:'ruby', name:'Warplate of the Fallen',price:80,  minLevel:9, bonus:3, flavor:"Its last owner didn't fall because of the armor." },
+  { id:'gear_armor_4', slot:'armor', gem:'ruby', name:'Emberforged Plate',     price:110, minLevel:14, bonus:4, flavor:"Quenched in something other than water." },
   // Boots — Sapphire (Swiftness)
-  { id:'gear_boots_1', slot:'boots', gem:'sapphire', name:"Sure-Footed Boots", price:20, minIndex:0,  bonus:1 },
-  { id:'gear_boots_2', slot:'boots', gem:'sapphire', name:'Windrunner Greaves',price:40, minIndex:15, bonus:2 },
-  { id:'gear_boots_3', slot:'boots', gem:'sapphire', name:'Tidewalker Boots', price:65,  minIndex:30, bonus:3 },
-  { id:'gear_boots_4', slot:'boots', gem:'sapphire', name:'Stormstep Sabatons',price:95, minIndex:45, bonus:4 },
+  { id:'gear_boots_1', slot:'boots', gem:'sapphire', name:"Sure-Footed Boots", price:20, minLevel:0,  bonus:1, flavor:"Never once let anyone down a cliff." },
+  { id:'gear_boots_2', slot:'boots', gem:'sapphire', name:'Windrunner Greaves',price:40, minLevel:5, bonus:2, flavor:"Lighter than they have any right to be." },
+  { id:'gear_boots_3', slot:'boots', gem:'sapphire', name:'Tidewalker Boots', price:65,  minLevel:9, bonus:3, flavor:"Dry the instant they leave the water." },
+  { id:'gear_boots_4', slot:'boots', gem:'sapphire', name:'Stormstep Sabatons',price:95, minLevel:14, bonus:4, flavor:"Each step sounds like distant thunder." },
   // Off-Hand — Amethyst (Spirit)
-  { id:'gear_offhand_1', slot:'offhand', gem:'amethyst', name:'Worn Buckler',       price:30,  minIndex:0,  bonus:1 },
-  { id:'gear_offhand_2', slot:'offhand', gem:'amethyst', name:'Spirit-Bound Charm', price:50,  minIndex:15, bonus:2 },
-  { id:'gear_offhand_3', slot:'offhand', gem:'amethyst', name:'Wolfheart Talisman', price:75,  minIndex:30, bonus:3 },
-  { id:'gear_offhand_4', slot:'offhand', gem:'amethyst', name:'Relic of the Pack',  price:105, minIndex:45, bonus:4 }
+  { id:'gear_offhand_1', slot:'offhand', gem:'amethyst', name:'Worn Buckler',       price:30,  minLevel:0,  bonus:1, flavor:"Small, plain, and somehow always exactly where it's needed." },
+  { id:'gear_offhand_2', slot:'offhand', gem:'amethyst', name:'Spirit-Bound Charm', price:50,  minLevel:5, bonus:2, flavor:"Hums faintly when danger is close." },
+  { id:'gear_offhand_3', slot:'offhand', gem:'amethyst', name:'Wolfheart Talisman', price:75,  minLevel:9, bonus:3, flavor:"Beats, very faintly, like it remembers having a pulse." },
+  { id:'gear_offhand_4', slot:'offhand', gem:'amethyst', name:'Relic of the Pack',  price:105, minLevel:14, bonus:4, flavor:"Never feels quite as heavy when you're not alone." }
 ];
 const GEM_LABEL = { emerald:'Wisdom (Green)', ruby:'Strength (Red)', sapphire:'Swiftness (Blue)', amethyst:'Spirit (Purple)' };
 // Same tones as the board's .gem-* gradients, so gear UI reads as the gem it
@@ -2918,16 +2939,16 @@ function gearBonus(gem){
 // freely afterward. Level scales damage; color drives the cast portrait effect.
 const MANA_SPELLS = [
   { id:'spell_mana_base', name:'Ember Bolt',      level:1, damage:17, color:'#ff8a3a', free:true },
-  { id:'spell_mana_1',    name:'Frost Needle',    level:2, damage:24, color:'#5ab8ff', price:15, minIndex:0 },
-  { id:'spell_mana_2',    name:'Thorn Volley',    level:3, damage:29, color:'#5aff8a', price:20, minIndex:7 },
-  { id:'spell_mana_3',    name:'Ember Lance',     level:4, damage:36, color:'#ff4a3a', price:50, minIndex:34 },
-  { id:'spell_mana_4',    name:'Wildfire Bloom',  level:5, damage:42, color:'#c9f04a', price:70, minIndex:45 }
+  { id:'spell_mana_1',    name:'Frost Needle',    level:2, damage:24, color:'#5ab8ff', price:15, minLevel:0 },
+  { id:'spell_mana_2',    name:'Thorn Volley',    level:3, damage:29, color:'#5aff8a', price:20, minLevel:2 },
+  { id:'spell_mana_3',    name:'Ember Lance',     level:4, damage:36, color:'#ff4a3a', price:50, minLevel:10 },
+  { id:'spell_mana_4',    name:'Wildfire Bloom',  level:5, damage:42, color:'#c9f04a', price:70, minLevel:14 }
 ];
 const COMPANION_SPELLS = [
-  { id:'spell_companion_base', name:'Wolf Lunge',      level:1, damage:28, color:'#e8e2d8', free:true },
-  { id:'spell_companion_1',    name:'Howling Charge',  level:2, damage:36, color:'#a8d8ff', price:40, minIndex:15 },
-  { id:'spell_companion_2',    name:'Fang Strike',     level:3, damage:44, color:'#9aa0a6', price:45, minIndex:24 },
-  { id:'spell_companion_3',    name:'Rending Howl',    level:4, damage:52, color:'#c060ff', price:60, minIndex:34 }
+  { id:'spell_companion_base', name:'Wolf Lunge',      level:1, damage:25, color:'#e8e2d8', free:true },
+  { id:'spell_companion_1',    name:'Howling Charge',  level:2, damage:32, color:'#a8d8ff', price:40, minLevel:5 },
+  { id:'spell_companion_2',    name:'Fang Strike',     level:3, damage:39, color:'#9aa0a6', price:45, minLevel:7 },
+  { id:'spell_companion_3',    name:'Rending Howl',    level:4, damage:46, color:'#c060ff', price:60, minLevel:10 }
 ];
 // Treasure-chest-only rewards, found after lock/riddle puzzles — never sold
 // in the shop (renderShop filters storyExclusive out). Four tiers per gear
@@ -2937,34 +2958,34 @@ const COMPANION_SPELLS = [
 // across the story; the gold fallback for a fully-emptied pool is now a
 // rare edge case rather than something a normal playthrough will hit.
 GEAR_ITEMS.push(
-  { id:'gear_head_x1',    slot:'head',    gem:'emerald',  name:'Sunfall Diadem',              bonus:3, minIndex:15, storyExclusive:true },
-  { id:'gear_head_x2',    slot:'head',    gem:'emerald',  name:'Crown of the Unburnt',         bonus:4, minIndex:30, storyExclusive:true },
-  { id:'gear_head_x3',    slot:'head',    gem:'emerald',  name:'Halo of the First Light',      bonus:5, minIndex:40, storyExclusive:true },
-  { id:'gear_head_x4',    slot:'head',    gem:'emerald',  name:'Diadem of the Ember Star',     bonus:6, minIndex:50, storyExclusive:true },
-  { id:'gear_armor_x1',   slot:'armor',   gem:'ruby',     name:'Dragonscale Plate',            bonus:3, minIndex:15, storyExclusive:true },
-  { id:'gear_armor_x2',   slot:'armor',   gem:'ruby',     name:'Aegis of the Fallen Kings',    bonus:4, minIndex:30, storyExclusive:true },
-  { id:'gear_armor_x3',   slot:'armor',   gem:'ruby',     name:'Bulwark of the Undying',       bonus:5, minIndex:40, storyExclusive:true },
-  { id:'gear_armor_x4',   slot:'armor',   gem:'ruby',     name:"Emberking's Warplate",         bonus:6, minIndex:50, storyExclusive:true },
-  { id:'gear_boots_x1',   slot:'boots',   gem:'sapphire', name:"Windwalker's Grace",           bonus:3, minIndex:15, storyExclusive:true },
-  { id:'gear_boots_x2',   slot:'boots',   gem:'sapphire', name:'Tempest-Stride Sabatons',      bonus:4, minIndex:30, storyExclusive:true },
-  { id:'gear_boots_x3',   slot:'boots',   gem:'sapphire', name:'Gale-Marked Striders',         bonus:5, minIndex:40, storyExclusive:true },
-  { id:'gear_boots_x4',   slot:'boots',   gem:'sapphire', name:'Boots of the Last Wind',       bonus:6, minIndex:50, storyExclusive:true },
-  { id:'gear_offhand_x1', slot:'offhand', gem:'amethyst', name:'Moonlit Fang Charm',           bonus:3, minIndex:15, storyExclusive:true },
-  { id:'gear_offhand_x2', slot:'offhand', gem:'amethyst', name:'Relic of the First Pack',      bonus:4, minIndex:30, storyExclusive:true },
-  { id:'gear_offhand_x3', slot:'offhand', gem:'amethyst', name:'Howling Ember Fetish',         bonus:5, minIndex:40, storyExclusive:true },
-  { id:'gear_offhand_x4', slot:'offhand', gem:'amethyst', name:'Heart of the Eternal Pack',    bonus:6, minIndex:50, storyExclusive:true }
+  { id:'gear_head_x1',    slot:'head',    gem:'emerald',  name:'Sunfall Diadem',              bonus:3, minLevel:5, storyExclusive:true, flavor:"Warm long after the sun that named it has set." },
+  { id:'gear_head_x2',    slot:'head',    gem:'emerald',  name:'Crown of the Unburnt',         bonus:4, minLevel:9, storyExclusive:true, flavor:"Survived a fire that took everything else in the room." },
+  { id:'gear_head_x3',    slot:'head',    gem:'emerald',  name:'Halo of the First Light',      bonus:5, minLevel:12, storyExclusive:true, flavor:"Said to hold the very first sunrise Azure ever saw." },
+  { id:'gear_head_x4',    slot:'head',    gem:'emerald',  name:'Diadem of the Ember Star',     bonus:6, minLevel:15, storyExclusive:true, flavor:"A fallen star, cooled just enough to wear." },
+  { id:'gear_armor_x1',   slot:'armor',   gem:'ruby',     name:'Dragonscale Plate',            bonus:3, minLevel:5, storyExclusive:true, flavor:"Each scale still faintly warm. As if it hasn't quite finished dying." },
+  { id:'gear_armor_x2',   slot:'armor',   gem:'ruby',     name:'Aegis of the Fallen Kings',    bonus:4, minLevel:9, storyExclusive:true, flavor:"Passed down through more funerals than coronations." },
+  { id:'gear_armor_x3',   slot:'armor',   gem:'ruby',     name:'Bulwark of the Undying',       bonus:5, minLevel:12, storyExclusive:true, flavor:"Refuses to rust, chip, or stay buried." },
+  { id:'gear_armor_x4',   slot:'armor',   gem:'ruby',     name:"Emberking's Warplate",         bonus:6, minLevel:15, storyExclusive:true, flavor:"Forged in a furnace that was, itself, once a throne." },
+  { id:'gear_boots_x1',   slot:'boots',   gem:'sapphire', name:"Windwalker's Grace",           bonus:3, minLevel:5, storyExclusive:true, flavor:"Leaves footprints that vanish before anyone can follow." },
+  { id:'gear_boots_x2',   slot:'boots',   gem:'sapphire', name:'Tempest-Stride Sabatons',      bonus:4, minLevel:9, storyExclusive:true, flavor:"Smells faintly of ozone, always." },
+  { id:'gear_boots_x3',   slot:'boots',   gem:'sapphire', name:'Gale-Marked Striders',         bonus:5, minLevel:12, storyExclusive:true, flavor:"Marked with a wind that stopped blowing centuries ago." },
+  { id:'gear_boots_x4',   slot:'boots',   gem:'sapphire', name:'Boots of the Last Wind',       bonus:6, minLevel:15, storyExclusive:true, flavor:"Said to carry the very last breath of a dying storm." },
+  { id:'gear_offhand_x1', slot:'offhand', gem:'amethyst', name:'Moonlit Fang Charm',           bonus:3, minLevel:5, storyExclusive:true, flavor:"Only shows its true shape under moonlight." },
+  { id:'gear_offhand_x2', slot:'offhand', gem:'amethyst', name:'Relic of the First Pack',      bonus:4, minLevel:9, storyExclusive:true, flavor:"The oldest bond in Azure, worn smooth by centuries of hands." },
+  { id:'gear_offhand_x3', slot:'offhand', gem:'amethyst', name:'Howling Ember Fetish',         bonus:5, minLevel:12, storyExclusive:true, flavor:"Warm to the touch, and it hums like something asleep." },
+  { id:'gear_offhand_x4', slot:'offhand', gem:'amethyst', name:'Heart of the Eternal Pack',    bonus:6, minLevel:15, storyExclusive:true, flavor:"Doesn't beat. Doesn't need to. It never stopped belonging to something larger." }
 );
 MANA_SPELLS.push(
-  { id:'spell_mana_x1', name:'Solar Flare',       level:6, damage:39, color:'#fff29a', minIndex:15, storyExclusive:true },
-  { id:'spell_mana_x2', name:'Cataclysm',         level:7, damage:44, color:'#ff3a6a', minIndex:30, storyExclusive:true },
-  { id:'spell_mana_x3', name:'Azure Requiem', level:8, damage:49, color:'#ff8a3a', minIndex:40, storyExclusive:true },
-  { id:'spell_mana_x4', name:'Starfire Cascade',  level:9, damage:54, color:'#8affea', minIndex:50, storyExclusive:true }
+  { id:'spell_mana_x1', name:'Solar Flare',       level:6, damage:39, color:'#fff29a', minLevel:5, storyExclusive:true },
+  { id:'spell_mana_x2', name:'Cataclysm',         level:7, damage:44, color:'#ff3a6a', minLevel:9, storyExclusive:true },
+  { id:'spell_mana_x3', name:'Azure Requiem', level:8, damage:49, color:'#ff8a3a', minLevel:12, storyExclusive:true },
+  { id:'spell_mana_x4', name:'Starfire Cascade',  level:9, damage:54, color:'#8affea', minLevel:15, storyExclusive:true }
 );
 COMPANION_SPELLS.push(
-  { id:'spell_companion_x1', name:"Alpha's Fury",  level:5, damage:46,  color:'#ff5a3a', minIndex:15, storyExclusive:true },
-  { id:'spell_companion_x2', name:'Moonrise Howl', level:6, damage:53,  color:'#c9e8ff', minIndex:30, storyExclusive:true },
-  { id:'spell_companion_x3', name:'Packbound Fury',level:7, damage:59, color:'#e8b8ff', minIndex:40, storyExclusive:true },
-  { id:'spell_companion_x4', name:'The Last Howl', level:8, damage:66, color:'#f0f0f0', minIndex:50, storyExclusive:true }
+  { id:'spell_companion_x1', name:"Alpha's Fury",  level:5, damage:40,  color:'#ff5a3a', minLevel:5, storyExclusive:true },
+  { id:'spell_companion_x2', name:'Moonrise Howl', level:6, damage:47,  color:'#c9e8ff', minLevel:9, storyExclusive:true },
+  { id:'spell_companion_x3', name:'Packbound Fury',level:7, damage:52, color:'#e8b8ff', minLevel:12, storyExclusive:true },
+  { id:'spell_companion_x4', name:'The Last Howl', level:8, damage:58, color:'#f0f0f0', minLevel:15, storyExclusive:true }
 );
 // ---------- procedural shop scaling ----------
 // The hand-authored tiers above are a fixed pool -- eventually exhausted by
@@ -3052,7 +3073,7 @@ function reconstructProceduralGearItem(id){
   const slot = m[1], bonus = parseInt(m[2],10);
   return { id, slot, gem:SLOT_GEM[slot], bonus, name:proceduralGearName(slot,bonus),
     flavor: proceduralGearFlavor(bonus),
-    price: 25 + bonus*20, minIndex:0, procedural:true };
+    price: 25 + bonus*20, minLevel:0, procedural:true };
 }
 // Damage formulas are tuned to continue each spell type's own hand-authored
 // pacing smoothly (mana climbs ~+6/level late-game, companion ~+8/level) --
@@ -3061,10 +3082,14 @@ function reconstructProceduralGearItem(id){
 function reconstructProceduralSpellItem(id){
   const m = /^spell_(mana|companion)_scaled_(\d+)$/.exec(id||'');
   if(!m) return null;
-  const category = m[1], level = parseInt(m[2],10);
-  const damage = category==='mana' ? Math.round(0+level*6) : Math.round(2+level*8);
-  return { id, name:proceduralSpellName(category,level), level, damage,
-    flavor: proceduralSpellFlavor(level),
+  const category = m[1], damage = parseInt(m[2],10);
+  // Display-only tier index, derived from the damage value purely for
+  // naming/flavor variety and the cosmetic "Lv." shown in the shop -- the
+  // actual balance-relevant number is the damage embedded in the id itself.
+  const base = category==='mana' ? 17 : 25, step = category==='mana' ? 6 : 8;
+  const tier = Math.max(0, Math.round((damage-base)/step));
+  return { id, name:proceduralSpellName(category,10+tier), level:10+tier, damage,
+    flavor: proceduralSpellFlavor(10+tier),
     price: Math.round(30+damage*1.2), procedural:true };
 }
 // Called on save load for every currently-equipped slot/spell -- if it's a
@@ -3093,11 +3118,11 @@ function ensureProceduralGearStock(slot){
   const equippedItem = equippedId ? GEAR_ITEMS.find(g=>g.id===equippedId) : null;
   const currentBonus = equippedItem ? equippedItem.bonus : 0;
   const upgradeCount = GEAR_ITEMS.filter(g=>
-    g.slot===slot && questIndex >= (g.minIndex||0) && !ownedItems.has(g.id) && g.bonus > currentBonus
+    g.slot===slot && playerLevel >= (g.minLevel||0) && !ownedItems.has(g.id) && g.bonus > currentBonus
   ).length;
   const needed = Math.max(0, 2 - upgradeCount);
   if(needed===0) return;
-  const maxKnownBonus = Math.max(0, ...GEAR_ITEMS.filter(g=>g.slot===slot).map(g=>g.bonus));
+  const maxKnownBonus = Math.max(currentBonus, ...GEAR_ITEMS.filter(g=>g.slot===slot && playerLevel>=(g.minLevel||0)).map(g=>g.bonus));
   for(let i=1;i<=needed;i++){
     const id = `gear_${slot}_scaled_${maxKnownBonus+i}`;
     ensureGearItemRegistered(id);
@@ -3115,13 +3140,14 @@ function ensureProceduralSpellStock(category){
   const equippedItem = arr.find(s=>s.id===equippedId);
   const currentDamage = equippedItem ? equippedItem.damage : 0;
   const upgradeCount = arr.filter(s=>
-    (s.free || questIndex >= (s.minIndex||0)) && !ownedItems.has(s.id) && s.damage > currentDamage
+    (s.free || playerLevel >= (s.minLevel||0)) && !ownedItems.has(s.id) && s.damage > currentDamage
   ).length;
   const needed = Math.max(0, 2 - upgradeCount);
   if(needed===0) return;
-  const maxKnownLevel = Math.max(0, ...arr.map(s=>s.level));
+  const maxKnownDamage = Math.max(currentDamage, ...arr.filter(s=>(s.free||playerLevel>=(s.minLevel||0))).map(s=>s.damage));
+  const increment = category==='mana' ? 6 : 8;
   for(let i=1;i<=needed;i++){
-    const id = `spell_${category}_scaled_${maxKnownLevel+i}`;
+    const id = `spell_${category}_scaled_${maxKnownDamage+increment*i}`;
     ensureSpellItemRegistered(id, category);
   }
 }
@@ -3130,13 +3156,15 @@ let equippedCompanionSpell = 'spell_companion_base';
 let ownedItems = new Set();
 
 const KEEPER_LINES = [
-  "\"Ah, a traveler! Gold's no good buried in your pocket, let's see what I've got.\"",
+  "\"Ah, a traveler! Gold's no good buried in a pocket. Let's see what I've got.\"",
   "\"Everything here's honest goods. Mostly. Don't ask about the buckler.\"",
-  "\"Spend it while you're breathing, I always say. Rare comfort in this line of work.\""
+  "\"Spend it while you're breathing, I always say. Rare comfort, this line of work.\""
 ];
 function renderShop(){
   renderShopBackdrop(bgAnimTick);
   document.getElementById('shopGoldDisplay').textContent = totalGold;
+  document.getElementById('shopLevelDisplay').textContent = playerLevel;
+  document.getElementById('shopDifficultyDisplay').textContent = difficulty.charAt(0).toUpperCase()+difficulty.slice(1);
   typeText(document.getElementById('keeperDialogue'), KEEPER_LINES[Math.floor(Math.random()*KEEPER_LINES.length)]);
   drawSprite(document.getElementById('shopHeroCanvas').getContext('2d'), 'hero', THEMES.ember.sprites.hero);
   renderCharacterEquipped();
@@ -3160,7 +3188,7 @@ function gearStatCompareHtml(item){
   return `<span class="spell-level">+0</span>`;
 }
 const gearHtml = GEAR_ITEMS
-    .filter(item => !item.storyExclusive && questIndex >= (item.minIndex||0))
+    .filter(item => !item.storyExclusive && playerLevel >= (item.minLevel||0))
     .filter(item => {
       if(ownedItems.has(item.id)) return true; // always show what you already own
       const equippedId = equippedGear[item.slot];
@@ -3178,7 +3206,7 @@ const gearHtml = GEAR_ITEMS
       else btnHtml = `<button class="shop-buy-btn" data-equipgear="${item.id}">EQUIP</button>`;
       return `<div class="shop-item">
         <div>
-          <div class="shop-item-name">${item.name} ${gearStatCompareHtml(item)}</div>
+          <div class="shop-item-name"><span class="shop-gem-swatch" style="background:${GEM_BRIGHT[item.gem]}"></span>${item.name} ${gearStatCompareHtml(item)}</div>
           <div class="shop-item-cat">Gear: ${item.slot.toUpperCase()} · ${GEM_LABEL[item.gem]}</div>
           ${item.flavor ? `<div class="shop-item-flavor">${item.flavor}</div>` : ''}
         </div>
@@ -3187,7 +3215,7 @@ const gearHtml = GEAR_ITEMS
     }).join('');
 
   const spellSection = (label, spells, equippedId, equipKey) => spells
-    .filter(item => !item.storyExclusive && (item.free || questIndex >= (item.minIndex||0)))
+    .filter(item => !item.storyExclusive && (item.free || playerLevel >= (item.minLevel||0)))
     .filter(item => {
       if(item.free || ownedItems.has(item.id)) return true;
       const equippedItem = spells.find(s=>s.id===equippedId);
@@ -3366,7 +3394,7 @@ function equipGear(id){
 // after every story-exclusive item has already been claimed.
 // Generates a properly-scaled item for a treasure chest when nothing
 // hand-authored is eligible (already owned, or not yet unlocked by
-// minIndex) -- reuses the same procedural stock system the shop uses
+// minLevel) -- reuses the same procedural stock system the shop uses
 // rather than authoring fixed fallback content, so the generated item is
 // correctly powered for wherever the player currently is. Falls back from
 // gear to spells (or vice versa) if the first category comes up empty,
@@ -3393,8 +3421,8 @@ function generateTreasureFallbackItem(wantGear, excludeIds){
   return candidates.length ? candidates[Math.floor(Math.random()*candidates.length)] : null;
 }
 function pickTreasureOptions(){
-  const gearPool = GEAR_ITEMS.filter(g=>g.storyExclusive && !ownedItems.has(g.id) && questIndex >= (g.minIndex||0));
-  const spellPool = [...MANA_SPELLS, ...COMPANION_SPELLS].filter(s=>s.storyExclusive && !ownedItems.has(s.id) && questIndex >= (s.minIndex||0));
+  const gearPool = GEAR_ITEMS.filter(g=>g.storyExclusive && !ownedItems.has(g.id) && playerLevel >= (g.minLevel||0));
+  const spellPool = [...MANA_SPELLS, ...COMPANION_SPELLS].filter(s=>s.storyExclusive && !ownedItems.has(s.id) && playerLevel >= (s.minLevel||0));
   const pickOne = (excludeIds)=>{
     const wantGear = Math.random() < (2/3);
     const primary = (wantGear ? gearPool : spellPool).filter(i=>!excludeIds.includes(i.id));
@@ -3605,7 +3633,7 @@ document.getElementById('treasureChest').addEventListener('click', ()=>{
         flash.classList.remove('pulse'); void flash.offsetWidth; flash.classList.add('pulse');
         spawnTreasureSparkles(card);
         subEl.textContent = treasureIsBossChest
-          ? `${item.name} is yours — your battle window runs ${(WINDOW_BONUS_PER_BOSS_MS/1000).toFixed(1)}s longer from here on.`
+          ? `${item.name} is yours. Your battle window runs ${(WINDOW_BONUS_PER_BOSS_MS/1000).toFixed(1)}s longer from here on.`
           : `${item.name} is yours.`;
         setTimeout(finishTreasure, 1450);
       }, { once:true });
@@ -4346,12 +4374,14 @@ const ENEMY_ARCHETYPE_TRAITS = {
   bandit:'ambush', wraith:'ambush', stalker:'ambush', thornspike:'ambush', twisted:'ambush',
   drowned:'dragunder', crawler:'dragunder', serpent:'dragunder', longneck:'dragunder',
   raider:'sunbaked', sandwraith:'sunbaked', handler:'sunbaked', shellback:'sunbaked',
+  warden:'fading', wisp:'fading', rootbound:'fading', gianteye:'fading',
 };
 const ENEMY_DISCIPLINED_VARIANTS = new Set(['guard','assassin','zealot','wingedimp','crownregal']);
 const MIN_WINDOW_DURATION_MS = 2500;
 function enemyAttackDamage(){
   const t = ENEMY_DMG_BY_BIOME[state.biome] || ENEMY_DMG_BY_BIOME.battlefield;
   let dmg = Math.round((t.base + Math.floor(Math.random()*t.range)) * state.bossEnrageMultiplier);
+  if(playContext==='story') dmg = Math.round(dmg * DIFFICULTY_MULT[difficulty]);
   if(!state.isBoss){
     const trait = ENEMY_ARCHETYPE_TRAITS[enemyVariant];
     if(trait === 'desperate' && state.enemyHP > 0 && state.enemyHP < state.enemyMaxHP*0.3){
@@ -4372,6 +4402,14 @@ function enemyAttackDamage(){
       state.enemyHP = Math.min(state.enemyMaxHP, state.enemyHP+heal);
       addLog(`${state.enemyName} draws resilience from the heat. Recovers ${heal} HP.`);
       announceEnemyTrait('SUNBAKED!', `+${heal} HP restored`, '#f0c060');
+    } else if(trait === 'fading'){
+      const fadeMult = 0.6 + 0.4*(state.enemyHP/state.enemyMaxHP);
+      dmg = Math.round(dmg * fadeMult);
+      if(state.enemyHP > 0 && state.enemyHP < state.enemyMaxHP*0.5 && !state.fadingAnnounced){
+        state.fadingAnnounced = true;
+        addLog(`${state.enemyName}'s ancient strength is visibly failing.`);
+        announceEnemyTrait('FADING!', 'Weakening as it falls', '#a8c8b8');
+      }
     }
   }
   return dmg;
@@ -4379,7 +4417,7 @@ function enemyAttackDamage(){
 const LOCK_FLAVOR = {
   battlefield:{ name:'The War Chest', banner:"A dead commander's strongbox, warded shut. Align the gold tumblers to break the seal.", moves:16, progressPerMatch:14 },
   forest:{ name:'The Root-Bound Vault', banner:'Roots have grown through an old iron door. Align the gold tumblers to force it open.', moves:15, progressPerMatch:13 },
-  lake:{ name:'The Sunken Archive Door', banner:'Black water laps at stone steps leading down. Wards of old magic bind the door. Align the gold tumblers to force it open.', moves:14, progressPerMatch:12 },
+  lake:{ name:'The Sunken Archive Door', banner:'Black water laps at stone steps leading down, warded shut with old magic. Align the gold tumblers to force it open.', moves:14, progressPerMatch:12 },
   castle:{ name:'The Sealed Armory', banner:'A vault door, untouched since the siege. Align the gold tumblers to break the lock.', moves:13, progressPerMatch:11 },
   desert:{ name:'The Buried Reliquary', banner:'Sand has swallowed this door to the hilt. Align the gold tumblers to pry it free.', moves:13, progressPerMatch:10 },
   sanctuary:{ name:'The Last Ward', banner:'A final seal guards the path forward. Align the gold tumblers to pass.', moves:12, progressPerMatch:10 }
@@ -4389,8 +4427,8 @@ const RIDDLE_FLAVOR = {
   forest:{ name:'The Hollow Oak Sphinx', banner:'A shape rests in the hollow of the oldest tree, and speaks only in riddles.', seqLength:3, moves:15, variant:'titan' },
   lake:{ name:'The Drowned Sphinx', banner:'A shape half-submerged watches from the shallows, and speaks only in riddles.', seqLength:4, moves:14, variant:'manymouth' },
   castle:{ name:'The Gatehouse Sphinx', banner:'Something ancient guards the inner gate, and speaks only in riddles.', seqLength:4, moves:13, variant:'hollowvoid' },
-  desert:{ name:"The Sphinx's Gate", banner:'Heat shimmers off endless dunes. The Sphinx blocks the only shade for miles, and speaks only in riddles.', seqLength:5, moves:13, variant:'horned' },
-  sanctuary:{ name:'The Last Question', banner:'One final riddle stands between you and the grove, and it speaks only in riddles.', seqLength:5, moves:12, variant:'titan' }
+  desert:{ name:"The Sphinx's Gate", banner:'The Sphinx blocks the only shade in the shimmering heat, and speaks only in riddles.', seqLength:5, moves:13, variant:'horned' },
+  sanctuary:{ name:'The Last Question', banner:'One final trial stands between you and the grove, and it speaks only in riddles.', seqLength:5, moves:12, variant:'titan' }
 };
 function lockNode(biome){ const f = LOCK_FLAVOR[biome] || LOCK_FLAVOR.battlefield; return { type:'lock', name:f.name, biome, banner:f.banner, moves:f.moves, progressPerMatch:f.progressPerMatch }; }
 function riddleNode(biome){ const f = RIDDLE_FLAVOR[biome] || RIDDLE_FLAVOR.desert; return { type:'riddle', name:f.name, biome, banner:f.banner, moves:f.moves, seqLength:f.seqLength, variant:f.variant }; }
@@ -4402,12 +4440,12 @@ function riddleNode(biome){ const f = RIDDLE_FLAVOR[biome] || RIDDLE_FLAVOR.dese
 // fights are counted in their biome's total but always appended last, never
 // shuffled into the mix. Battlefield 9 -> Forest 10 -> Lake 10 -> Castle 11
 // -> Desert 12 -> Sanctuary 7 (a shorter, more concentrated final stretch).
-// TODO (deferred on purpose, per explicit instruction — revisit when asked):
-// Forest, Lake, Castle, and Desert don't have Azure-world lore identities
-// yet, just generic fantasy zone names. Alerra (battlefield) and Mother's
-// Crown (sanctuary) are the two biomes the lore explicitly names — the
-// four in between are still waiting on specific place-names/history before
-// they get the same treatment.
+// World naming: Alerra (battlefield), the Hollow Wood (forest), the Sorrow
+// Deep (lake), Duskhold (castle), the Scorched Reach (desert), and the
+// Borez Cliffs leading to Mother's Crown (sanctuary). Every biome-intro
+// threads the central relationship -- Ro and the wolf's bond, and the
+// escalating stakes of the wound -- rather than being purely about the
+// location itself.
 function generateQuestChain(){
   const chain = [];
 
@@ -4437,7 +4475,7 @@ function generateQuestChain(){
 
   chain.push(...buildBiomeNodes('sanctuary', 7, [lockNode('sanctuary'), riddleNode('sanctuary')]));
   chain.push({ type:'finalboss', name:"The Crown's Guardian", biome:'sanctuary', boss:true,
-    banner:'Light unlike any you have seen filters through leaves untouched for centuries. Somewhere at the center of Mother\'s Crown, the flower blooms, and something ancient stands between you and it.' });
+    banner:'Light unlike any you have seen filters through leaves untouched for centuries. The flower blooms at the heart of Mother\'s Crown, and something ancient stands between you and it.' });
 
   return chain;
 }
@@ -4448,6 +4486,31 @@ let questIndex = 0;
 // Persistent across encounters — banked from state.gold once a battle concludes,
 // not reset by initMode the way state.gold is. Spent at the shop.
 let totalGold = 0;
+// Player level, earned by defeating enemies rather than walking through
+// story nodes -- gear, spells, and treasure are gated against this instead
+// of raw story progress. Points scale with how tough the enemy actually
+// was (their max HP, doubled for bosses), so a player who's genuinely
+// handling harder fights levels up faster than one just passing through.
+let playerXP = 0;
+let playerLevel = 1;
+// Difficulty deliberately only scales enemy HP/damage -- gear/spell yield
+// and the momentum multiplier stay untouched, since those went through
+// careful specific tuning this session and multiplying the ways a
+// difficulty setting could interact with them risks undoing that work.
+let difficulty = 'medium';
+const DIFFICULTY_MULT = { easy:0.8, medium:1.0, hard:1.25 };
+function enemyDifficultyPoints(maxHP, isBoss){
+  return Math.round(maxHP/15) * (isBoss ? 2 : 1);
+}
+// Called with the difficulty-scaled enemyMaxHP divided back to its true
+// baseline at every call site -- otherwise Hard mode's inflated enemy HP
+// would also inflate XP earned per kill, causing gear/spell progression to
+// unlock faster on Hard and slower on Easy. Difficulty is only meant to
+// affect combat challenge, not how fast the level curve advances.
+function awardDifficultyXP(maxHP, isBoss){
+  playerXP += enemyDifficultyPoints(maxHP, isBoss);
+  playerLevel = Math.max(1, Math.floor(playerXP/30));
+}
 // Lightweight run-tracking for the post-game summary screen -- cheap to
 // maintain, no new save-schema needed since these only ever get read once,
 // right at the story's actual ending.
@@ -4715,33 +4778,33 @@ Object.keys(BOSS_LORE).forEach(variant=>{
 const BIOME_LORE = {
   forest: [
     { scene:'forestEntrance', sprite:'hero', pos:'left', prop:'trees', fx:'default',
-      text:'The road narrows, then vanishes beneath root and canopy. The forest does not announce itself. It simply closes overhead.' },
+      text:"They call it the Hollow Wood, though no one agrees why. Some say it's the silence, no birds sing here, even by daylight. Ro doesn't care what it's called, only that it stands between her and the mountain." },
     { scene:'forestEntrance', sprite:'wolf', pos:'right', prop:'trees', fx:'rackfocus',
-      text:`${getWolfName()} tenses at the treeline. Something in here has been watching the road for longer than either of them.` }
+      text:`She checks the wound every night now, needed or not. ${getWolfName()} never complains, just watches with those patient amber eyes, like they're the one doing the comforting.` }
   ],
   lake: [
     { scene:'lakeStill', sprite:'hero', pos:'left', fx:'default',
-      text:'The water opens ahead of them, black and mirror-still, giving nothing away.' },
+      text:"The Sorrow Deep doesn't ripple. Not wind, not rain, not anything living. Ro has started talking just to fill the silence it leaves." },
     { scene:'lakeStill', sprite:'hero', pos:'left', fx:'punch',
-      text:'No birds. No wind on the surface. Whatever lives beneath it has claimed the quiet as its own.' }
+      text:`"What if the flower isn't real," she says, not really a question. ${getWolfName()} leans into her side, warm and still breathing. That's answer enough for tonight.` }
   ],
   castle: [
     { scene:'castleRuins', sprite:'hero', pos:'left', prop:'debris', particles:'dust', fx:'default',
-      text:'The keep rises out of the dark, half-ruin and half-throne, still standing out of pure stubbornness.' },
-    { scene:'castleRuins', sprite:'hero', pos:'left', particles:'dust', fx:'punch',
-      text:'Whatever held this castle once is long gone. Something else answers for it now.' }
+      text:"Duskhold was a throne once, before it was a ruin, before it was just another shape the dark makes on the horizon. Ro doesn't know its history. She knows the wound smells wrong now, and that terrifies her more than any keep could." },
+    { scene:'castleRuins', sprite:'wolf', pos:'right', particles:'dust', fx:'punch',
+      text:`"Leave me at the gate," ${getWolfName()} says, and it's the first time. Ro doesn't answer, just keeps walking. So do they.` }
   ],
   desert: [
     { scene:'desertDunes', sprite:'hero', pos:'left', particles:'dust', fx:'default',
-      text:'Heat rises off the dunes in visible sheets. There is no shade here, and no cover either.' },
+      text:"The Scorched Reach doesn't kill quickly. It takes its time, the way grief does, the way a wound does when the cure is still two biomes away." },
     { scene:'desertDunes', sprite:'wolf', pos:'right', particles:'dust', fx:'default',
-      text:`${getWolfName()} walks close to her heel, tired but steady. Neither of them is built for this heat. Neither of them has a choice.` }
+      text:`${getWolfName()} goes down at midday, just long enough for Ro's whole world to go white with panic. She carries them into what shade there is and doesn't let go until the sun starts down.` }
   ],
   sanctuary: [
     { scene:'sanctuaryCliffs', sprite:'hero', pos:'left', prop:'mountainBloom', particles:'light', fx:'propfocus',
-      text:"The Borez Cliffs rise ahead at last, and somewhere above them, Mother's Crown. Closer now than at any point in the journey." },
+      text:"The Borez Cliffs rise ahead at last, and somewhere above them, Mother's Crown. Closer now than at any point in the journey, close enough to be afraid to believe it." },
     { scene:'sanctuaryCliffs', sprite:'wolf', pos:'right', particles:'light', fx:'punch',
-      text:`${getWolfName()}'s breathing has grown shallower with every mile. There is no more road left to spend. Only the climb.` }
+      text:`${getWolfName()}'s breathing has gone shallow and quick, like something rationed. No more road left to spend, only the climb, and Ro would carry them up every inch of it if that's what it took.` }
   ]
 };
 const seenBiomeIntro = {};
@@ -5338,24 +5401,52 @@ function renderNightStars(){
     container.appendChild(star);
   }
 }
+let wolfPetCooldown = false;
+function petWolf(e){
+  e.stopPropagation();
+  if(wolfPetCooldown) return;
+  wolfPetCooldown = true;
+  setTimeout(()=>{ wolfPetCooldown = false; }, 700);
+  playSFX('wolfPet');
+  const wrap = document.getElementById('campfireWolfWrap');
+  wrap.classList.remove('petted'); void wrap.offsetWidth; wrap.classList.add('petted');
+  const layer = document.getElementById('petHeartLayer');
+  for(let i=0;i<3;i++){
+    const h = document.createElement('div');
+    h.className = 'pet-heart';
+    h.textContent = '\u2665';
+    h.style.left = (35+Math.random()*30)+'%';
+    h.style.bottom = '35%';
+    h.style.color = ['#ff8a9a','#ffb0c0','#ff6a80'][i%3];
+    h.style.animationDelay = (i*0.12)+'s';
+    layer.appendChild(h);
+    setTimeout(()=> h.remove(), 1600);
+  }
+}
 function drawCampfireFlame(ctx, t){
   t = t || 0;
   ctx.clearRect(0,0,20,24);
   // Logs at the base
   band(ctx,20,3,16,'#3a2818'); band(ctx,21,4,15,'#2a1c10');
-  // Each row's horizontal offset jitters independently via layered sine
-  // waves -- the flame's internal shape genuinely flickers frame to frame
-  // now, rather than being one static silhouette only ever moved as a
-  // rigid whole by the CSS wobble.
-  const jx = (y)=> Math.round(Math.sin(t*0.15+y*0.5)*1.2 + Math.sin(t*0.31+y)*0.6);
+  // Motion now biases vertical over horizontal -- real flames flicker in
+  // height far more than they sway side to side. The tip occasionally
+  // reaches up an extra row, the bright core bobs between two heights, and
+  // horizontal jitter is reduced to a subtle sway rather than the
+  // dominant motion it was before.
+  const jx = (y)=> Math.round(Math.sin(t*0.15+y*0.5)*0.5 + Math.sin(t*0.31+y)*0.3);
+  const reach = Math.sin(t*0.11) + Math.sin(t*0.23)*0.6;
+  const tipUp = reach > 0.7;
   // Flame, tapering from a wide base to a point, warmest at the core
   const OUTER = [[9,9,10],[10,7,12],[11,6,13],[12,6,13],[13,5,14],[14,5,14],[15,4,15],[16,4,15],[17,4,15],[18,4,15],[19,4,15]];
+  if(tipUp) band(ctx,8,9+jx(8),10+jx(8),'#8a1a10');
   OUTER.forEach(([y,x0,x1])=> band(ctx,y,x0+jx(y),x1+jx(y),'#8a1a10'));
   const MID = [[10,8,11],[11,7,12],[12,7,12],[13,6,13],[14,6,13],[15,6,13],[16,6,13],[17,6,13],[18,6,13]];
   MID.forEach(([y,x0,x1])=> band(ctx,y,x0+jx(y),x1+jx(y),'#e0641a'));
   const CORE = [[12,9,10],[13,8,11],[14,8,11],[15,8,11],[16,8,11],[17,8,11]];
+  if(tipUp) band(ctx,11,9+jx(11),10+jx(11),'#ffcf4a');
   CORE.forEach(([y,x0,x1])=> band(ctx,y,x0+jx(y),x1+jx(y),'#ffcf4a'));
-  band(ctx,14,9+jx(14),10+jx(14),'#fff0c0'); band(ctx,15,9+jx(15),10+jx(15),'#fff0c0');
+  const coreTipY = reach > 0.1 ? 13 : 14;
+  band(ctx,coreTipY,9+jx(coreTipY),10+jx(coreTipY),'#fff0c0'); band(ctx,coreTipY+1,9+jx(coreTipY+1),10+jx(coreTipY+1),'#fff0c0');
 }
 function showCampfireNode(node){
   campfireHealAmt = Math.max(1, Math.round(persistentPlayerMaxHP*0.4));
@@ -5383,6 +5474,7 @@ document.getElementById('campfireScene').addEventListener('click', ()=>{
   glowEl.classList.add('stoked');
   setTimeout(()=>{ campfireStoking = false; }, 1300);
 });
+document.getElementById('campfireWolfWrap').addEventListener('click', petWolf);
 document.getElementById('campfireLeaveBtn').addEventListener('click', ()=>{
   document.getElementById('campfireOverlay').classList.remove('show');
   stopAmbientLoop();
@@ -5524,6 +5616,7 @@ function resolveBankedStrike(){
   if(state.enemyHP<=0){
     state.gameOver=true; state.won=true;
     arcadeAwardPoints();
+    if(playContext==='story') awardDifficultyXP(state.enemyMaxHP / DIFFICULTY_MULT[difficulty], state.isBoss);
     if(finalBossPhase===3){
       finalBossPhase = 0; finalBossJustCompleted = true;
       state.resultText = "The eye closes. Whatever it was, it doesn't rise again.";
@@ -5592,6 +5685,7 @@ async function resolveWindow(){
     if(state.enemyHP<=0){
       state.gameOver=true; state.won=true;
       arcadeAwardPoints();
+    if(playContext==='story') awardDifficultyXP(state.enemyMaxHP / DIFFICULTY_MULT[difficulty], state.isBoss);
       if(finalBossPhase===3){
         finalBossPhase = 0; finalBossJustCompleted = true;
         state.resultText = "The eye closes, undone by a chain reaction. Whatever it was, it doesn't rise again.";
@@ -5904,6 +5998,7 @@ async function castManaSpell(){
     over = true;
     state.gameOver=true; state.won=true;
     arcadeAwardPoints();
+    if(playContext==='story') awardDifficultyXP(state.enemyMaxHP / DIFFICULTY_MULT[difficulty], state.isBoss);
     if(finalBossPhase===3){
       finalBossPhase = 0; finalBossJustCompleted = true;
       state.resultText = `The eye closes, undone by ${spell.name}. Whatever it was, it doesn't rise again.`;
@@ -5953,6 +6048,7 @@ async function castWolfAttack(){
     over = true;
     state.gameOver=true; state.won=true;
     arcadeAwardPoints();
+    if(playContext==='story') awardDifficultyXP(state.enemyMaxHP / DIFFICULTY_MULT[difficulty], state.isBoss);
     if(finalBossPhase===3){
       finalBossPhase = 0; finalBossJustCompleted = true;
       state.resultText = "The eye closes, driven back by fang and claw. Whatever it was, it doesn't rise again.";
@@ -6173,6 +6269,7 @@ function initMode(mode, node){
   state.bossVariant = node ? node.variant : null;
   state.bossTraitFired = false;
   state.ambushConsumed = false;
+  state.fadingAnnounced = false;
   state.bossDamageReduction = 0;
   if(!state.isBoss && ENEMY_DISCIPLINED_VARIANTS.has(enemyVariant)){
     state.bossDamageReduction = 0.15;
@@ -6213,6 +6310,7 @@ function initMode(mode, node){
     state.gold=0; state.enemyName=node?node.name:'the Bandit Chief';
     state.enemyHP=state.enemyMaxHP = (node && node.hp) ? node.hp :
       (state.isBoss ? (BOSS_HP_BY_BIOME[node && node.biome] || 205) : (BATTLE_HP_BY_BIOME[node && node.biome] || 115));
+    if(playContext==='story') state.enemyHP = state.enemyMaxHP = Math.round(state.enemyMaxHP * DIFFICULTY_MULT[difficulty]);
   } else if(mode==='lock'){
     const mv = (node && node.moves) || 14;
     state.lockProgress=0; state.lockMoves=mv; state.lockMovesMax=mv;
@@ -6534,9 +6632,14 @@ function mysticShimmer(ctx, out, t0, freq, dur, {vol=0.24, wave='sine', echo=tru
     o2.connect(eg2); o2.start(t0+dur*0.55); o2.stop(t0+dur*1.3+0.02);
   }
 }
-const NOTE = { C4:261.63,D4:293.66,E4:329.63,F4:349.23,G4:392.00,A4:440.00,
-  C5:523.25,D5:587.33,E5:659.25,F5:698.46,G5:783.99,A5:880.00,B5:987.77,
-  C6:1046.50,D6:1174.66,E6:1318.51,G6:1567.98 };
+const NOTE = {
+  C1:32.7, Db1:34.65, D1:36.71, Eb1:38.89, E1:41.2, F1:43.65, Gb1:46.25, G1:49.0, Ab1:51.91, A1:55.0, Bb1:58.27, B1:61.74,
+  C2:65.41, Db2:69.3, D2:73.42, Eb2:77.78, E2:82.41, F2:87.31, Gb2:92.5, G2:98.0, Ab2:103.83, A2:110.0, Bb2:116.54, B2:123.47,
+  C3:130.81, Db3:138.59, D3:146.83, Eb3:155.56, E3:164.81, F3:174.61, Gb3:185.0, G3:196.0, Ab3:207.65, A3:220.0, Bb3:233.08, B3:246.94,
+  C4:261.63, Db4:277.18, D4:293.66, Eb4:311.13, E4:329.63, F4:349.23, Gb4:369.99, G4:392.0, Ab4:415.3, A4:440.0, Bb4:466.16, B4:493.88,
+  C5:523.25, Db5:554.37, D5:587.33, Eb5:622.25, E5:659.26, F5:698.46, Gb5:739.99, G5:783.99, Ab5:830.61, A5:880.0, Bb5:932.33, B5:987.77,
+  C6:1046.5, Db6:1108.73, D6:1174.66, Eb6:1244.51, E6:1318.51, F6:1396.91, Gb6:1479.98, G6:1567.98, Ab6:1661.22, A6:1760.0, Bb6:1864.66, B6:1975.53
+};
 
 // Every sound from the audio guide's list, built with the primitives above.
 // Keyed by the same names used at each call site so it's obvious which
@@ -7012,18 +7115,23 @@ const MUSIC_TRACKS = {
     ],
   },
   campfire: {
-    bpm: 76,
+    bpm: 66,
     voices: [
       { sequence: [
-        ['A4',2],['G4',1],['E4',1],['F4',2],['D4',2],
-        ['E4',2],['C4',1],['A3',1],['D4',4],
-      ], wave:'triangle', vol:0.22, gate:0.9 },
+        ['A3',2],['G3',2],['F3',2],['E4',2],['D4',4],['C4',2],['D4',2],['E4',2],['D4',2],['C4',4],
+        ['D4',2],['C4',2],['Bb3',2],['A3',2],['G3',4],['F3',2],['G3',2],['A3',2],['G3',2],['F3',4],
+        ['A3',2],['G3',2],['F3',2],['E4',2],['D4',4],['C4',2],['D4',2],['E4',2],['D4',2],['C4',4],
+      ], wave:'triangle', vol:0.19, gate:0.9 },
       { sequence: [
-        ['D3',4],['A2',4],['Bb2',4],['A2',4],
-      ], wave:'triangle', vol:0.16, gate:0.97 },
+        ['D3',8],['Bb2',8],['A2',8],
+        ['F3',8],['C3',8],['Bb2',8],
+        ['D3',8],['Bb2',8],['A2',8],
+      ], wave:'triangle', vol:0.14, gate:0.97 },
       { sequence: [
-        ['F4',8],['D4',8],
-      ], wave:'square', vol:0.045, duty:0.5, gate:0.98 },
+        [null,24],
+        [null,24],
+        [null,4],['F4',4],['E4',4],['D4',4],['C4',4],['Bb3',4],
+      ], wave:'sine', vol:0.08, gate:0.9 },
     ],
   },
   // Warm and glowing rather than a quick fanfare -- this plays while the
@@ -7138,6 +7246,7 @@ const SFX_RECIPES = {
   bossGroveRegen: (ctx,out)=> notesSeq(ctx,out,[NOTE.G5,NOTE.C6,NOTE.G5],0.09,{wave:'sine',vol:0.2,fat:false}),
   enemyTraitActivate: (ctx,out)=>{ sweepFat(ctx,out,ctx.currentTime,180,420,0.3,{wave:'sawtooth',vol:0.22}); crunchNoise(ctx,out,ctx.currentTime+0.05,0.15,{vol:0.15,lo:200,hi:2000,decay:10}); },
   lifeLost: (ctx,out)=>{ const t=ctx.currentTime; sweepFat(ctx,out,t,300,80,0.5,{wave:'triangle',vol:0.26}); thump(ctx,out,t+0.1,0.3,{vol:0.3,f0:120,f1:40}); },
+  wolfPet: (ctx,out)=>{ const t=ctx.currentTime; notesSeq(ctx,out,[NOTE.A4,NOTE.C5],0.11,{wave:'sine',vol:0.18,fat:false}); },
 
   // Lock puzzle — mechanical: metal clicks and tumbler/bolt sounds, not tones
   lockTick: (ctx,out)=> metalClick(ctx,out,ctx.currentTime,{vol:0.34,ringFreq:2100,dur:0.09}),
@@ -7270,19 +7379,28 @@ function startAmbientLoop(kind){
   try{
     const ctx = getAudioCtx();
     if(ctx.state === 'suspended') return;
-    const dur = 3;
+    const dur = 8;
     const n = Math.floor(ctx.sampleRate*dur);
     const buf = ctx.createBuffer(1, n, ctx.sampleRate);
     const data = buf.getChannelData(0);
-    // layered crackle: a low rumble bed plus sparse sharp pops, looped
-    for(let i=0;i<n;i++){
-      const t = i/ctx.sampleRate;
-      let v = (Math.random()*2-1) * 0.05;
-      if(Math.random() < 0.0025) v += (Math.random()*2-1) * 0.5; // occasional pop
-      data[i] = v;
+    // A quiet, barely-there hiss bed -- previously this ran at 0.05 and
+    // was the dominant, constant element, which is exactly why it read as
+    // static rather than fire. Crackle should be built from discrete pops
+    // with real decay shaping, not noise with occasional spikes on top.
+    for(let i=0;i<n;i++) data[i] = (Math.random()*2-1) * 0.015;
+    let i = 0;
+    while(i < n){
+      i += Math.floor((0.05 + Math.random()*0.35) * ctx.sampleRate);
+      if(i >= n) break;
+      const popLen = Math.floor((0.004 + Math.random()*0.02) * ctx.sampleRate);
+      const popAmp = 0.25 + Math.random()*0.55;
+      for(let k=0; k<popLen && i+k<n; k++){
+        const decay = Math.exp(-k/(popLen*0.3));
+        data[i+k] += (Math.random()*2-1) * popAmp * decay;
+      }
     }
     const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
-    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1800; bp.Q.value = 0.6;
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2200; bp.Q.value = 0.8;
     const g = ctx.createGain(); g.gain.value = 0;
     src.connect(bp).connect(g).connect(ctx.destination);
     src.start();
@@ -7308,6 +7426,7 @@ function saveGame(){
     persistentPlayerMana, persistentPlayerMaxMana, persistentRage,
     persistentWindowBonus, storyLivesRemaining,
     totalGold, ownedItems: Array.from(ownedItems),
+    playerXP, playerLevel, difficulty,
     equippedGear, equippedManaSpell, equippedCompanionSpell,
     hasSeenIntroCutscene, hasSeenLivesExplanation, skipPuzzleIntro,
     seenBossLore, seenBiomeIntro
@@ -7349,6 +7468,9 @@ function applySavedGame(save){
   persistentWindowBonus = typeof save.persistentWindowBonus === 'number' ? save.persistentWindowBonus : 0;
   storyLivesRemaining = typeof save.storyLivesRemaining === 'number' ? save.storyLivesRemaining : STORY_MAX_LIVES;
   totalGold = save.totalGold;
+  playerXP = typeof save.playerXP === 'number' ? save.playerXP : 0;
+  playerLevel = typeof save.playerLevel === 'number' ? save.playerLevel : 1;
+  difficulty = DIFFICULTY_MULT[save.difficulty] ? save.difficulty : 'medium';
   ownedItems = new Set(save.ownedItems);
   equippedGear = save.equippedGear;
   equippedManaSpell = save.equippedManaSpell;
@@ -7620,6 +7742,8 @@ function startFreshStory(){
   runStartTime = Date.now();
   totalDamageDealt = 0;
   totalMatchesMade = 0;
+  playerXP = 0;
+  playerLevel = 1;
   playContext = 'story';
   showScreen('game');
   showCutscene(cutsceneSlides(), ()=>{
@@ -7639,10 +7763,21 @@ document.getElementById('menuStoryBtn').addEventListener('click', ()=>{
   playSFX('screenTransition');
   const existing = loadSavedGame();
   if(existing && existing.questIndex > 0){
-    showConfirm('Restart your quest from the very beginning? A brand new campaign will be generated. Your progress, equipped gear and spells, and wolf customization will all reset.', startFreshStory);
+    showConfirm('Restart your quest from the very beginning? A brand new campaign will be generated. Your progress, equipped gear and spells, and wolf customization will all reset.', showDifficultySelect);
   } else {
-    startFreshStory();
+    showDifficultySelect();
   }
+});
+function showDifficultySelect(){
+  document.getElementById('difficultyOverlay').classList.add('show');
+}
+document.querySelectorAll('#difficultyOverlay [data-difficulty]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    playSFX('buttonTap');
+    difficulty = btn.dataset.difficulty;
+    document.getElementById('difficultyOverlay').classList.remove('show');
+    startFreshStory();
+  });
 });
 document.getElementById('menuContinueBtn').addEventListener('click', ()=>{
   if(!hasSavedGame()) return;
