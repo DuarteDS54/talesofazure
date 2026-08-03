@@ -3867,6 +3867,7 @@ function spawnPerfectTimingPopup(){
   el.className = 'combo-popup perfect-timing-popup';
   el.style.fontSize = 'clamp(20px,6vw,32px)';
   el.style.color = '#ffe066';
+  el.style.top = '20%';
   el.textContent = 'PERFECT!';
   boardFxEl.appendChild(el);
   setTimeout(()=>el.remove(), 700);
