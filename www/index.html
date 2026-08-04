@@ -31,6 +31,17 @@
     transition:background .4s ease, color .4s ease;
   }
   .wrap{ position:fixed; inset:0; overflow:hidden; }
+  .wrap.screen-shake{ animation: screenShake .5s cubic-bezier(.36,.07,.19,.97); }
+  @keyframes screenShake{
+    10%{ transform:translate(calc(-4px * var(--screen-shake-power,1)), calc(2.5px * var(--screen-shake-power,1))); }
+    20%{ transform:translate(calc(3.5px * var(--screen-shake-power,1)), calc(-3px * var(--screen-shake-power,1))); }
+    30%{ transform:translate(calc(-3px * var(--screen-shake-power,1)), calc(2.5px * var(--screen-shake-power,1))); }
+    40%{ transform:translate(calc(2.5px * var(--screen-shake-power,1)), calc(-2px * var(--screen-shake-power,1))); }
+    50%{ transform:translate(calc(-2px * var(--screen-shake-power,1)), calc(1.5px * var(--screen-shake-power,1))); }
+    60%{ transform:translate(calc(1.5px * var(--screen-shake-power,1)), calc(-1px * var(--screen-shake-power,1))); }
+    70%{ transform:translate(calc(-1px * var(--screen-shake-power,1)), calc(1px * var(--screen-shake-power,1))); }
+    80%,100%{ transform:translate(0,0); }
+  }
   h1, .subtitle, .log{ display:none; }
 
   /* Layout positions — set from the layout designer tool, one rule set per
@@ -126,6 +137,20 @@
   #enemyCol .character-body{ flex-direction:row-reverse; }
   .portrait-col{ flex:3 1 0; min-width:0; height:100%; display:flex; flex-direction:column; gap:clamp(2px,1cqh,5px); }
   .portrait-frame{ position:relative; flex:1 1 auto; min-width:0; min-height:0; width:100%; background:#0c0603; border:3px solid var(--panelBorder); box-shadow:3px 3px 0 rgba(0,0,0,0.5), inset 0 0 0 2px #000; overflow:hidden; display:flex; flex-direction:row; contain:layout paint style; container-type:inline-size; container-name:portraitbox; }
+  .portrait-frame.has-trait{ animation: traitBorderPulse 1.8s ease-in-out infinite; }
+  @keyframes traitBorderPulse{
+    0%,100%{ box-shadow: 3px 3px 0 rgba(0,0,0,0.5), inset 0 0 0 4px var(--trait-color, #fff), 0 0 10px 3px var(--trait-color, #fff); }
+    50%{ box-shadow: 3px 3px 0 rgba(0,0,0,0.5), inset 0 0 0 4px var(--trait-color, #fff), 0 0 24px 7px var(--trait-color, #fff); }
+  }
+  .trait-badge{ position:absolute; top:4px; right:4px; width:22px; height:22px; border-radius:50%; background:rgba(10,6,3,0.88);
+    border:2px solid var(--trait-color, #fff); display:flex; align-items:center; justify-content:center; font-size:12px;
+    color:var(--trait-color, #fff); cursor:pointer; z-index:6; box-shadow:0 0 6px var(--trait-color, #fff);
+    animation: traitBadgePulse 1.8s ease-in-out infinite; }
+  .trait-badge.hidden{ display:none; }
+  @keyframes traitBadgePulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.15); } }
+  .trait-info-desc{ font-family:'Silkscreen',monospace; font-size:13px; color:var(--textDim); line-height:1.5; text-align:center; max-width:280px; padding:0 8px; }
+  .gear-detail-stat{ display:flex; align-items:center; justify-content:center; gap:8px; font-family:'Press Start 2P',monospace; font-size:12px; color:var(--gold); margin:4px 0; }
+  .gear-detail-swatch{ display:inline-block; width:14px; height:14px; border-radius:50%; box-shadow:0 0 0 2px rgba(0,0,0,0.7), 0 0 6px 1px currentColor; }
   .portrait-frame canvas{ width:100%; height:100%; object-fit:contain; display:block; position:relative; z-index:2; }
   .portrait-frame.hit::after{ content:''; position:absolute; inset:0; background:rgba(255,60,40,0.6); animation:flash .45s ease forwards; z-index:3; }
   .portrait-frame.charge{ box-shadow:0 0 18px 4px var(--glow), 3px 3px 0 rgba(0,0,0,0.5); }
@@ -133,7 +158,7 @@
   .portrait-frame.victory{ box-shadow:0 0 22px 6px var(--gold), 3px 3px 0 rgba(0,0,0,0.5); }
   .portrait-frame.trait-flash{ animation: traitFlash 0.7s ease; }
   @keyframes traitFlash{ 0%{ box-shadow:0 0 0 0 rgba(255,60,60,0), 3px 3px 0 rgba(0,0,0,0.5); } 30%{ box-shadow:0 0 26px 9px var(--trait-flash-color, rgba(255,60,60,0.9)), 3px 3px 0 rgba(0,0,0,0.5); } 100%{ box-shadow:3px 3px 0 rgba(0,0,0,0.5); } }
-  .trait-portrait-announce{ position:absolute; inset:0; z-index:5; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; background:rgba(5,3,2,0.75); text-align:center; padding:4px; animation: traitPortraitIn 0.2s ease, traitPortraitOut 0.3s ease 0.75s forwards; }
+  .trait-portrait-announce{ position:absolute; inset:0; z-index:5; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; background:rgba(5,3,2,0.75); text-align:center; padding:4px; animation: traitPortraitIn 0.2s ease, traitPortraitOut 0.3s ease 2.0s forwards; }
   .trait-portrait-title{ font-family:'Press Start 2P',monospace; font-size:clamp(6px,9cqw,9px); color:var(--trait-color, #fff); text-shadow:1.5px 1.5px 0 #000; letter-spacing:0.01em; line-height:1.3; word-break:break-word; }
   .trait-portrait-effect{ font-family:'Silkscreen',monospace; font-size:clamp(6px,7cqw,8px); color:#e8d0c0; text-shadow:1px 1px 0 #000; line-height:1.3; word-break:break-word; }
   @keyframes traitPortraitIn{ from{ opacity:0; transform:scale(0.85); } to{ opacity:1; transform:scale(1); } }
@@ -172,6 +197,8 @@
   .mini-bar-value{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
     font-family:'Press Start 2P',monospace; font-size:clamp(5px,10cqh,8px); color:#fff; text-shadow:1px 1px 0 #000; text-align:center; line-height:1.1; padding:0 1px; }
   .mini-bar.chargeable.ready{ cursor:pointer; box-shadow:0 0 8px 2px rgba(165,99,217,0.7); animation: chargeReady 1s ease-in-out infinite; }
+  .mini-bar.chargeable.cooling{ filter:grayscale(0.6) brightness(0.75); cursor:not-allowed; }
+  .mini-bar.chargeable.cooling .mini-bar-value{ font-size:clamp(9px,16cqh,14px); color:#ffd866; text-shadow:1px 1px 0 #000, 0 0 4px rgba(255,216,102,0.6); }
   @keyframes chargeReady{ 0%,100%{ opacity:1; } 50%{ opacity:0.65; } }
   .fill-hp{ background:linear-gradient(0deg,#7a1f1f,#e0473f); }
   .fill-enemy{ background:linear-gradient(0deg,#5c1414,#c73030); }
@@ -181,6 +208,10 @@
   .fill-moves{ background:linear-gradient(0deg,#3a6a4a,#4fae7a); }
   .fill-gold{ background:linear-gradient(0deg,#8a6a1c,#dfae3c); }
   .riddle-seq-mini{ width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:space-evenly; gap:2px; }
+  .focus-mini{ width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:space-evenly; gap:3px; }
+  .focus-color-label{ font-family:'Press Start 2P',monospace; font-size:8px; color:var(--textDim); letter-spacing:0.05em; }
+  .focus-pulse{ animation: focusPulse 1s ease-in-out infinite; }
+  @keyframes focusPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.25); } }
   .riddle-seq-mini .seq-gem{ width:clamp(8px,20cqh,16px); height:clamp(8px,20cqh,16px); clip-path:polygon(30% 0%,70% 0%,100% 30%,100% 70%,70% 100%,30% 100%,0% 70%,0% 30%); opacity:0.3; border:1px solid #000; flex-shrink:0; background-image:var(--gem-color-bg); }
   .riddle-seq-mini .seq-gem.done{ opacity:1; }
   .riddle-seq-mini .seq-gem.current{ opacity:1; box-shadow:0 0 6px 2px rgba(255,255,255,0.6); }
@@ -259,20 +290,20 @@
   .treasure-overlay.show{ opacity:1; pointer-events:auto; }
   .treasure-heading{ font-family:'Press Start 2P',monospace; font-size:clamp(14px,3vw,20px); color:var(--gold); text-align:center; text-shadow:3px 3px 0 rgba(0,0,0,0.5); }
   .treasure-sub{ font-family:'Silkscreen',monospace; color:var(--textDim); font-size:clamp(11px,2vw,14px); text-align:center; margin-top:-10px; }
-  .treasure-chest{ position:relative; width:clamp(110px,22vw,160px); height:clamp(96px,19vw,138px); cursor:pointer; transition:width .3s ease, height .3s ease; }
+  .treasure-chest{ position:relative; width:clamp(110px,22vw,160px); height:clamp(96px,19vw,138px); cursor:pointer; transition:width .3s ease, height .3s ease; perspective:400px; }
   .treasure-chest.boss-chest{ width:clamp(150px,30vw,220px); height:clamp(132px,26vw,190px); filter:drop-shadow(0 0 16px rgba(224,169,74,0.55)); }
   .treasure-chest.opened{ cursor:default; }
   .boss-chest .chest-base{ background:linear-gradient(180deg,#3a2a4a,#1e1428); border:3px solid var(--gold); box-shadow:inset 0 -8px 0 rgba(0,0,0,0.3), inset 0 0 0 2px rgba(224,169,74,0.35), 3px 3px 0 rgba(0,0,0,0.5); }
   .boss-chest .chest-lid{ background:linear-gradient(180deg,#5a3e6e,#2e1c3a); border:3px solid var(--gold); box-shadow:inset 0 6px 0 rgba(255,255,255,0.12), inset 0 0 0 2px rgba(224,169,74,0.35); }
   .boss-chest .chest-lock{ width:26px; height:30px; background:radial-gradient(circle at 35% 30%, #fff2c9, var(--gold) 55%, #a86a1e 100%); box-shadow:0 0 14px rgba(224,169,74,0.85), inset 0 0 0 2px #2e1d0e; }
-  .boss-chest::before, .boss-chest::after{ content:''; position:absolute; width:10px; height:10px; background:var(--gold); border:2px solid #2e1d0e; z-index:4; box-shadow:0 0 6px rgba(224,169,74,0.7); }
-  .boss-chest::before{ top:-2px; left:-2px; }
-  .boss-chest::after{ top:-2px; right:-2px; }
+  .boss-chest .chest-lid::before, .boss-chest .chest-lid::after{ content:''; position:absolute; width:10px; height:10px; background:var(--gold); border:2px solid #2e1d0e; z-index:4; box-shadow:0 0 6px rgba(224,169,74,0.7); }
+  .boss-chest .chest-lid::before{ top:-2px; left:-2px; }
+  .boss-chest .chest-lid::after{ top:-2px; right:-2px; }
   .chest-base{ position:absolute; bottom:0; left:0; right:0; height:60%; background:linear-gradient(180deg,#8a5a2e,#5c3a1a); border:3px solid #2e1d0e; border-radius:4px; box-shadow:inset 0 -8px 0 rgba(0,0,0,0.25), 3px 3px 0 rgba(0,0,0,0.4); }
   .chest-base::before{ content:''; position:absolute; inset:7px; border:2px solid #c98a3a; border-radius:2px; opacity:0.65; }
   .chest-lid{ position:absolute; top:0; left:0; right:0; height:46%; background:linear-gradient(180deg,#a97a3e,#6a4420); border:3px solid #2e1d0e; border-radius:10px 10px 2px 2px; box-shadow:inset 0 6px 0 rgba(255,255,255,0.08); transform-origin:bottom center; transition:transform .5s cubic-bezier(.22,.85,.3,1.2), opacity .3s ease; z-index:2; }
   .treasure-chest.opened .chest-lid{ transform:rotateX(120deg) translateY(-8px); }
-  .boss-chest.opened .chest-lid{ transition:transform .9s cubic-bezier(.18,.85,.25,1.3), opacity .3s ease; transform:rotateX(140deg) translateY(-14px); }
+  .boss-chest.opened .chest-lid{ transition:transform 1s cubic-bezier(.16,.9,.2,1.4), opacity .3s ease; transform:rotateX(165deg) translateY(-26px) translateZ(-10px); }
   .chest-lock{ position:absolute; left:50%; top:44%; transform:translate(-50%,-50%); width:18px; height:22px; background:var(--gold); border:2px solid #2e1d0e; border-radius:3px; z-index:3; box-shadow:0 0 8px rgba(224,169,74,0.6); transition:opacity .2s ease, transform .2s ease; }
   .chest-lock::after{ content:''; position:absolute; left:50%; top:52%; width:4px; height:7px; background:#2e1d0e; transform:translateX(-50%); }
   .treasure-chest.opened .chest-lock{ opacity:0; transform:translate(-50%,-50%) scale(0.4); }
@@ -280,9 +311,10 @@
   .treasure-chest.opened .chest-glow{ animation:chestBurst .65s ease-out forwards; }
   .boss-chest.opened .chest-glow{ animation:chestBurstBig 1.1s ease-out forwards; }
   @keyframes chestBurst{ 0%{ width:8px; height:8px; opacity:0.95; } 55%{ opacity:0.7; } 100%{ width:280px; height:280px; opacity:0; } }
-  @keyframes chestBurstBig{ 0%{ width:8px; height:8px; opacity:1; } 15%{ width:20px; height:20px; opacity:1; } 45%{ opacity:0.85; } 100%{ width:520px; height:520px; opacity:0; } }
+  @keyframes chestBurstBig{ 0%{ width:8px; height:8px; opacity:1; } 12%{ width:28px; height:28px; opacity:1; } 45%{ opacity:0.9; } 100%{ width:680px; height:680px; opacity:0; } }
   .treasure-chest.boss-chest{ animation:bossChestAnticipate 1.4s ease-in-out infinite; }
-  .treasure-chest.boss-chest.opened{ animation:none; }
+  .treasure-chest.boss-chest.opened{ animation:bossChestJolt .5s ease; }
+  @keyframes bossChestJolt{ 0%{ transform:scale(1) translateX(0); } 15%{ transform:scale(1.08) translateX(-4px); } 30%{ transform:scale(1.05) translateX(4px); } 50%{ transform:scale(1.06) translateX(-2px); } 100%{ transform:scale(1) translateX(0); } }
   @keyframes bossChestAnticipate{ 0%,100%{ filter:drop-shadow(0 0 16px rgba(224,169,74,0.55)); } 50%{ filter:drop-shadow(0 0 26px rgba(224,169,74,0.85)); } }
   .treasure-prompt{ font-family:'Press Start 2P',monospace; font-size:clamp(10px,2.2vw,13px); color:var(--text); letter-spacing:0.06em; animation:bootBlink 1.3s ease-in-out infinite; }
   .treasure-prompt.hidden{ display:none; }
@@ -445,6 +477,8 @@
   .window-hud, .banner, .board, .quest-path{
     border-width:3px; border-image-source:var(--biome-trim, none); border-image-slice:1; border-image-repeat:round; }
   .cell{ width:var(--cell); height:var(--cell); display:flex; align-items:center; justify-content:center; cursor:pointer; background:rgba(255,255,255,0.02); touch-action:manipulation; position:relative; }
+  .cell.hint-pulse{ animation: hintPulse 1.4s ease-in-out infinite; }
+  @keyframes hintPulse{ 0%,100%{ background:rgba(255,255,255,0.02); } 50%{ background:rgba(255,230,140,0.35); } }
   .cell:hover{ background:rgba(255,255,255,0.07); }
   .cell.selected{ background:rgba(224,169,74,0.2); box-shadow:0 0 0 2px var(--gold) inset; }
   .cell.consumed{ cursor:default; }
@@ -589,7 +623,7 @@
   .character-preview{ width:min(48vw,180px); aspect-ratio:5/6; background:#0c0603; border:3px solid var(--panelBorder); box-shadow:3px 3px 0 rgba(0,0,0,0.4); }
   .character-preview canvas{ width:100%; height:100%; object-fit:contain; display:block; }
   .gear-slots{ display:grid; grid-template-columns:repeat(2, 1fr); gap:12px; width:min(74vw,240px); }
-  .gear-slot{ width:clamp(58px,13vw,86px); aspect-ratio:0.82; background:var(--panel); border:2px dashed var(--panelBorder); display:flex; align-items:center; justify-content:center; font-family:'Press Start 2P',monospace; font-size:9.5px; line-height:1.3; color:var(--textDim); text-align:center; padding:5px; overflow:hidden; word-break:break-word; overflow-wrap:break-word; }
+  .gear-slot{ width:clamp(58px,13vw,86px); aspect-ratio:0.82; background:var(--panel); border:2px dashed var(--panelBorder); display:flex; align-items:center; justify-content:center; font-family:'Press Start 2P',monospace; font-size:9.5px; line-height:1.3; color:var(--textDim); text-align:center; padding:5px; overflow:hidden; word-break:break-word; overflow-wrap:break-word; cursor:pointer; }
   .gear-slots .gear-slot{ width:100%; aspect-ratio:1.25; padding:6px; }
   .gear-slot.equipped{ border:2px solid var(--gold); color:var(--gold); background:rgba(224,169,74,0.1); box-shadow:0 0 9px 1px rgba(224,169,74,0.55); }
   .gear-slot.equipped[data-slot="head"]{ border-color:#278a52; color:#9be8bd; background:rgba(39,138,82,0.14); box-shadow:0 0 9px 1px rgba(39,138,82,0.55); }
@@ -606,9 +640,10 @@
   .companion-preview canvas{ width:100%; height:100%; object-fit:contain; display:block; }
   .companion-controls{ display:flex; flex-direction:column; gap:6px; flex:1; min-width:0; }
   .wolf-name-row{ display:flex; gap:8px; align-items:stretch; }
-  .wolf-name-input{ font-family:'Press Start 2P',monospace; font-size:11px; background:#0c0603; border:2px solid var(--panelBorder); color:var(--gold); padding:7px 8px; width:50%; box-sizing:border-box; }
+  .wolf-name-input{ font-family:'Press Start 2P',monospace; font-size:11px; background:#0c0603; border:2px solid var(--panelBorder); color:var(--gold); padding:7px 8px; width:100%; box-sizing:border-box; }
   .wolf-name-input:focus{ outline:none; border-color:var(--gold); }
-  .companion-ability-slot{ flex:1; min-width:0; aspect-ratio:auto; font-size:6px; padding:4px 3px; line-height:1.3; }
+  .companion-ability-slot{ width:100%; aspect-ratio:auto; min-height:34px; font-size:9.5px; padding:6px 8px; line-height:1.3; }
+  #equippedManaSlot{ width:min(70vw,220px); aspect-ratio:auto; min-height:34px; font-size:9.5px; padding:6px 8px; line-height:1.3; }
   .coat-swatches{ display:flex; gap:6px; }
   .coat-swatch{ width:20px; height:20px; border-radius:50%; border:2px solid #000; cursor:pointer; flex-shrink:0; position:relative; }
   .coat-swatch.locked{ filter:grayscale(0.7) brightness(0.5); cursor:not-allowed; }
@@ -627,7 +662,7 @@
   .shop-loadout-portrait canvas{ width:100%; height:100%; object-fit:contain; display:block; }
   .shop-loadout-slots{ display:grid; grid-template-columns:repeat(3,1fr); gap:6px; flex:1; min-width:0; }
   .shop-loadout-slots .gear-slot{ width:100%; aspect-ratio:auto; padding:5px 3px; font-size:6px; line-height:1.25; }
-  .shop-gold{ font-family:'Press Start 2P',monospace; font-size:13px; color:var(--shop-accent); transition:transform .15s ease; display:inline-block; }
+  .shop-gold{ font-family:'Press Start 2P',monospace; font-size:13px; color:var(--shop-accent); transition:transform .15s ease; display:inline-block; background:rgba(10,6,3,0.88); border:2px solid var(--shop-accent-dim); border-radius:6px; padding:8px 14px; box-shadow:0 2px 6px rgba(0,0,0,0.4); }
   .shop-gold.bump{ animation: goldBump .4s ease; }
   @keyframes goldBump{ 0%{ transform:scale(1); } 30%{ transform:scale(1.35); color:#fff; } 100%{ transform:scale(1); } }
   .shop-list{ display:flex; flex-direction:column; gap:8px; width:min(90vw,440px); max-height:38vh; overflow-y:auto; }
@@ -637,7 +672,7 @@
   .shop-item.purchased{ animation: shopItemPurchased .5s ease; }
   @keyframes shopItemPurchased{ 0%{ background:var(--panel); } 35%{ background:rgba(224,169,74,0.35); } 100%{ background:var(--panel); } }
   .shop-item-name{ font-family:'Press Start 2P',monospace; font-size:10px; color:var(--text); }
-  .shop-gem-swatch{ display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; box-shadow:0 0 0 1.5px rgba(0,0,0,0.6), 0 0 4px currentColor; vertical-align:middle; }
+  .shop-gem-swatch{ display:inline-block; width:13px; height:13px; border-radius:50%; margin-right:7px; box-shadow:0 0 0 2px rgba(0,0,0,0.7), 0 0 6px 1px currentColor; vertical-align:middle; }
   .shop-item-cat{ font-family:'Silkscreen',monospace; font-size:10.5px; color:var(--textDim); margin-top:2px; }
   .shop-item-flavor{ font-family:'Silkscreen',monospace; font-size:12.5px; color:#c9baa6; margin-top:4px; line-height:1.5; }
   .spell-level{ font-family:'Press Start 2P',monospace; font-size:8px; color:var(--gold); margin-left:4px; }
@@ -660,6 +695,13 @@
     transform:scale(0.8); opacity:0; transition:transform .3s cubic-bezier(.34,1.56,.64,1), opacity .22s ease; }
   .overlay.show .modal{ transform:scale(1); opacity:1; }
   .screen-wipe{ position:fixed; inset:0; z-index:200; background:#000; pointer-events:none; opacity:0; }
+  .crt-overlay{ position:fixed; inset:0; z-index:9999; pointer-events:none; opacity:0; transition:opacity .3s ease; }
+  body.crt-enabled .crt-overlay{ opacity:1; }
+  .crt-overlay::before{ content:''; position:absolute; inset:0;
+    background:repeating-linear-gradient(0deg, rgba(0,0,0,0.16) 0px, rgba(0,0,0,0.16) 1px, transparent 1px, transparent 3px);
+    mix-blend-mode:multiply; }
+  .crt-overlay::after{ content:''; position:absolute; inset:0;
+    box-shadow: inset 0 0 60px rgba(0,0,0,0.55), inset 0 0 140px rgba(0,0,0,0.35); }
   .screen-wipe.active{ animation: screenFade .35s ease-in-out forwards; }
   @keyframes screenFade{
     0%{ opacity:0; }
@@ -785,11 +827,18 @@
       Music Volume
       <input type="range" id="musicVolumeSlider" min="0" max="100" value="50" style="flex:1; accent-color:var(--gold);">
     </label>
+    <label class="puzzle-intro-skip" style="cursor:pointer; display:flex; align-items:center; gap:10px; font-size:14px; margin-top:16px;">
+      <input type="checkbox" id="crtToggleCheck" style="width:18px; height:18px; accent-color:var(--gold);">
+      CRT scanline effect
+    </label>
+    <div class="screen-note">A subtle retro scanline and vignette overlay across the whole game.</div>
+
     <button class="back-btn" id="viewErrorLogBtn" style="margin-top:16px;">VIEW ERROR LOG</button>
     <button class="back-btn" data-back="menu">&larr; BACK</button>
   </div>
 
   <div class="screen hidden" id="characterScreen">
+    <canvas class="shop-backdrop" id="characterBackdropCanvas" width="160" height="90"></canvas>
     <div class="screen-heading">CHARACTER</div>
     <div class="character-preview"><canvas id="charPreviewCanvas" width="20" height="24"></canvas></div>
     <div class="equip-columns">
@@ -816,8 +865,9 @@
       <div class="companion-controls">
         <div class="wolf-name-row">
           <input type="text" id="wolfNameInput" class="wolf-name-input" placeholder="Zai" maxlength="10">
-          <div class="gear-slot companion-ability-slot equip-slot-companion" id="equippedCompanionSlot">WOLF LUNGE</div>
         </div>
+        <div class="equip-column-label">COMPANION SPELL</div>
+        <div class="gear-slot companion-ability-slot equip-slot-companion" id="equippedCompanionSlot">WOLF LUNGE</div>
         <div class="coat-swatches" id="coatSwatches"></div>
       </div>
     </div>
@@ -903,7 +953,7 @@
         <div class="character-body">
           <div class="portrait-col">
             <div class="portrait-name" id="enemyName">AN ENEMY</div>
-            <div class="portrait-frame idle" id="enemyFrame" style="--lunge-dir:-16px"><div class="hero-half"><canvas id="enemyCanvas" width="20" height="24"></canvas><div class="spell-aura-glow" id="enemySpellAura"></div></div></div>
+            <div class="portrait-frame idle" id="enemyFrame" style="--lunge-dir:-16px"><div class="hero-half"><canvas id="enemyCanvas" width="20" height="24"></canvas><div class="spell-aura-glow" id="enemySpellAura"></div></div><div class="trait-badge hidden" id="enemyTraitBadge"></div></div>
           </div>
           <div class="mini-bars" id="enemyStats"></div>
         </div>
@@ -921,6 +971,7 @@
 </div>
 
 <div class="screen-wipe" id="screenWipe"></div>
+<div class="crt-overlay" id="crtOverlay"></div>
 
 <div class="travel-overlay" id="travelOverlay">
   <div class="travel-scene"><canvas id="travelCanvas" width="20" height="24"></canvas></div>
@@ -1081,6 +1132,19 @@
   <button class="back-btn quest-legend-close" id="questLegendCloseBtn">CLOSE</button>
 </div>
 
+<div class="quest-legend-popover hidden" id="traitInfoPopover">
+  <div class="quest-legend-heading" id="traitInfoTitle">TRAIT</div>
+  <div id="traitInfoDesc" class="trait-info-desc"></div>
+  <button class="back-btn quest-legend-close" id="traitInfoCloseBtn">CLOSE</button>
+</div>
+
+<div class="quest-legend-popover hidden" id="gearDetailPopover">
+  <div class="quest-legend-heading" id="gearDetailTitle">ITEM</div>
+  <div id="gearDetailStat" class="gear-detail-stat"></div>
+  <div id="gearDetailDesc" class="trait-info-desc"></div>
+  <button class="back-btn quest-legend-close" id="gearDetailCloseBtn">CLOSE</button>
+</div>
+
 <script>
 /* ---------- biomes (environmental palette + light touches) ----------
    Separate from THEMES: THEMES controls fixed art direction (sprite shapes/
@@ -1099,7 +1163,7 @@ const BIOMES = {
     trim:'repeating-linear-gradient(90deg, #c9922e 0 6px, #e0b050 6px 10px)' },
   grotto:     { name:'The Grotto',      bg1:'#142622', bg2:'#0a1512', panel:'#1c322c', panelBorder:'#4aaa8a', gold:'#8fe8c9', text:'#dcf0e8', textDim:'#6aa892', glow:'#8fe8c9',
     trim:'repeating-linear-gradient(90deg, #1c322c 0 5px, #4aaa8a 5px 8px)' },
-  sanctuary:  { name:"Mother's Crown",  bg1:'#2e2438', bg2:'#181220', panel:'#382c48', panelBorder:'#d9b8ff', gold:'#f0d8ff', text:'#f4ecff', textDim:'#b89ad9', glow:'#f0d8ff',
+  sanctuary:  { name:"The Borez Cliffs",  bg1:'#2e2438', bg2:'#181220', panel:'#382c48', panelBorder:'#d9b8ff', gold:'#f0d8ff', text:'#f4ecff', textDim:'#b89ad9', glow:'#f0d8ff',
     trim:'repeating-linear-gradient(90deg, #d9b8ff 0 5px, #f0d8ff 5px 9px)' }
 };
 let currentBiome = null;
@@ -1226,6 +1290,8 @@ function startBgAnimLoop(){
     if(isVisible(stripCanvas)) renderQuestStrip(bgAnimTick);
     const shopCanvas = document.getElementById('shopBackdropCanvas');
     if(isVisible(shopCanvas)) renderShopBackdrop(bgAnimTick);
+    const characterCanvas = document.getElementById('characterBackdropCanvas');
+    if(isVisible(characterCanvas)) renderCharacterBackdrop(bgAnimTick);
     const campfireCanvas = document.getElementById('campfireFlameCanvas');
     if(isVisible(campfireCanvas)) drawCampfireFlame(campfireCanvas.getContext('2d'), bgAnimTick);
     if(activeCutsceneBespokeScene){
@@ -1334,6 +1400,61 @@ function drawTree(ctx, cx, groundY, height, canopyColor, trunkColor){
 // pixel-art technique as the biome scenes, but its own distinct look
 // (warm bronze/wood tones, hanging goods, flickering lanterns) rather than
 // reusing outdoor biome scenery or the generic panel chrome.
+function renderCharacterBackdrop(t){
+  const canvas = document.getElementById('characterBackdropCanvas');
+  if(!canvas) return;
+  t = t || 0;
+  const W = canvas.width, H = canvas.height;
+  const ctx = canvas.getContext('2d');
+  const groundY = Math.round(H*0.78);
+
+  // Same warm plaster wall + timber technique as the shop, for a sense of
+  // continuity between the game's indoor screens -- but distinct dressing
+  // (weapon rack, window) so it reads as its own room, not a reused scene.
+  const wallGrad = ctx.createLinearGradient(0,0,0,groundY);
+  wallGrad.addColorStop(0, '#4a3a2e'); wallGrad.addColorStop(1, '#2e2418');
+  ctx.fillStyle = wallGrad;
+  ctx.fillRect(0,0,W,groundY);
+  ctx.fillStyle = '#3a2e22';
+  ctx.fillRect(0,0,W,3); ctx.fillRect(0,groundY-3,W,3);
+  ctx.fillStyle = '#5a4a38';
+  ctx.fillRect(0, groundY-5, W, 1);
+  ctx.fillStyle = '#241c14';
+  for(let x=0;x<W;x+=14) ctx.fillRect(x, groundY, 10, 4);
+
+  // A small window, soft moonlight-blue, off to one side
+  const winX = W*0.14, winY = H*0.16, winW = 20, winH = 26;
+  ctx.fillStyle = '#1a2438';
+  ctx.fillRect(winX, winY, winW, winH);
+  const winGlow = 0.5 + 0.15*Math.sin(t*0.05);
+  ctx.fillStyle = `rgba(140,170,220,${winGlow.toFixed(2)})`;
+  ctx.fillRect(winX+2, winY+2, winW-4, winH-4);
+  ctx.fillStyle = '#3a2e22';
+  ctx.fillRect(winX+winW/2-1, winY, 2, winH);
+  ctx.fillRect(winX, winY+winH/2-1, winW, 2);
+
+  // Weapon rack against the far wall
+  const rackX = W*0.82, rackY = groundY-30;
+  ctx.fillStyle = '#3a2414'; ctx.fillRect(rackX-2, rackY, 4, 30);
+  ctx.fillStyle = '#5a4530'; ctx.fillRect(rackX-8, rackY+4, 16, 3); ctx.fillRect(rackX-8, rackY+18, 16, 3);
+  ctx.fillStyle = '#8a8a90'; ctx.fillRect(rackX-1, rackY-6, 2, 12);
+  ctx.fillStyle = '#c98a3a'; ctx.fillRect(rackX+3, rackY-4, 2, 10);
+
+  // One flickering lantern, warmer and lower than the shop's pair
+  const flick = 0.55 + 0.35*Math.abs(Math.sin(t*0.28));
+  ctx.fillStyle = `rgba(255,190,110,${flick.toFixed(2)})`;
+  ctx.beginPath(); ctx.arc(W*0.5, H*0.2, 3, 0, Math.PI*2); ctx.fill();
+
+  // Drifting dust motes, same technique as the shop for consistency
+  for(let i=0;i<5;i++){
+    const seed = i*31.7;
+    const x = W*(0.35+(i*0.08)%0.4) + Math.sin(t*0.04+seed)*4;
+    const y = groundY - ((t*0.28 + seed*5) % (groundY*0.6));
+    const alpha = Math.max(0, 0.45 - (groundY-y)/(groundY*0.6)*0.45);
+    ctx.fillStyle = `rgba(255,210,140,${alpha.toFixed(2)})`;
+    ctx.fillRect(Math.round(x), Math.round(y), 1, 1);
+  }
+}
 function renderShopBackdrop(t){
   const canvas = document.getElementById('shopBackdropCanvas');
   if(!canvas) return;
@@ -1663,6 +1784,20 @@ function drawGuardian(ctx, pal){
   band(ctx,9,9,10,pal.eye); band(ctx,10,9,10,pal.eye);
   band(ctx,14,3,3,pal.hoodShadow); band(ctx,15,4,5,pal.hoodShadow); band(ctx,17,15,16,pal.hoodShadow);
 }
+const WIZARD_PAL = {outline:'#0a0614',hoodMain:'#5a3a8a',hoodShadow:'#3a2260',skin:'#d8c8b8',eye:'#e8d060',cloakMain:'#3a2260',cloakShadow:'#241448',trim:'#e8d060',accent:'#8a5ac0'};
+function drawWizard(ctx, pal){
+  const p = pal && pal.outline ? pal : WIZARD_PAL;
+  drawBase(ctx, REGAL_SHAPE, p);
+  band(ctx,7,8,11,p.skin);
+  band(ctx,7,9,9,p.eye); band(ctx,7,10,10,p.eye);
+  // Pointed hat with a wide brim, sitting above the head
+  band(ctx,0,9,10,p.hoodMain);
+  band(ctx,1,8,11,p.hoodMain);
+  band(ctx,2,7,12,p.hoodMain);
+  band(ctx,3,6,13,p.trim);
+  // Glowing orb at the belt
+  band(ctx,12,9,10,p.eye);
+}
 function drawSphinx(ctx, pal){
   drawBase(ctx, MONSTROUS, pal);
   band(ctx,0,5,5,pal.hoodMain); band(ctx,1,4,5,pal.hoodMain); band(ctx,2,4,6,pal.hoodMain);
@@ -1897,13 +2032,19 @@ function drawWolf(ctx, pal, condition='wounded', earTwitch=false, blinking=false
   // eyes and nose
   band(ctx,9,7,7,blinking?pal.hoodShadow:pal.eye); band(ctx,9,12,12,blinking?pal.hoodShadow:pal.eye);
   band(ctx,14,9,10,pal.accent);
-  // wound marker on the flank — grows more severe as the journey wears on
+  // wound marks, spread across the body rather than one growing blotch --
+  // severity adds more spread points, not just a bigger single spot
   if(condition==='wounded'){
-    band(ctx,17,4,6,'#8a2020');
+    band(ctx,17,3,4,'#8a2020'); band(ctx,20,6,7,'#8a2020');
   } else if(condition==='weakening'){
-    band(ctx,16,3,6,'#8a2020'); band(ctx,17,3,7,'#6a1818'); band(ctx,18,4,6,'#8a2020');
+    band(ctx,15,4,5,'#8a2020');
+    band(ctx,17,3,4,'#6a1818'); band(ctx,17,15,16,'#8a2020');
+    band(ctx,20,5,7,'#8a2020');
   } else if(condition==='critical'){
-    band(ctx,15,3,7,'#6a1818'); band(ctx,16,2,7,'#8a2020'); band(ctx,17,2,8,'#6a1818'); band(ctx,18,3,7,'#8a2020'); band(ctx,19,4,6,'#4a1010');
+    band(ctx,14,4,6,'#6a1818');
+    band(ctx,16,3,4,'#8a2020'); band(ctx,16,15,17,'#6a1818');
+    band(ctx,18,2,4,'#6a1818'); band(ctx,18,15,17,'#8a2020');
+    band(ctx,21,5,8,'#4a1010');
   }
 }
 // Two more silhouettes for the newly selected designs — LONGNECK stays
@@ -2063,6 +2204,20 @@ function drawColossalEye(ctx, pal){
   [[4,3],[5,1],[9,0],[11,3],[13,7],[4,16],[5,18],[11,16],[13,12]].forEach(([y,x])=> band(ctx,y,x,x,pal.accent));
   for(let y=14;y<24;y++){ const xo = 9 + (y%3===0?1:y%3===1?-1:0); band(ctx,y,xo,xo+1,pal.accent); }
 }
+const ORIN_PAL = {outline:'#0a0e14',hoodMain:'#c8d4e0',hoodShadow:'#8898ac',skin:'#e8eef5',eye:'#b0e8ff',cloakMain:'#a8b8cc',cloakShadow:'#6a7890',trim:'#d8e8f0',accent:'#4a5a70'};
+function drawOrin(ctx){
+  drawWolf(ctx, ORIN_PAL, 'healthy', false, false);
+  // Regal crown, branching upward from the head, and glowing rune marks
+  // across the body -- keeps the same base wolf shape as Zai (same race),
+  // but clearly elevated and mystical rather than just a recolor.
+  const antler = '#d8e8f0';
+  band(ctx,0,8,8,antler); band(ctx,0,11,11,antler);
+  band(ctx,1,7,8,antler); band(ctx,1,9,10,antler); band(ctx,1,11,12,antler);
+  band(ctx,2,7,9,antler); band(ctx,2,10,12,antler);
+  const rune = '#7fe8ff';
+  band(ctx,14,5,5,rune); band(ctx,14,14,14,rune);
+  band(ctx,17,3,3,rune); band(ctx,17,16,16,rune);
+}
 const DRAWERS = { hero:drawHero, bandit:drawBandit, guardian:drawGuardian, sphinx:drawSphinx, wolf:drawWolf, keeper:drawKeeper,
   straggler:drawStraggler, drowned:drawDrowned, guard:drawGuard, raider:drawRaider, warden:drawWarden,
   looter:drawLooter, wraith:drawWraith, crawler:drawCrawler, assassin:drawAssassin, sandwraith:drawSandwraith, wisp:drawWisp,
@@ -2073,7 +2228,7 @@ const DRAWERS = { hero:drawHero, bandit:drawBandit, guardian:drawGuardian, sphin
   thornspike:drawThornSpike, skeletal:drawSkeletal, crownregal:drawCrownRegal, gianteye:drawGiantEye, twisted:drawTwisted,
   titan:drawTitan, manymouth:drawManyMouth, hollowvoid:drawHollowVoid,
   naga:drawNaga, arachnid:drawArachnid, tentacled:drawTentacled, manyeyed:drawManyEyed, horned:drawHorned,
-  unmade:drawUnmade, maw:drawMaw, colossaleye:drawColossalEye };
+  unmade:drawUnmade, maw:drawMaw, colossaleye:drawColossalEye, orin:drawOrin, wizard:drawWizard };
 let playerVariant = 'hero';
 
 // ---------- sprite images: async-loaded, with procedural fallback ----------
@@ -2140,6 +2295,11 @@ function markStoryCompleted(){
   hasCompletedStory = true;
   try{ localStorage.setItem('talesofazure_completed_v1', 'true'); }catch(e){ /* best effort */ }
 }
+// Whether the player has ever had perfect timing explained to them --
+// lifetime flag so a returning player doesn't see the explanation repeat
+// on every new story.
+let hasSeenPerfectTiming = false;
+try{ hasSeenPerfectTiming = localStorage.getItem('talesofazure_perfecttiming_v1') === 'true'; }catch(e){ /* best effort */ }
 const WOLF_COATS = {
   white: { label:'White', hoodMain:'#e8e2d8', hoodShadow:'#b8b0a0', cloakMain:'#d8d0c0', cloakShadow:'#a89e88' },
   grey:  { label:'Grey',  hoodMain:'#9aa0a8', hoodShadow:'#6a7078', cloakMain:'#8a9098', cloakShadow:'#5a6068' },
@@ -2151,6 +2311,17 @@ const WOLF_COATS = {
   bloomtouched: { label:'Bloomtouched', hoodMain:'#e8d0ff', hoodShadow:'#b894e0', cloakMain:'#d8b8f5', cloakShadow:'#a578d0', locked:true }
 };
 preloadSpriteImages();
+// getWolfName() returns raw player input (the wolf name field). Most
+// places it's used go through textContent (typeText, direct .textContent
+// assignment), which is safe by construction. Anywhere it lands in an
+// innerHTML template needs this instead -- round-tripping through a
+// detached element's textContent/innerHTML is a standard, reliable way to
+// HTML-escape a string without a manual character-replacement table.
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
 function getWolfName(){
   const n = wolfName.trim();
   return n.length ? n : 'Zai';
@@ -2224,12 +2395,14 @@ function cutsceneSlides(){
       text:'Ro was the most promising recruit in a generation. Today was her first day carrying the title.' },
     { scene:'alerraInvasion', sprite:'hero', pos:'left', prop:'invaders', impact:true, particles:'ash', fx:'punch',
       text:"Instead, invaders from the South stormed Alerra, Azure's capital and its beating heart, before she'd worn the title a single hour." },
+    { scene:'alerraInvasion', sprite:'hero', pos:'left', particles:'ash', fx:'default',
+      text:"She doesn't remember deciding to fight. Only the weight of a blade she'd never swung in anger before, and the sound of Alerra falling around her, one street at a time." },
     { scene:'alerraAftermath', sprite:'hero', pos:'left', prop:'debris', particles:'ash', fx:'rackfocus',
       text:'The battle for Alerra is over. The field is quiet now, and quiet is worse.' },
     { scene:'wolfWound', sprite:'wolf', pos:'right', prop:'spear', impact:true, particles:'chill', fx:'punch',
       text:`${getWolfName()} lies still beside her, breath shallow, wound deep: poison, and no cure within reach.` },
     { scene:'mountainDistant', sprite:'hero', pos:'left', prop:'mountainBloom', particles:'light', fx:'propfocus',
-      text:"They say a flower blooms atop Mother's Crown, upon the Borez Cliffs, past horrors she cannot yet name." },
+      text:"They say a flower blooms atop Mother's Crown, upon the Borez Cliffs, and that something has guarded it since before Alerra had a name. She doesn't know what yet. She will." },
     { scene:'relicAwakening', sprite:'wolf', pos:'right', prop:'relic', particles:'light', fx:'burst',
       text:'The Ancient Relics of Virtue stir in answer to her blood. There is no other choice. She rises. The journey begins.' }
   ];
@@ -2280,7 +2453,7 @@ function showRunSummary(onDone){
     ['Final spells', `${manaSpell.name}, ${companionSpell.name}`],
   ];
   document.getElementById('runSummaryStats').innerHTML = rows
-    .map(([label,value])=> `<div class="run-summary-row"><span>${label}</span><span class="run-summary-value">${value}</span></div>`)
+    .map(([label,value])=> `<div class="run-summary-row"><span>${escapeHtml(label)}</span><span class="run-summary-value">${escapeHtml(String(value))}</span></div>`)
     .join('');
   document.getElementById('runSummaryOverlay').classList.add('show');
   document.getElementById('runSummaryBtn').addEventListener('click', ()=>{
@@ -2434,6 +2607,28 @@ const CUTSCENE_BACKGROUNDS = {
     const mist=0.08+0.05*Math.sin(t*0.05);
     ctx.fillStyle=`rgba(180,150,130,${mist.toFixed(2)})`;
     ctx.fillRect(0,groundY-16,W,16);
+  },
+  grottoInterior: (ctx,t)=>{
+    const W=160,H=90,groundY=66;
+    const g=ctx.createLinearGradient(0,0,0,groundY); g.addColorStop(0,'#141c22'); g.addColorStop(1,'#080c10');
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,groundY);
+    ctx.fillStyle='#0a0d10'; ctx.fillRect(0,groundY,W,H-groundY);
+    // Cave mouth opening, soft ambient light spilling in
+    const glow = 0.35 + 0.08*Math.sin(t*0.03);
+    const rg = ctx.createRadialGradient(80,30,4,80,30,50);
+    rg.addColorStop(0, `rgba(176,232,255,${glow.toFixed(2)})`);
+    rg.addColorStop(1, 'rgba(176,232,255,0)');
+    ctx.fillStyle = rg; ctx.fillRect(0,0,W,groundY);
+    // Rock formations, jagged silhouettes framing the scene
+    ctx.fillStyle = '#0c1116';
+    ctx.beginPath(); ctx.moveTo(0,groundY); ctx.lineTo(0,groundY-30); ctx.lineTo(14,groundY-18); ctx.lineTo(22,groundY-34); ctx.lineTo(30,groundY-14); ctx.lineTo(38,groundY); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(W,groundY); ctx.lineTo(W,groundY-26); ctx.lineTo(W-16,groundY-16); ctx.lineTo(W-24,groundY-32); ctx.lineTo(W-32,groundY-10); ctx.lineTo(W-40,groundY); ctx.closePath(); ctx.fill();
+    // Stalactites
+    ctx.fillStyle = '#0a0e12';
+    [20,50,90,120,140].forEach((x,i)=>{
+      const len = 6+((i*7)%9);
+      ctx.beginPath(); ctx.moveTo(x-3,0); ctx.lineTo(x+3,0); ctx.lineTo(x,len); ctx.closePath(); ctx.fill();
+    });
   },
   wolfWound: (ctx,t)=>{
     const W=160,H=90,groundY=66;
@@ -2957,24 +3152,40 @@ wolfNameInputEl.addEventListener('input', ()=>{
 const GEAR_ITEMS = [
   // Head — Emerald (Wisdom)
   { id:'gear_head_1', slot:'head', gem:'emerald', name:"Traveler's Hood",    price:25,  minLevel:0,  bonus:1, flavor:"Patched more times than anyone's bothered to count." },
-  { id:'gear_head_2', slot:'head', gem:'emerald', name:"Sage's Circlet",     price:45,  minLevel:5, bonus:2, flavor:"Cool to the touch, even in the desert sun." },
-  { id:'gear_head_3', slot:'head', gem:'emerald', name:'Crown of Insight',   price:70,  minLevel:9, bonus:3, flavor:"Wearing it feels like remembering something you never learned." },
-  { id:'gear_head_4', slot:'head', gem:'emerald', name:'Diadem of the Grove',price:100, minLevel:14, bonus:4, flavor:"Threaded with living root that hasn't noticed it's no longer in the ground." },
+  { id:'gear_head_c1',slot:'head', gem:'emerald', name:"Wanderer's Wrap",    price:34,  minLevel:2,  bonus:2, flavor:"Picked up somewhere and never quite let go of since." },
+  { id:'gear_head_2', slot:'head', gem:'emerald', name:"Sage's Circlet",     price:45,  minLevel:5, bonus:3, flavor:"Cool to the touch, even in the desert sun." },
+  { id:'gear_head_c2',slot:'head', gem:'emerald', name:"Scholar's Band",     price:57,  minLevel:7,  bonus:4, flavor:"Smells faintly of old paper, no matter how long since it was near any." },
+  { id:'gear_head_3', slot:'head', gem:'emerald', name:'Crown of Insight',   price:70,  minLevel:9, bonus:5, flavor:"Wearing it feels like remembering something you never learned." },
+  { id:'gear_head_c3',slot:'head', gem:'emerald', name:'Circlet of the Watchful',price:84,minLevel:11, bonus:6, flavor:"Feels like it's paying more attention than you are." },
+  { id:'gear_head_4', slot:'head', gem:'emerald', name:'Diadem of the Grove',price:100, minLevel:14, bonus:7, flavor:"Threaded with living root that hasn't noticed it's no longer in the ground." },
+  { id:'gear_head_c4',slot:'head', gem:'emerald', name:'Crown of Whispered Names',price:118,minLevel:16, bonus:8, flavor:"Every name it's ever been given still lingers somewhere in it." },
   // Armor — Ruby (Strength)
   { id:'gear_armor_1', slot:'armor', gem:'ruby', name:'Boiled Leather Vest',   price:35,  minLevel:0,  bonus:1, flavor:"Stiff, ugly, and it's kept more soldiers alive than prettier armor ever has." },
-  { id:'gear_armor_2', slot:'armor', gem:'ruby', name:'Reinforced Cuirass',    price:55,  minLevel:5, bonus:2, flavor:"Dented in exactly the places that matter most." },
-  { id:'gear_armor_3', slot:'armor', gem:'ruby', name:'Warplate of the Fallen',price:80,  minLevel:9, bonus:3, flavor:"Its last owner didn't fall because of the armor." },
-  { id:'gear_armor_4', slot:'armor', gem:'ruby', name:'Emberforged Plate',     price:110, minLevel:14, bonus:4, flavor:"Quenched in something other than water." },
+  { id:'gear_armor_c1',slot:'armor', gem:'ruby', name:'Padded Gambeson',       price:46,  minLevel:2,  bonus:2, flavor:"Not much to look at. Neither is surviving, usually." },
+  { id:'gear_armor_2', slot:'armor', gem:'ruby', name:'Reinforced Cuirass',    price:55,  minLevel:5, bonus:3, flavor:"Dented in exactly the places that matter most." },
+  { id:'gear_armor_c2',slot:'armor', gem:'ruby', name:'Banded Warplate',       price:68,  minLevel:7,  bonus:4, flavor:"Held together by more straps than it probably needs, and all of them matter." },
+  { id:'gear_armor_3', slot:'armor', gem:'ruby', name:'Warplate of the Fallen',price:80,  minLevel:9, bonus:5, flavor:"Its last owner didn't fall because of the armor." },
+  { id:'gear_armor_c3',slot:'armor', gem:'ruby', name:'Ironclad Bulwark',      price:95,  minLevel:11, bonus:6, flavor:"Built less to look strong and more to actually be it." },
+  { id:'gear_armor_4', slot:'armor', gem:'ruby', name:'Emberforged Plate',     price:110, minLevel:14, bonus:7, flavor:"Quenched in something other than water." },
+  { id:'gear_armor_c4',slot:'armor', gem:'ruby', name:'Platemail of the Unbroken Line',price:128,minLevel:16, bonus:8, flavor:"Every wearer before you survived long enough to pass it on." },
   // Boots — Sapphire (Swiftness)
   { id:'gear_boots_1', slot:'boots', gem:'sapphire', name:"Sure-Footed Boots", price:20, minLevel:0,  bonus:1, flavor:"Never once let anyone down a cliff." },
-  { id:'gear_boots_2', slot:'boots', gem:'sapphire', name:'Windrunner Greaves',price:40, minLevel:5, bonus:2, flavor:"Lighter than they have any right to be." },
-  { id:'gear_boots_3', slot:'boots', gem:'sapphire', name:'Tidewalker Boots', price:65,  minLevel:9, bonus:3, flavor:"Dry the instant they leave the water." },
-  { id:'gear_boots_4', slot:'boots', gem:'sapphire', name:'Stormstep Sabatons',price:95, minLevel:14, bonus:4, flavor:"Each step sounds like distant thunder." },
+  { id:'gear_boots_c1',slot:'boots', gem:'sapphire', name:'Roadworn Treads',   price:28, minLevel:2,  bonus:2, flavor:"Know the shape of a bad step before you take it." },
+  { id:'gear_boots_2', slot:'boots', gem:'sapphire', name:'Windrunner Greaves',price:40, minLevel:5, bonus:3, flavor:"Lighter than they have any right to be." },
+  { id:'gear_boots_c2',slot:'boots', gem:'sapphire', name:'Swiftstride Boots',price:51,  minLevel:7,  bonus:4, flavor:"Somehow always land you a half-step ahead of where you meant to be." },
+  { id:'gear_boots_3', slot:'boots', gem:'sapphire', name:'Tidewalker Boots', price:65,  minLevel:9, bonus:5, flavor:"Dry the instant they leave the water." },
+  { id:'gear_boots_c3',slot:'boots', gem:'sapphire', name:'Galewalker Treads',price:79,  minLevel:11, bonus:6, flavor:"The wind seems to already know which way they're going." },
+  { id:'gear_boots_4', slot:'boots', gem:'sapphire', name:'Stormstep Sabatons',price:95, minLevel:14, bonus:7, flavor:"Each step sounds like distant thunder." },
+  { id:'gear_boots_c4',slot:'boots', gem:'sapphire', name:'Boots of the Racing Tide',price:112,minLevel:16, bonus:8, flavor:"Never quite touch the ground the way they should." },
   // Off-Hand — Amethyst (Spirit)
   { id:'gear_offhand_1', slot:'offhand', gem:'amethyst', name:'Worn Buckler',       price:30,  minLevel:0,  bonus:1, flavor:"Small, plain, and somehow always exactly where it's needed." },
-  { id:'gear_offhand_2', slot:'offhand', gem:'amethyst', name:'Spirit-Bound Charm', price:50,  minLevel:5, bonus:2, flavor:"Hums faintly when danger is close." },
-  { id:'gear_offhand_3', slot:'offhand', gem:'amethyst', name:'Wolfheart Talisman', price:75,  minLevel:9, bonus:3, flavor:"Beats, very faintly, like it remembers having a pulse." },
-  { id:'gear_offhand_4', slot:'offhand', gem:'amethyst', name:'Relic of the Pack',  price:105, minLevel:14, bonus:4, flavor:"Never feels quite as heavy when you're not alone." }
+  { id:'gear_offhand_c1',slot:'offhand', gem:'amethyst', name:'Bound Ward-Stone',   price:40,  minLevel:2,  bonus:2, flavor:"Cool in the hand no matter how hot the day gets." },
+  { id:'gear_offhand_2', slot:'offhand', gem:'amethyst', name:'Spirit-Bound Charm', price:50,  minLevel:5, bonus:3, flavor:"Hums faintly when danger is close." },
+  { id:'gear_offhand_c2',slot:'offhand', gem:'amethyst', name:"Keeper's Icon",      price:62,  minLevel:7,  bonus:4, flavor:"Feels like it's watching out for you, in its own quiet way." },
+  { id:'gear_offhand_3', slot:'offhand', gem:'amethyst', name:'Wolfheart Talisman', price:75,  minLevel:9, bonus:5, flavor:"Beats, very faintly, like it remembers having a pulse." },
+  { id:'gear_offhand_c3',slot:'offhand', gem:'amethyst', name:'Fetish of the Unbroken Bond',price:90,minLevel:11, bonus:6, flavor:"The kind of thing you carry because you can't imagine not carrying it." },
+  { id:'gear_offhand_4', slot:'offhand', gem:'amethyst', name:'Relic of the Pack',  price:105, minLevel:14, bonus:7, flavor:"Never feels quite as heavy when you're not alone." },
+  { id:'gear_offhand_c4',slot:'offhand', gem:'amethyst', name:"Warden's Old Ward",  price:123, minLevel:16, bonus:8, flavor:"Passed down from someone who needed it less than you do now." }
 ];
 const GEM_LABEL = { emerald:'Wisdom (Green)', ruby:'Strength (Red)', sapphire:'Swiftness (Blue)', amethyst:'Spirit (Purple)' };
 // Same tones as the board's .gem-* gradients, so gear UI reads as the gem it
@@ -3001,17 +3212,25 @@ function gearBonus(gem){
 // — buying a new one auto-equips it, but owned spells can be re-equipped
 // freely afterward. Level scales damage; color drives the cast portrait effect.
 const MANA_SPELLS = [
-  { id:'spell_mana_base', name:'Ember Bolt',      level:1, damage:17, color:'#ff8a3a', free:true },
-  { id:'spell_mana_1',    name:'Frost Needle',    level:2, damage:24, color:'#5ab8ff', price:15, minLevel:0 },
-  { id:'spell_mana_2',    name:'Thorn Volley',    level:3, damage:29, color:'#5aff8a', price:20, minLevel:2 },
-  { id:'spell_mana_3',    name:'Ember Lance',     level:4, damage:36, color:'#ff4a3a', price:50, minLevel:10 },
-  { id:'spell_mana_4',    name:'Wildfire Bloom',  level:5, damage:42, color:'#c9f04a', price:70, minLevel:14 }
+  { id:'spell_mana_base', name:'Ember Bolt',      level:1, damage:17, color:'#ff8a3a', free:true, flavor:"The first spell anyone learns. Simple, reliable, always there." },
+  { id:'spell_mana_c1',   name:'Cinder Spark',    level:1, damage:20, color:'#ff9a5a', price:10, minLevel:0, flavor:"Barely a spell at all. Barely needs to be." },
+  { id:'spell_mana_1',    name:'Frost Needle',    level:2, damage:24, color:'#5ab8ff', price:15, minLevel:0, flavor:"Small, precise, and colder than it has any right to be." },
+  { id:'spell_mana_c2',   name:'Glacial Shard',   level:2, damage:26, color:'#7fc8ff', price:18, minLevel:1, flavor:"Cold enough to hurt on the way out, not just the way in." },
+  { id:'spell_mana_2',    name:'Thorn Volley',    level:3, damage:29, color:'#5aff8a', price:20, minLevel:2, flavor:"Borrowed from the forest itself, and it shows." },
+  { id:'spell_mana_c3',   name:'Verdant Snare',   level:3, damage:32, color:'#8aff5a', price:32, minLevel:6, flavor:"Grows faster than anything planted on purpose." },
+  { id:'spell_mana_3',    name:'Ember Lance',     level:4, damage:36, color:'#ff4a3a', price:50, minLevel:10, flavor:"Burns hotter the longer you hold the shape in mind." },
+  { id:'spell_mana_c4',   name:'Molten Spike',    level:4, damage:39, color:'#ff6a3a', price:58, minLevel:12, flavor:"Doesn't cool. Doesn't seem to want to." },
+  { id:'spell_mana_4',    name:'Wildfire Bloom',  level:5, damage:42, color:'#c9f04a', price:70, minLevel:14, flavor:"Spreads faster than it should. Faster than fire usually does." }
 ];
 const COMPANION_SPELLS = [
-  { id:'spell_companion_base', name:'Wolf Lunge',      level:1, damage:25, color:'#e8e2d8', free:true },
-  { id:'spell_companion_1',    name:'Howling Charge',  level:2, damage:32, color:'#a8d8ff', price:40, minLevel:5 },
-  { id:'spell_companion_2',    name:'Fang Strike',     level:3, damage:39, color:'#9aa0a6', price:45, minLevel:7 },
-  { id:'spell_companion_3',    name:'Rending Howl',    level:4, damage:46, color:'#c060ff', price:60, minLevel:10 }
+  { id:'spell_companion_base', name:'Wolf Lunge',      level:1, damage:25, color:'#e8e2d8', free:true, flavor:"Instinct, not training. It's always been there." },
+  { id:'spell_companion_c1',   name:'Snapping Jaws',   level:1, damage:28, color:'#d8d0c0', price:28, minLevel:2, flavor:"No warning. There rarely is." },
+  { id:'spell_companion_1',    name:'Howling Charge',  level:2, damage:32, color:'#a8d8ff', price:40, minLevel:5, flavor:"The sound carries further than the strike does." },
+  { id:'spell_companion_c2',   name:'Feral Charge',    level:2, damage:36, color:'#8ac8ff', price:44, minLevel:6, flavor:"Whatever's in front of them stops being a problem." },
+  { id:'spell_companion_2',    name:'Fang Strike',     level:3, damage:39, color:'#9aa0a6', price:45, minLevel:7, flavor:"Quick, clean, and over before the enemy understands what happened." },
+  { id:'spell_companion_c3',   name:'Savage Bite',     level:3, damage:42, color:'#8a9098', price:52, minLevel:8, flavor:"Doesn't let go as fast as it should." },
+  { id:'spell_companion_3',    name:'Rending Howl',    level:4, damage:46, color:'#c060ff', price:60, minLevel:10, flavor:"The howl arrives a half-second after the damage already has." },
+  { id:'spell_companion_c4',   name:'Bloodmoon Strike',level:4, damage:50, color:'#d040ff', price:68, minLevel:12, flavor:"Something old in the blood, awake and hungry." }
 ];
 // Treasure-chest-only rewards, found after lock/riddle puzzles — never sold
 // in the shop (renderShop filters storyExclusive out). Four tiers per gear
@@ -3021,34 +3240,58 @@ const COMPANION_SPELLS = [
 // across the story; the gold fallback for a fully-emptied pool is now a
 // rare edge case rather than something a normal playthrough will hit.
 GEAR_ITEMS.push(
-  { id:'gear_head_x1',    slot:'head',    gem:'emerald',  name:'Sunfall Diadem',              bonus:3, minLevel:5, storyExclusive:true, flavor:"Warm long after the sun that named it has set." },
-  { id:'gear_head_x2',    slot:'head',    gem:'emerald',  name:'Crown of the Unburnt',         bonus:4, minLevel:9, storyExclusive:true, flavor:"Survived a fire that took everything else in the room." },
-  { id:'gear_head_x3',    slot:'head',    gem:'emerald',  name:'Halo of the First Light',      bonus:5, minLevel:12, storyExclusive:true, flavor:"Said to hold the very first sunrise Azure ever saw." },
-  { id:'gear_head_x4',    slot:'head',    gem:'emerald',  name:'Diadem of the Ember Star',     bonus:6, minLevel:15, storyExclusive:true, flavor:"A fallen star, cooled just enough to wear." },
-  { id:'gear_armor_x1',   slot:'armor',   gem:'ruby',     name:'Dragonscale Plate',            bonus:3, minLevel:5, storyExclusive:true, flavor:"Each scale still faintly warm. As if it hasn't quite finished dying." },
-  { id:'gear_armor_x2',   slot:'armor',   gem:'ruby',     name:'Aegis of the Fallen Kings',    bonus:4, minLevel:9, storyExclusive:true, flavor:"Passed down through more funerals than coronations." },
-  { id:'gear_armor_x3',   slot:'armor',   gem:'ruby',     name:'Bulwark of the Undying',       bonus:5, minLevel:12, storyExclusive:true, flavor:"Refuses to rust, chip, or stay buried." },
-  { id:'gear_armor_x4',   slot:'armor',   gem:'ruby',     name:"Emberking's Warplate",         bonus:6, minLevel:15, storyExclusive:true, flavor:"Forged in a furnace that was, itself, once a throne." },
-  { id:'gear_boots_x1',   slot:'boots',   gem:'sapphire', name:"Windwalker's Grace",           bonus:3, minLevel:5, storyExclusive:true, flavor:"Leaves footprints that vanish before anyone can follow." },
-  { id:'gear_boots_x2',   slot:'boots',   gem:'sapphire', name:'Tempest-Stride Sabatons',      bonus:4, minLevel:9, storyExclusive:true, flavor:"Smells faintly of ozone, always." },
-  { id:'gear_boots_x3',   slot:'boots',   gem:'sapphire', name:'Gale-Marked Striders',         bonus:5, minLevel:12, storyExclusive:true, flavor:"Marked with a wind that stopped blowing centuries ago." },
-  { id:'gear_boots_x4',   slot:'boots',   gem:'sapphire', name:'Boots of the Last Wind',       bonus:6, minLevel:15, storyExclusive:true, flavor:"Said to carry the very last breath of a dying storm." },
-  { id:'gear_offhand_x1', slot:'offhand', gem:'amethyst', name:'Moonlit Fang Charm',           bonus:3, minLevel:5, storyExclusive:true, flavor:"Only shows its true shape under moonlight." },
-  { id:'gear_offhand_x2', slot:'offhand', gem:'amethyst', name:'Relic of the First Pack',      bonus:4, minLevel:9, storyExclusive:true, flavor:"The oldest bond in Azure, worn smooth by centuries of hands." },
-  { id:'gear_offhand_x3', slot:'offhand', gem:'amethyst', name:'Howling Ember Fetish',         bonus:5, minLevel:12, storyExclusive:true, flavor:"Warm to the touch, and it hums like something asleep." },
-  { id:'gear_offhand_x4', slot:'offhand', gem:'amethyst', name:'Heart of the Eternal Pack',    bonus:6, minLevel:15, storyExclusive:true, flavor:"Doesn't beat. Doesn't need to. It never stopped belonging to something larger." }
+  { id:'gear_head_x1',    slot:'head',    gem:'emerald',  name:'Sunfall Diadem',              bonus:4, minLevel:5, storyExclusive:true, flavor:"Warm long after the sun that named it has set." },
+  { id:'gear_head_xc1',   slot:'head',    gem:'emerald',  name:'Coronet of Quiet Fire',        bonus:5, minLevel:7, storyExclusive:true, flavor:"Doesn't burn. Doesn't feel like it's not burning, either." },
+  { id:'gear_head_x2',    slot:'head',    gem:'emerald',  name:'Crown of the Unburnt',         bonus:6, minLevel:9, storyExclusive:true, flavor:"Survived a fire that took everything else in the room." },
+  { id:'gear_head_xc2',   slot:'head',    gem:'emerald',  name:'Circlet of the Deep Vigil',     bonus:7, minLevel:11, storyExclusive:true, flavor:"Old enough that no one alive remembers what it was originally kept for." },
+  { id:'gear_head_x3',    slot:'head',    gem:'emerald',  name:'Halo of the First Light',      bonus:8, minLevel:12, storyExclusive:true, flavor:"Said to hold the very first sunrise Azure ever saw." },
+  { id:'gear_head_xc3',   slot:'head',    gem:'emerald',  name:'Diadem of the Last Ember',      bonus:9, minLevel:14, storyExclusive:true, flavor:"Whatever fire it came from, it was the very end of it." },
+  { id:'gear_head_x4',    slot:'head',    gem:'emerald',  name:'Diadem of the Ember Star',     bonus:10, minLevel:15, storyExclusive:true, flavor:"A fallen star, cooled just enough to wear." },
+  { id:'gear_head_xc4',   slot:'head',    gem:'emerald',  name:'Crown Beyond Reckoning',        bonus:11, minLevel:17, storyExclusive:true, flavor:"No one who wore it before you left a record of how they found it." },
+  { id:'gear_armor_x1',   slot:'armor',   gem:'ruby',     name:'Dragonscale Plate',            bonus:4, minLevel:5, storyExclusive:true, flavor:"Each scale still faintly warm. As if it hasn't quite finished dying." },
+  { id:'gear_armor_xc1',  slot:'armor',   gem:'ruby',     name:'Warplate of the Last Stand',    bonus:5, minLevel:7, storyExclusive:true, flavor:"Whoever wore it last didn't retreat. This is how you know." },
+  { id:'gear_armor_x2',   slot:'armor',   gem:'ruby',     name:'Aegis of the Fallen Kings',    bonus:6, minLevel:9, storyExclusive:true, flavor:"Passed down through more funerals than coronations." },
+  { id:'gear_armor_xc2',  slot:'armor',   gem:'ruby',     name:'Bastion Plate of the Unyielding',bonus:7, minLevel:11, storyExclusive:true, flavor:"Built by someone who had already decided not to lose." },
+  { id:'gear_armor_x3',   slot:'armor',   gem:'ruby',     name:'Bulwark of the Undying',       bonus:8, minLevel:12, storyExclusive:true, flavor:"Refuses to rust, chip, or stay buried." },
+  { id:'gear_armor_xc3',  slot:'armor',   gem:'ruby',     name:'Warplate of the Endless War',   bonus:9, minLevel:14, storyExclusive:true, flavor:"Has been worn into more battles than anyone kept count of." },
+  { id:'gear_armor_x4',   slot:'armor',   gem:'ruby',     name:"Emberking's Warplate",         bonus:10, minLevel:15, storyExclusive:true, flavor:"Forged in a furnace that was, itself, once a throne." },
+  { id:'gear_armor_xc4',  slot:'armor',   gem:'ruby',     name:'Armor of the Last Ember King',  bonus:11, minLevel:17, storyExclusive:true, flavor:"The throne is gone. This is what's left of it." },
+  { id:'gear_boots_x1',   slot:'boots',   gem:'sapphire', name:"Windwalker's Grace",           bonus:4, minLevel:5, storyExclusive:true, flavor:"Leaves footprints that vanish before anyone can follow." },
+  { id:'gear_boots_xc1',  slot:'boots',   gem:'sapphire', name:'Striders of the Quiet Storm',   bonus:5, minLevel:7, storyExclusive:true, flavor:"Never announce themselves. Neither does whatever's coming." },
+  { id:'gear_boots_x2',   slot:'boots',   gem:'sapphire', name:'Tempest-Stride Sabatons',      bonus:6, minLevel:9, storyExclusive:true, flavor:"Smells faintly of ozone, always." },
+  { id:'gear_boots_xc2',  slot:'boots',   gem:'sapphire', name:'Boots of the Racing Storm',     bonus:7, minLevel:11, storyExclusive:true, flavor:"Somehow always outpace whatever weather they're walking through." },
+  { id:'gear_boots_x3',   slot:'boots',   gem:'sapphire', name:'Gale-Marked Striders',         bonus:8, minLevel:12, storyExclusive:true, flavor:"Marked with a wind that stopped blowing centuries ago." },
+  { id:'gear_boots_xc3',  slot:'boots',   gem:'sapphire', name:'Treads of the Final Gale',      bonus:9, minLevel:14, storyExclusive:true, flavor:"The last wind that ever blew this hard left these behind." },
+  { id:'gear_boots_x4',   slot:'boots',   gem:'sapphire', name:'Boots of the Last Wind',       bonus:10, minLevel:15, storyExclusive:true, flavor:"Said to carry the very last breath of a dying storm." },
+  { id:'gear_boots_xc4',  slot:'boots',   gem:'sapphire', name:'Sabatons of the Endless Sky',   bonus:11, minLevel:17, storyExclusive:true, flavor:"Somewhere up there, the wind that made these is still blowing." },
+  { id:'gear_offhand_x1', slot:'offhand', gem:'amethyst', name:'Moonlit Fang Charm',           bonus:4, minLevel:5, storyExclusive:true, flavor:"Only shows its true shape under moonlight." },
+  { id:'gear_offhand_xc1',slot:'offhand', gem:'amethyst', name:"Kinbond Fetish",                bonus:5, minLevel:7, storyExclusive:true, flavor:"Ties two fates together whether either one asked for it or not." },
+  { id:'gear_offhand_x2', slot:'offhand', gem:'amethyst', name:'Relic of the First Pack',      bonus:6, minLevel:9, storyExclusive:true, flavor:"The oldest bond in Azure, worn smooth by centuries of hands." },
+  { id:'gear_offhand_xc2',slot:'offhand', gem:'amethyst', name:"Warden's Bloodmark",            bonus:7, minLevel:11, storyExclusive:true, flavor:"Marks you as something worth watching over, whether you wanted the attention or not." },
+  { id:'gear_offhand_x3', slot:'offhand', gem:'amethyst', name:'Howling Ember Fetish',         bonus:8, minLevel:12, storyExclusive:true, flavor:"Warm to the touch, and it hums like something asleep." },
+  { id:'gear_offhand_xc3',slot:'offhand', gem:'amethyst', name:'Talisman of the Last Vow',      bonus:9, minLevel:14, storyExclusive:true, flavor:"Whatever promise it was made for, it hasn't been broken yet." },
+  { id:'gear_offhand_x4', slot:'offhand', gem:'amethyst', name:'Heart of the Eternal Pack',    bonus:10, minLevel:15, storyExclusive:true, flavor:"Doesn't beat. Doesn't need to. It never stopped belonging to something larger." },
+  { id:'gear_offhand_xc4',slot:'offhand', gem:'amethyst', name:'The Unbroken Bond',             bonus:11, minLevel:17, storyExclusive:true, flavor:"Some things outlast whoever first carried them." }
 );
 MANA_SPELLS.push(
-  { id:'spell_mana_x1', name:'Solar Flare',       level:6, damage:39, color:'#fff29a', minLevel:5, storyExclusive:true },
-  { id:'spell_mana_x2', name:'Cataclysm',         level:7, damage:44, color:'#ff3a6a', minLevel:9, storyExclusive:true },
-  { id:'spell_mana_x3', name:'Azure Requiem', level:8, damage:49, color:'#ff8a3a', minLevel:12, storyExclusive:true },
-  { id:'spell_mana_x4', name:'Starfire Cascade',  level:9, damage:54, color:'#8affea', minLevel:15, storyExclusive:true }
+  { id:'spell_mana_x1', name:'Solar Flare',       level:6, damage:39, color:'#fff29a', minLevel:5, storyExclusive:true, flavor:"For one instant, it's very hard to look directly at your own hands." },
+  { id:'spell_mana_xc1',name:'Radiant Burst',      level:6, damage:42, color:'#ffe27a', minLevel:7, storyExclusive:true, flavor:"Bright enough to leave an afterimage." },
+  { id:'spell_mana_x2', name:'Cataclysm',         level:7, damage:44, color:'#ff3a6a', minLevel:9, storyExclusive:true, flavor:"Not subtle. Not meant to be." },
+  { id:'spell_mana_xc2',name:'Void Rend',          level:7, damage:46, color:'#c040ff', minLevel:10, storyExclusive:true, flavor:"Tears something that wasn't supposed to be torn." },
+  { id:'spell_mana_x3', name:'Azure Requiem', level:8, damage:49, color:'#ff8a3a', minLevel:12, storyExclusive:true, flavor:"Named after a song no one alive remembers the words to." },
+  { id:'spell_mana_xc3',name:'Eclipse Bolt',       level:8, damage:52, color:'#6a4a8a', minLevel:14, storyExclusive:true, flavor:"For a moment, the light goes the wrong way." },
+  { id:'spell_mana_x4', name:'Starfire Cascade',  level:9, damage:54, color:'#8affea', minLevel:15, storyExclusive:true, flavor:"Falls like something that was never meant to land here." },
+  { id:'spell_mana_xc4',name:"Nova's End",         level:9, damage:58, color:'#ffffff', minLevel:17, storyExclusive:true, flavor:"The kind of spell that leaves the caster tired for a reason." }
 );
 COMPANION_SPELLS.push(
-  { id:'spell_companion_x1', name:"Alpha's Fury",  level:5, damage:40,  color:'#ff5a3a', minLevel:5, storyExclusive:true },
-  { id:'spell_companion_x2', name:'Moonrise Howl', level:6, damage:47,  color:'#c9e8ff', minLevel:9, storyExclusive:true },
-  { id:'spell_companion_x3', name:'Packbound Fury',level:7, damage:52, color:'#e8b8ff', minLevel:12, storyExclusive:true },
-  { id:'spell_companion_x4', name:'The Last Howl', level:8, damage:58, color:'#f0f0f0', minLevel:15, storyExclusive:true }
+  { id:'spell_companion_x1', name:"Alpha's Fury",  level:5, damage:40,  color:'#ff5a3a', minLevel:5, storyExclusive:true, flavor:"Something ancient in the blood, remembering what it's for." },
+  { id:'spell_companion_xc1',name:"Packmate's Vow", level:5, damage:44, color:'#ffb0a0', minLevel:7, storyExclusive:true, flavor:"A promise kept even when no one else remembers it was made." },
+  { id:'spell_companion_x2', name:'Moonrise Howl', level:6, damage:47,  color:'#c9e8ff', minLevel:9, storyExclusive:true, flavor:"Strongest under an open sky, but it doesn't seem to need one." },
+  { id:'spell_companion_xc2',name:'Wildheart Fury', level:6, damage:50, color:'#a8c8ff', minLevel:10, storyExclusive:true, flavor:"The gentlest wolf you'll ever meet, until this." },
+  { id:'spell_companion_x3', name:'Packbound Fury',level:7, damage:52, color:'#e8b8ff', minLevel:12, storyExclusive:true, flavor:"Fights like there are more of them than there actually are." },
+  { id:'spell_companion_xc3',name:'Ancestral Howl', level:7, damage:55, color:'#d8a8ff', minLevel:14, storyExclusive:true, flavor:"Carries further than sound should be able to." },
+  { id:'spell_companion_x4', name:'The Last Howl', level:8, damage:58, color:'#f0f0f0', minLevel:15, storyExclusive:true, flavor:"The kind of sound that ends fights before they're finished." },
+  { id:'spell_companion_xc4',name:'The Endless Hunt',level:8, damage:62, color:'#ffffff', minLevel:17, storyExclusive:true, flavor:"Some hunts don't end. This one's still going." }
 );
 // ---------- procedural shop scaling ----------
 // The hand-authored tiers above are a fixed pool -- eventually exhausted by
@@ -3204,7 +3447,7 @@ function ensureProceduralGearStock(slot){
   const equippedItem = equippedId ? GEAR_ITEMS.find(g=>g.id===equippedId) : null;
   const currentBonus = equippedItem ? equippedItem.bonus : 0;
   const upgradeCount = GEAR_ITEMS.filter(g=>
-    g.slot===slot && playerLevel >= (g.minLevel||0) && !ownedItems.has(g.id) && g.bonus > currentBonus
+    g.slot===slot && !g.storyExclusive && playerLevel >= (g.minLevel||0) && !ownedItems.has(g.id) && g.bonus > currentBonus
   ).length;
   const needed = Math.max(0, 2 - upgradeCount);
   if(needed===0) return;
@@ -3220,20 +3463,24 @@ function ensureProceduralGearStock(slot){
     if(!registered || registered.bonus <= currentBonus) break;
   }
 }
+const PROCEDURAL_SPELL_DAMAGE_CAP = { mana:70, companion:76 };
 function ensureProceduralSpellStock(category){
   const arr = category==='mana' ? MANA_SPELLS : COMPANION_SPELLS;
   const equippedId = category==='mana' ? equippedManaSpell : equippedCompanionSpell;
   const equippedItem = arr.find(s=>s.id===equippedId);
   const currentDamage = equippedItem ? equippedItem.damage : 0;
   const upgradeCount = arr.filter(s=>
-    (s.free || playerLevel >= (s.minLevel||0)) && !ownedItems.has(s.id) && s.damage > currentDamage
+    !s.storyExclusive && (s.free || playerLevel >= (s.minLevel||0)) && !ownedItems.has(s.id) && s.damage > currentDamage
   ).length;
   const needed = Math.max(0, 2 - upgradeCount);
   if(needed===0) return;
+  const cap = PROCEDURAL_SPELL_DAMAGE_CAP[category];
   const maxKnownDamage = Math.max(currentDamage, ...arr.filter(s=>(s.free||playerLevel>=(s.minLevel||0))).map(s=>s.damage));
   const increment = category==='mana' ? 6 : 8;
   for(let i=1;i<=needed;i++){
-    const id = `spell_${category}_scaled_${maxKnownDamage+increment*i}`;
+    const damage = Math.min(cap, maxKnownDamage+increment*i);
+    if(damage <= currentDamage) break;
+    const id = `spell_${category}_scaled_${damage}`;
     ensureSpellItemRegistered(id, category);
   }
 }
@@ -3300,7 +3547,7 @@ const gearHtml = GEAR_ITEMS
       if(!owned) btnHtml = `<button class="shop-buy-btn" data-buy="${item.id}" ${!afford?'disabled':''}>${item.price}g</button>`;
       else if(isEquipped) btnHtml = `<button class="shop-buy-btn owned" disabled>EQUIPPED</button>`;
       else btnHtml = `<button class="shop-buy-btn" data-equipgear="${item.id}">EQUIP</button>`;
-      return `<div class="shop-item">
+      return `<div class="shop-item" style="border-left:4px solid ${GEM_BRIGHT[item.gem]};">
         <div>
           <div class="shop-item-name"><span class="shop-gem-swatch" style="background:${GEM_BRIGHT[item.gem]}"></span>${item.name} ${gearStatCompareHtml(item)}</div>
           <div class="shop-item-cat">Gear: ${item.slot.toUpperCase()} · ${GEM_LABEL[item.gem]}</div>
@@ -3310,7 +3557,17 @@ const gearHtml = GEAR_ITEMS
       </div>`;
     }).join('');
 
-  const spellSection = (label, spells, equippedId, equipKey) => spells
+function spellCooldownCompareHtml(item, spells, equippedId){
+  const cd = spellCooldownTurns(item.level);
+  if(item.id === equippedId) return `<span class="spell-level">${cd}-turn CD</span>`;
+  const equippedItem = spells.find(s=>s.id===equippedId);
+  const equippedCd = equippedItem ? spellCooldownTurns(equippedItem.level) : 0;
+  const diff = cd - equippedCd;
+  if(diff > 0) return `<span class="spell-level stat-down">${cd}-turn CD (+${diff})</span>`;
+  if(diff < 0) return `<span class="spell-level stat-up">${cd}-turn CD (${diff})</span>`;
+  return `<span class="spell-level">${cd}-turn CD</span>`;
+}
+const spellSection = (label, spells, equippedId, equipKey) => spells
     .filter(item => !item.storyExclusive && (item.free || playerLevel >= (item.minLevel||0)))
     .filter(item => {
       if(item.free || ownedItems.has(item.id)) return true;
@@ -3328,7 +3585,7 @@ const gearHtml = GEAR_ITEMS
       else btnHtml = `<button class="shop-buy-btn" data-equip="${item.id}" data-equipkey="${equipKey}">EQUIP</button>`;
       return `<div class="shop-item">
         <div>
-          <div class="shop-item-name">${item.name} <span class="spell-level">Lv.${item.level}</span></div>
+          <div class="shop-item-name">${item.name} <span class="spell-level">Lv.${item.level}</span> ${spellCooldownCompareHtml(item, spells, equippedId)}</div>
           <div class="shop-item-cat">${label}: ${item.damage} damage</div>
           ${item.flavor ? `<div class="shop-item-flavor">${item.flavor}</div>` : ''}
         </div>
@@ -3350,6 +3607,27 @@ const gearHtml = GEAR_ITEMS
 // actually equipped right now — gear slots and the two spell slots alike.
 // Called anywhere equipped state changes, not just when the screen opens,
 // so it's never stale if you buy/equip something and check back later.
+function showGearDetail(slot){
+  const id = equippedGear[slot];
+  const item = id && GEAR_ITEMS.find(g=>g.id===id);
+  if(!item) return;
+  playSFX('legendToggle');
+  document.getElementById('gearDetailTitle').textContent = item.name;
+  document.getElementById('gearDetailStat').innerHTML = `<span class="gear-detail-swatch" style="background:${GEM_BRIGHT[item.gem]}"></span>+${item.bonus} ${GEM_LABEL[item.gem]}`;
+  document.getElementById('gearDetailDesc').textContent = item.flavor || '';
+  document.getElementById('gearDetailPopover').classList.remove('hidden');
+}
+function showSpellDetail(category){
+  const id = category==='mana' ? equippedManaSpell : equippedCompanionSpell;
+  const arr = category==='mana' ? MANA_SPELLS : COMPANION_SPELLS;
+  const item = arr.find(s=>s.id===id);
+  if(!item) return;
+  playSFX('legendToggle');
+  document.getElementById('gearDetailTitle').textContent = item.name;
+  document.getElementById('gearDetailStat').innerHTML = `<span class="gear-detail-swatch" style="background:${item.color}"></span>${item.damage} damage &middot; Lv.${item.level} &middot; ${spellCooldownTurns(item.level)}-turn CD`;
+  document.getElementById('gearDetailDesc').textContent = item.flavor || '';
+  document.getElementById('gearDetailPopover').classList.remove('hidden');
+}
 function renderCharacterEquipped(){
   document.querySelectorAll('.gear-slot[data-slot]').forEach(el=>{
     const id = equippedGear[el.dataset.slot];
@@ -3519,8 +3797,19 @@ function generateTreasureFallbackItem(wantGear, excludeIds){
   return candidates.length ? candidates[Math.floor(Math.random()*candidates.length)] : null;
 }
 function pickTreasureOptions(){
-  const gearPool = GEAR_ITEMS.filter(g=>g.storyExclusive && !ownedItems.has(g.id) && playerLevel >= (g.minLevel||0));
-  const spellPool = [...MANA_SPELLS, ...COMPANION_SPELLS].filter(s=>s.storyExclusive && !ownedItems.has(s.id) && playerLevel >= (s.minLevel||0));
+  const gearPool = GEAR_ITEMS.filter(g=>{
+    if(!g.storyExclusive || ownedItems.has(g.id) || playerLevel < (g.minLevel||0)) return false;
+    const equippedId = equippedGear[g.slot];
+    const equippedItem = equippedId ? GEAR_ITEMS.find(x=>x.id===equippedId) : null;
+    return g.bonus > (equippedItem ? equippedItem.bonus : 0);
+  });
+  const spellPool = [...MANA_SPELLS, ...COMPANION_SPELLS].filter(s=>{
+    if(!s.storyExclusive || ownedItems.has(s.id) || playerLevel < (s.minLevel||0)) return false;
+    const isMana = MANA_SPELLS.includes(s);
+    const arr = isMana ? MANA_SPELLS : COMPANION_SPELLS;
+    const equippedItem = arr.find(x=>x.id===(isMana ? equippedManaSpell : equippedCompanionSpell));
+    return s.damage > (equippedItem ? equippedItem.damage : 0);
+  });
   const pickOne = (excludeIds)=>{
     const wantGear = Math.random() < (2/3);
     const primary = (wantGear ? gearPool : spellPool).filter(i=>!excludeIds.includes(i.id));
@@ -3880,6 +4169,53 @@ function spawnPerfectTimingPopup(){
 // enemy. Used by both the archetype traits (Desperate, Ambush) and the
 // existing boss traits (heal, damage reduction, counter, enrage, steal),
 // which previously only had a log message with no visual feedback at all.
+const TRAIT_INFO = {
+  desperate: { label:'Desperate', icon:'\u2191', color:'#ff6a4a', desc:"Hits harder once below 30% HP." },
+  ambush: { label:'Ambush', icon:'\u2694', color:'#a563d9', desc:"The first counter-attack deals 40% more damage." },
+  dragunder: { label:'Drag Under', icon:'\u23F3', color:'#3f86d6', desc:"Shrinks the strike window with each counter-attack." },
+  sunbaked: { label:'Sunbaked', icon:'\u2600', color:'#f0c060', desc:"Heals a small amount of HP with each counter-attack." },
+  fading: { label:'Fading', icon:'\u2193', color:'#a8c8b8', desc:"Weakens as its HP drops -- less dangerous the more you hurt it." },
+  disciplined: { label:'Disciplined', icon:'\u25C6', color:'#8a90a0', desc:"Takes 15% less damage from all sources, for the whole fight." },
+  manyeyed: { label:'Regenerating', icon:'\u2665', color:'#5aff8a', desc:"Heals a burst of HP once below 50%. Happens only once." },
+  arachnid: { label:'Hardening', icon:'\u25A0', color:'#8a90a0', desc:"Takes 30% less damage once below 50% HP, for the rest of the fight." },
+  naga: { label:'Coiling', icon:'\u27F3', color:'#4aaa8a', desc:"Strikes twice in a row once below 50% HP. Happens only once." },
+  tentacled: { label:'Enraged', icon:'\u25B2', color:'#ff3a3a', desc:"Counter-attacks hit 50% harder once below 33% HP." },
+  gianteye: { label:'Perceiving', icon:'\u25C9', color:'#e0a94a', desc:"Steals a portion of your gold once below 50% HP. Happens only once." },
+  groveheart: { label:'Regenerating', icon:'\u2665', color:'#5aff8a', desc:"Heals a small amount of HP repeatedly once below 50% HP." },
+};
+function getActiveTraitInfo(){
+  if(state.isBoss && state.bossVariant && TRAIT_INFO[state.bossVariant]) return TRAIT_INFO[state.bossVariant];
+  if(!state.isBoss && enemyVariant){
+    const traitKey = ENEMY_ARCHETYPE_TRAITS[enemyVariant];
+    if(traitKey && TRAIT_INFO[traitKey]) return TRAIT_INFO[traitKey];
+  }
+  return null;
+}
+function updateTraitBadge(){
+  const enemyFrame = document.getElementById('enemyFrame');
+  if(!enemyFrame) return;
+  const info = state.mode==='battle' ? getActiveTraitInfo() : null;
+  enemyFrame.classList.toggle('has-trait', !!info);
+  const badge = document.getElementById('enemyTraitBadge');
+  if(!badge) return;
+  if(info){
+    badge.classList.remove('hidden');
+    badge.textContent = info.icon;
+    badge.style.setProperty('--trait-color', info.color);
+    enemyFrame.style.setProperty('--trait-color', info.color);
+  } else {
+    badge.classList.add('hidden');
+  }
+}
+function showTraitInfoPopup(){
+  const info = getActiveTraitInfo();
+  if(!info) return;
+  playSFX('legendToggle');
+  document.getElementById('traitInfoTitle').textContent = info.label;
+  document.getElementById('traitInfoTitle').style.color = info.color;
+  document.getElementById('traitInfoDesc').textContent = info.desc;
+  document.getElementById('traitInfoPopover').classList.remove('hidden');
+}
 function announceEnemyTrait(label, effect, color){
   const enemyFrame = document.getElementById('enemyFrame');
   if(enemyFrame){
@@ -3890,13 +4226,57 @@ function announceEnemyTrait(label, effect, color){
     el.style.setProperty('--trait-color', color);
     el.innerHTML = `<div class="trait-portrait-title">${label}</div><div class="trait-portrait-effect">${effect}</div>`;
     enemyFrame.appendChild(el);
-    setTimeout(()=> el.remove(), 1100);
+    setTimeout(()=> el.remove(), 2500);
     enemyFrame.style.setProperty('--trait-flash-color', color);
     enemyFrame.classList.remove('trait-flash');
     void enemyFrame.offsetWidth;
     enemyFrame.classList.add('trait-flash');
   }
   playSFX('enemyTraitActivate');
+}
+// Whole-screen shake, reserved for genuinely climactic moments (boss
+// defeat, perfect timing) -- distinct from triggerBoardImpact, which is
+// scoped to the board itself for regular matches/combos. This one shakes
+// the entire game screen for real weight on the moments that deserve it.
+function spawnBossVictoryBurst(){
+  if(!boardFxEl) return;
+  const wr = boardWrapEl.getBoundingClientRect();
+  const cx = wr.width/2, cy = wr.height/2;
+  const colors = ['#f0d878','#e0a94a','#ffe066','#c98a3a','#fff2b0'];
+  const shardCount = 26;
+  for(let i=0;i<shardCount;i++){
+    const ang = (Math.PI*2/shardCount)*i + (Math.random()*0.3-0.15);
+    const dist = 60+Math.random()*70;
+    const dx = Math.cos(ang)*dist, dy = Math.sin(ang)*dist;
+    const rot = (Math.random()*360) * (Math.random()<0.5?-1:1);
+    const size = 6 + Math.random()*6;
+    const s = document.createElement('div');
+    s.className='fx-shard';
+    s.style.left=cx+'px'; s.style.top=cy+'px';
+    s.style.width=size+'px'; s.style.height=size+'px'; s.style.margin=(-size/2)+'px 0 0 '+(-size/2)+'px';
+    s.style.setProperty('--dx',dx+'px'); s.style.setProperty('--dy',dy+'px');
+    s.style.setProperty('--rot',rot+'deg');
+    s.style.background = colors[i%colors.length];
+    s.style.animationDuration = (0.7+Math.random()*0.4)+'s';
+    boardFxEl.appendChild(s);
+    setTimeout(()=>s.remove(),1200);
+  }
+  const ring = document.createElement('div');
+  ring.className='fx-ring';
+  ring.style.left=cx+'px'; ring.style.top=cy+'px';
+  ring.style.width='16px'; ring.style.height='16px'; ring.style.margin='-8px 0 0 -8px';
+  ring.style.background = 'radial-gradient(circle, #ffe066 0%, transparent 70%)';
+  ring.style.animationDuration = '0.9s';
+  boardFxEl.appendChild(ring);
+  setTimeout(()=>ring.remove(),950);
+}
+function triggerScreenShake(power=1){
+  const wrap = document.querySelector('.wrap');
+  if(!wrap) return;
+  wrap.style.setProperty('--screen-shake-power', power);
+  wrap.classList.remove('screen-shake');
+  void wrap.offsetWidth;
+  wrap.classList.add('screen-shake');
 }
 function triggerBoardImpact(intensity){
   const boardEl = document.getElementById('board');
@@ -4062,14 +4442,35 @@ window.addEventListener('resize', ()=>{
 // recalculation (reading offsetHeight), never hides anything.
 function forceLayoutReflow(){
   window.scrollTo(0,0);
+  // Momentarily forcing an explicit height, then releasing it back to the
+  // CSS rule, is what actually unsticks a WebView with a stale cached vh/
+  // dvh value -- leaving the override permanently in place would instead
+  // stop the layout responding to other viewport changes later (like the
+  // on-screen keyboard for the wolf-naming field).
+  document.body.style.height = window.innerHeight + 'px';
   void document.body.offsetHeight;
+  document.body.style.height = '';
 }
 let reflowTimer = null;
+let reflowTimer2 = null;
+let reflowTimer3 = null;
 function scheduleReflowRecovery(){
+  // A touch/swipe in progress when the device physically rotates may never
+  // get a clean pointerup/pointercancel on some WebViews -- clearing this
+  // immediately (not waiting for the delayed reflow below) prevents stale
+  // drag state from corrupting the very next touch after rotating back.
+  dragState = null;
   clearTimeout(refitTimer);
   refitTimer = setTimeout(refitDynamicText, 550);
-  clearTimeout(reflowTimer);
-  reflowTimer = setTimeout(forceLayoutReflow, 600);
+  // Multiple staggered attempts rather than one fixed delay -- the OS-level
+  // rotation animation settles at different speeds across devices, and a
+  // single early attempt can capture the viewport mid-transition, which is
+  // exactly the "shifted down, doesn't reorient properly" symptom this is
+  // meant to fix. Cheap to run a few times; expensive to get it wrong once.
+  clearTimeout(reflowTimer); clearTimeout(reflowTimer2); clearTimeout(reflowTimer3);
+  reflowTimer = setTimeout(forceLayoutReflow, 300);
+  reflowTimer2 = setTimeout(forceLayoutReflow, 700);
+  reflowTimer3 = setTimeout(forceLayoutReflow, 1200);
 }
 // Scoped back to orientationchange only -- 'resize' and visualViewport
 // 'resize' fire far too often on mobile (keyboard, toolbar, etc) to be a
@@ -4095,6 +4496,48 @@ function generateGrid(){
     }
   }
   return g;
+}
+let idleHintTimer = null;
+let activeHintCells = [];
+function scheduleIdleHint(){
+  clearIdleHint();
+  idleHintTimer = setTimeout(()=>{
+    if(state.mode!=='battle' && state.mode!=='lock' && state.mode!=='riddle' && state.mode!=='focus') return;
+    if(state.busy || state.resolving || state.gameOver) return;
+    const hint = findHintMove();
+    if(!hint) return;
+    activeHintCells = hint;
+    hint.forEach(([r,c])=>{
+      const el = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+      if(el) el.classList.add('hint-pulse');
+    });
+  }, 8000);
+}
+function clearIdleHint(){
+  if(idleHintTimer){ clearTimeout(idleHintTimer); idleHintTimer=null; }
+  activeHintCells.forEach(([r,c])=>{
+    const el = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+    if(el) el.classList.remove('hint-pulse');
+  });
+  activeHintCells = [];
+}
+function findHintMove(){
+  for(let r=0;r<N;r++){
+    for(let c=0;c<N;c++){
+      if(state.grid[r][c]==null) continue;
+      if(c+1<N && state.grid[r][c+1]!=null){
+        const g = state.grid.map(row=>row.slice());
+        [g[r][c], g[r][c+1]] = [g[r][c+1], g[r][c]];
+        if(findMatches(g).size>0) return [[r,c],[r,c+1]];
+      }
+      if(r+1<N && state.grid[r+1][c]!=null){
+        const g = state.grid.map(row=>row.slice());
+        [g[r][c], g[r+1][c]] = [g[r+1][c], g[r][c]];
+        if(findMatches(g).size>0) return [[r,c],[r+1,c]];
+      }
+    }
+  }
+  return null;
 }
 function findMatches(g, blocked){
   const val = (r,c) => (blocked && blocked.has(r+','+c)) ? null : g[r][c];
@@ -4134,7 +4577,7 @@ function applyGravity(){
   return fallInfo;
 }
 function addLog(text){ state.log.push(text); if(state.log.length>40) state.log.shift(); renderLog(); }
-function renderLog(){ logEl.innerHTML = state.log.slice(-8).map(t=>`<div>${t}</div>`).join(''); logEl.scrollTop = logEl.scrollHeight; }
+function renderLog(){ logEl.innerHTML = state.log.slice(-8).map(t=>`<div>${escapeHtml(t)}</div>`).join(''); logEl.scrollTop = logEl.scrollHeight; }
 
 function renderBoard(matchedSet, fallMap, swapMap){
   boardEl.classList.toggle('lock-mode', state.mode==='lock');
@@ -4170,6 +4613,7 @@ function renderBoard(matchedSet, fallMap, swapMap){
     cell.dataset.r=r; cell.dataset.c=c;
     boardEl.appendChild(cell);
   } }
+  scheduleIdleHint();
 }
 function gemChip(type){ return `<div class="legend-gem gem-${type}"></div>`; }
 function renderLegend(){
@@ -4180,6 +4624,35 @@ function miniBar(valueText, pct, fillClass, extraClass=''){
   const p = Math.max(0, Math.min(100, pct));
   return `<div class="mini-bar ${extraClass}"><div class="mini-bar-fill ${fillClass}" style="height:${p}%"></div><div class="mini-bar-value">${valueText}</div></div>`;
 }
+// Cooldown scales with spell power: low-level spells (1-2) cool down in a
+// single turn, high-level spells (8+, including anything procedural) cap
+// at 4 turns. Applies even if the resource bar is already full again --
+// the point is to stop high-tier spells from being spammable every turn
+// just because gems keep coming.
+// Cooldown counts complete turns -- a turn finishes precisely when the
+// enemy has finished acting (their counter-attack, including any boss
+// extra-counter), not on match count or window resolution alone. This is
+// the actual round-based rhythm the player experiences: strike, then the
+// enemy replies, then the next turn begins.
+function spellCooldownTurns(level){
+  return Math.min(4, Math.max(1, Math.ceil(level/2.5)));
+}
+function manaChargeClass(){
+  if(state.playerMana<state.playerMaxMana) return '';
+  if(!state.windowActive) return ' cooling';
+  return (state.turnCount||0) >= (state.manaCooldownTurn||0) ? ' ready' : ' cooling';
+}
+function companionChargeClass(){
+  if(state.rage<100) return '';
+  if(!state.windowActive) return ' cooling';
+  return (state.turnCount||0) >= (state.companionCooldownTurn||0) ? ' ready' : ' cooling';
+}
+function manaTurnsRemaining(){
+  return Math.max(0, (state.manaCooldownTurn||0) - (state.turnCount||0));
+}
+function companionTurnsRemaining(){
+  return Math.max(0, (state.companionCooldownTurn||0) - (state.turnCount||0));
+}
 function renderPlayerStats(){
   if(state.mode==='battle'){
     if(state.playerHP>0 && state.playerHP < state.playerMaxHP*0.25 && !state.lowHpWarned){
@@ -4188,8 +4661,8 @@ function renderPlayerStats(){
     }
     playerStatsEl.innerHTML =
       miniBar(state.playerHP, 100*state.playerHP/state.playerMaxHP, 'fill-hp') +
-      miniBar(state.playerMana, 100*state.playerMana/state.playerMaxMana, 'fill-mana', 'chargeable' + (state.playerMana>=state.playerMaxMana?' ready':'')) +
-      miniBar(state.rage, state.rage, 'fill-rage', 'chargeable' + (state.rage>=100?' ready':'')) +
+      miniBar(manaTurnsRemaining()>0 ? `${manaTurnsRemaining()}` : state.playerMana, 100*state.playerMana/state.playerMaxMana, 'fill-mana', 'chargeable' + manaChargeClass()) +
+      miniBar(companionTurnsRemaining()>0 ? `${companionTurnsRemaining()}` : state.rage, state.rage, 'fill-rage', 'chargeable' + companionChargeClass()) +
       miniBar(state.gold, 100, 'fill-gold');
     const manaBar = playerStatsEl.querySelectorAll('.mini-bar.chargeable')[0];
     if(manaBar) manaBar.addEventListener('click', castManaSpell);
@@ -4202,7 +4675,9 @@ function renderPlayerStats(){
   } else if(state.mode==='lock'){
     playerStatsEl.innerHTML = miniBar(state.lockMoves, 100*state.lockMoves/state.lockMovesMax, 'fill-moves');
   } else if(state.mode==='riddle'){
-    playerStatsEl.innerHTML = miniBar(state.riddleMoves, 100*state.riddleMoves/state.riddleMovesMax, 'fill-moves');
+    playerStatsEl.innerHTML = miniBar(Math.max(0,state.riddleMoves), 100*state.riddleMoves/state.riddleMovesMax, 'fill-moves');
+  } else if(state.mode==='focus'){
+    playerStatsEl.innerHTML = miniBar(Math.max(0,state.focusMoves), 100*state.focusMoves/state.focusMovesMax, 'fill-moves');
   }
 }
 function renderEnemyStats(){
@@ -4216,6 +4691,12 @@ function renderEnemyStats(){
       return `<div class="seq-gem gem-${t} ${cls}"></div>`;
     }).join('');
     enemyStatsEl.innerHTML = `<div class="riddle-seq-mini">${seqHtml}</div>`;
+  } else if(state.mode==='focus'){
+    enemyStatsEl.innerHTML = `<div class="focus-mini">
+      <div class="focus-color-label">FOCUS</div>
+      <div class="seq-gem gem-${state.focusColor} current focus-pulse"></div>
+      ${miniBar(state.focusProgress+'%', state.focusProgress, 'fill-lock')}
+    </div>`;
   }
 }
 
@@ -4224,7 +4705,7 @@ function renderNonBoard(){
   document.querySelectorAll('.tab').forEach(b=> b.classList.toggle('active', b.dataset.mode===state.mode));
   if(state.gameOver){
     const midFinalBossTransition = state.won && finalBossPhase>0 && finalBossPhase<3;
-    const isStoryPuzzleWin = state.won && playContext==='story' && (state.mode==='lock' || state.mode==='riddle') && finalBossPhase===0;
+    const isStoryPuzzleWin = state.won && playContext==='story' && (state.mode==='lock' || state.mode==='riddle' || state.mode==='focus') && finalBossPhase===0;
     if(midFinalBossTransition){
       // The phase transition overlay is already showing, set synchronously
       // inside the win-check itself, right as this phase's win is detected.
@@ -4247,6 +4728,7 @@ function renderNonBoard(){
       }
       document.getElementById('modalTitle').textContent = state.mode==='battle' ? (state.enemyHP<=0?'Victory':'Defeat')
         : state.mode==='lock' ? (state.lockProgress>=100?'The Vault Opens':'Sealed Once More')
+        : state.mode==='focus' ? (state.focusProgress>=100?'Focus Held':'Attention Lost')
         : (state.riddleIndex>=state.riddleSequence.length?'Riddle Solved':'The Path Fades');
       typeText(document.getElementById('modalText'), state.resultText);
       document.getElementById('modalBtn').textContent = state.won
@@ -4288,6 +4770,7 @@ const NODE_STYLE = {
   lock:     { icon:'\u25A3', color:'#dfae3c' }, // gold vault/lock square
   battle:   { icon:'\u2694', color:'#e0473f' }, // red crossed swords
   riddle:   { icon:'?',      color:'#a563d9' }, // purple question mark — unambiguous
+  focus:    { icon:'\u25C9', color:'#c9a4ff' }, // lavender bullseye — distinct from riddle's purple
   rest:     { icon:'\u263E', color:'#4aaa8a' }, // teal crescent — reprieve, quiet, night
   campfire: { icon:'\u2668', color:'#ff8a3a' }, // orange ember glyph — a quick heal stop
   shop:     { icon:'$',      color:'#4ec9e0' }  // blue $ — distinct from lock's gold
@@ -4462,8 +4945,8 @@ function buildBiomeNodes(biome, totalCount, extraNodes, forceFirstType){
 // fights get meaningfully longer/harder the deeper you go without needing
 // to touch player damage formulas at all -- the same match-3 output just
 // covers proportionally less of a bigger HP pool as you progress.
-const BATTLE_HP_BY_BIOME = { battlefield:115, forest:132, lake:150, castle:170, desert:192, sanctuary:215 };
-const BOSS_HP_BY_BIOME   = { battlefield:205, forest:230, lake:258, castle:288, desert:320, sanctuary:355 };
+const BATTLE_HP_BY_BIOME = { battlefield:130, forest:150, lake:170, castle:195, desert:220, sanctuary:245 };
+const BOSS_HP_BY_BIOME   = { battlefield:375, forest:425, lake:470, castle:530, desert:590, sanctuary:655 };
 // Enemy counter-attack damage was flat (6 + random 0-8) regardless of how
 // far into the game you were -- HP scaled with progress, but damage taken
 // never did, so losses actually got LESS likely over time as the player's
@@ -4525,11 +5008,11 @@ function enemyAttackDamage(){
 }
 const LOCK_FLAVOR = {
   battlefield:{ name:'The War Chest', banner:"A dead commander's strongbox, warded shut. Align the gold tumblers to break the seal.", moves:16, progressPerMatch:14 },
-  forest:{ name:'The Root-Bound Vault', banner:'Roots have grown through an old iron door. Align the gold tumblers to force it open.', moves:15, progressPerMatch:13 },
-  lake:{ name:'The Sunken Archive Door', banner:'Black water laps at stone steps leading down, warded shut with old magic. Align the gold tumblers to force it open.', moves:14, progressPerMatch:12 },
-  castle:{ name:'The Sealed Armory', banner:'A vault door, untouched since the siege. Align the gold tumblers to break the lock.', moves:13, progressPerMatch:11 },
-  desert:{ name:'The Buried Reliquary', banner:'Sand has swallowed this door to the hilt. Align the gold tumblers to pry it free.', moves:13, progressPerMatch:10 },
-  sanctuary:{ name:'The Last Ward', banner:'A final seal guards the path forward. Align the gold tumblers to pass.', moves:12, progressPerMatch:10 }
+  forest:{ name:'The Root-Bound Vault', banner:'Roots have grown through an old iron door. Align the gold tumblers to force it open.', moves:16, progressPerMatch:11 },
+  lake:{ name:'The Sunken Archive Door', banner:'Black water laps at stone steps leading down, warded shut with old magic. Align the gold tumblers to force it open.', moves:16, progressPerMatch:9 },
+  castle:{ name:'The Sealed Armory', banner:'A vault door, untouched since the siege. Align the gold tumblers to break the lock.', moves:17, progressPerMatch:8 },
+  desert:{ name:'The Buried Reliquary', banner:'Sand has swallowed this door to the hilt. Align the gold tumblers to pry it free.', moves:18, progressPerMatch:7 },
+  sanctuary:{ name:'The Last Ward', banner:'A final seal guards the path forward. Align the gold tumblers to pass.', moves:20, progressPerMatch:6 }
 };
 const RIDDLE_FLAVOR = {
   battlefield:{ name:'The Grave-Marked Sphinx', banner:'Something ancient sits among the fallen, and speaks only in riddles.', seqLength:3, moves:16, variant:'horned' },
@@ -4539,6 +5022,20 @@ const RIDDLE_FLAVOR = {
   desert:{ name:"The Sphinx's Gate", banner:'The Sphinx blocks the only shade in the shimmering heat, and speaks only in riddles.', seqLength:5, moves:13, variant:'horned' },
   sanctuary:{ name:'The Last Question', banner:'One final trial stands between you and the grove, and it speaks only in riddles.', seqLength:5, moves:12, variant:'titan' }
 };
+// Third puzzle type: a wizard whose attention keeps shifting to a
+// different gem color -- match whatever they're currently fixed on. No
+// penalty for a wrong-color match beyond the wasted move (distinct from
+// riddle's full reset), since the challenge here is staying adaptable,
+// not memorizing a sequence perfectly.
+const FOCUS_FLAVOR = {
+  battlefield:{ name:'The Wandering Seer', banner:'A seer wanders the battlefield, muttering of colors only they can name. Match what they call, before their attention wanders again.', moves:16, progressPerMatch:14, switchEvery:3 },
+  forest:{ name:'The Fickle Grove-Ward', banner:"Something in the grove keeps changing its mind about what it wants. Match the color it's currently fixed on.", moves:16, progressPerMatch:13, switchEvery:3 },
+  lake:{ name:'The Shifting Tide-Ward', banner:'The water changes color with the current, and so must your hands.', moves:15, progressPerMatch:12, switchEvery:3 },
+  castle:{ name:'The Wavering Ward', banner:"Whatever holds this ward can't seem to settle on what it's protecting against.", moves:15, progressPerMatch:11, switchEvery:2 },
+  desert:{ name:'The Mirage Ward', banner:"The heat plays tricks, and so does whatever's watching. Match what it's watching for, before it changes its mind.", moves:14, progressPerMatch:10, switchEvery:2 },
+  sanctuary:{ name:'The Final Focus', banner:"One last test of attention before the climb's end. It will not make this easy.", moves:14, progressPerMatch:10, switchEvery:2 }
+};
+function focusNode(biome){ const f = FOCUS_FLAVOR[biome] || FOCUS_FLAVOR.battlefield; return { type:'focus', name:f.name, biome, banner:f.banner, moves:f.moves, progressPerMatch:f.progressPerMatch, switchEvery:f.switchEvery, variant:'wizard' }; }
 function lockNode(biome){ const f = LOCK_FLAVOR[biome] || LOCK_FLAVOR.battlefield; return { type:'lock', name:f.name, biome, banner:f.banner, moves:f.moves, progressPerMatch:f.progressPerMatch }; }
 function riddleNode(biome){ const f = RIDDLE_FLAVOR[biome] || RIDDLE_FLAVOR.desert; return { type:'riddle', name:f.name, biome, banner:f.banner, moves:f.moves, seqLength:f.seqLength, variant:f.variant }; }
 
@@ -4558,32 +5055,32 @@ function riddleNode(biome){ const f = RIDDLE_FLAVOR[biome] || RIDDLE_FLAVOR.dese
 function generateQuestChain(){
   const chain = [];
 
-  const battlefieldNodes = buildBiomeNodes('battlefield', 9, [lockNode('battlefield'), riddleNode('battlefield')], 'battle');
+  const battlefieldNodes = buildBiomeNodes('battlefield', 10, [lockNode('battlefield'), riddleNode('battlefield'), focusNode('battlefield')], 'battle');
   battlefieldNodes[0].battleTutorial = true;
   chain.push(...battlefieldNodes);
   chain.push({ type:'battle', name:'The Many-Eyed Host', biome:'battlefield', boss:true, variant:'manyeyed',
     banner:"What's left on this battlefield has stopped being one thing. A hundred eyes turn to watch you at once." });
 
-  chain.push(...buildBiomeNodes('forest', 10, [lockNode('forest'), riddleNode('forest')]));
+  chain.push(...buildBiomeNodes('forest', 11, [lockNode('forest'), riddleNode('forest'), focusNode('forest')]));
   chain.push({ type:'battle', name:'The Bramblefang Weaver', biome:'forest', boss:true, variant:'arachnid',
     banner:'Something vast has strung the canopy with silk. It has been waiting since before you entered the trees.' });
 
-  chain.push(...buildBiomeNodes('lake', 10, [lockNode('lake'), riddleNode('lake')]));
+  chain.push(...buildBiomeNodes('lake', 11, [lockNode('lake'), riddleNode('lake'), focusNode('lake')]));
   chain.push({ type:'battle', name:'The Drowned Naga', biome:'lake', boss:true, variant:'naga',
     banner:'The water stills all at once. Something long and coiled beneath it has noticed you.' });
 
-  chain.push(...buildBiomeNodes('castle', 11, [lockNode('castle'), riddleNode('castle')]));
+  chain.push(...buildBiomeNodes('castle', 12, [lockNode('castle'), riddleNode('castle'), focusNode('castle')]));
   chain.push({ type:'battle', name:"The Keep's Hunger", biome:'castle', boss:true, variant:'tentacled',
     banner:'Something the castle has fed for generations rises from the well at its heart. It is still hungry.' });
 
-  chain.push(...buildBiomeNodes('desert', 12, [lockNode('desert'), riddleNode('desert')]));
+  chain.push(...buildBiomeNodes('desert', 13, [lockNode('desert'), riddleNode('desert'), focusNode('desert')]));
   chain.push({ type:'battle', name:'The Unblinking Dune', biome:'desert', boss:true, variant:'gianteye',
     banner:'The dunes themselves seem to watch you. At their center, something vast finally opens its eye.' });
 
   chain.push({ type:'rest', name:'The Grotto', biome:'grotto' });
 
-  chain.push(...buildBiomeNodes('sanctuary', 7, [lockNode('sanctuary'), riddleNode('sanctuary')]));
-  chain.push({ type:'finalboss', name:"The Crown's Guardian", biome:'sanctuary', boss:true,
+  chain.push(...buildBiomeNodes('sanctuary', 8, [lockNode('sanctuary'), riddleNode('sanctuary'), focusNode('sanctuary')]));
+  chain.push({ type:'finalboss', name:"Kaelen, the Crown's Guardian", biome:'sanctuary', boss:true,
     banner:'Light unlike any you have seen filters through leaves untouched for centuries. The flower blooms at the heart of Mother\'s Crown, and something ancient stands between you and it.' });
 
   return chain;
@@ -4865,13 +5362,19 @@ const BOSS_LORE = {
   ],
   finalboss: [
     { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'hero', pos:'left', speaker:'RO',
-      text:"This is what guards Mother's Crown? It doesn't even have a face." },
-    { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'unmade', pos:'right', speaker:'???', impact:true, prop:'mountainBloom',
-      text:'Faces are for things that want to be remembered.' },
+      text:`The climb ends, and the world opens. Mother's Crown. She's never seen anything so quiet, or so clearly not empty. Somewhere behind her, ${getWolfName()}'s breathing is still counting down.` },
     { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'hero', pos:'left', speaker:'RO',
-      text:"I don't care what you are. I care what's on the other side of you." },
+      text:"So it's true. Something still stands watch here." },
+    { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'unmade', pos:'right', speaker:'???', impact:true, prop:'mountainBloom',
+      text:'Kaelen stood watch. Kaelen does not, anymore. Not entirely.' },
+    { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'hero', pos:'left', speaker:'RO',
+      text:"Kaelen. That's a name, not a monster. What happened to you?" },
     { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'unmade', pos:'right', speaker:'???',
-      text:'Then you had better be ready to meet all of me.' }
+      text:'The Unmade came first. Then the Maw. Then Vaesk. Three guests who never left. There is very little of Kaelen answering you now.' },
+    { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'hero', pos:'left', speaker:'RO',
+      text:"Then I'm sorry. But the flower isn't yours to keep from me, not like this." },
+    { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'unmade', pos:'right', speaker:'???',
+      text:'It was never meant to be easy to take. Kaelen made sure of that, once. We intend to keep his promise, whether he would want us to or not.' }
   ]
 };
 const seenBossLore = {};
@@ -4889,31 +5392,65 @@ const BIOME_LORE = {
     { scene:'forestEntrance', sprite:'hero', pos:'left', prop:'trees', fx:'default',
       text:"They call it the Hollow Wood, though no one agrees why. Some say it's the silence, no birds sing here, even by daylight. Ro doesn't care what it's called, only that it stands between her and the mountain." },
     { scene:'forestEntrance', sprite:'wolf', pos:'right', prop:'trees', fx:'rackfocus',
-      text:`She checks the wound every night now, needed or not. ${getWolfName()} never complains, just watches with those patient amber eyes, like they're the one doing the comforting.` }
+      text:`She checks the wound every night now, needed or not. ${getWolfName()} never complains, just watches with those patient amber eyes, like they're the one doing the comforting.` },
+    { scene:'forestEntrance', sprite:'hero', pos:'left', prop:'trees', fx:'default',
+      text:"Someone at the last village swore the mountain has a keeper, something that's been up there since before Alerra had a name. Ro files it away. Everything has a keeper, until you get close enough to see it's just weather and rock." }
   ],
   lake: [
     { scene:'lakeStill', sprite:'hero', pos:'left', fx:'default',
       text:"The Sorrow Deep doesn't ripple. Not wind, not rain, not anything living. Ro has started talking just to fill the silence it leaves." },
     { scene:'lakeStill', sprite:'hero', pos:'left', fx:'punch',
-      text:`"What if the flower isn't real," she says, not really a question. ${getWolfName()} leans into her side, warm and still breathing. That's answer enough for tonight.` }
+      text:`"What if the flower isn't real," she says, not really a question. ${getWolfName()} leans into her side, warm and still breathing. That's answer enough for tonight.` },
+    { scene:'lakeStill', sprite:'hero', pos:'left', fx:'default',
+      text:"The stories change shape with distance, but the shape underneath stays the same: something guards Mother's Crown, and it has never once let anyone pass. Ro decides not to think about what that means for her, specifically." }
   ],
   castle: [
     { scene:'castleRuins', sprite:'hero', pos:'left', prop:'debris', particles:'dust', fx:'default',
       text:"Duskhold was a throne once, before it was a ruin, before it was just another shape the dark makes on the horizon. Ro doesn't know its history. She knows the wound smells wrong now, and that terrifies her more than any keep could." },
     { scene:'castleRuins', sprite:'wolf', pos:'right', particles:'dust', fx:'punch',
-      text:`"Leave me at the gate," ${getWolfName()} says, and it's the first time. Ro doesn't answer, just keeps walking. So do they.` }
+      text:`"Leave me at the gate," ${getWolfName()} says, and it's the first time. Ro doesn't answer, just keeps walking. So do they.` },
+    { scene:'castleRuins', sprite:'hero', pos:'left', particles:'dust', fx:'default',
+      text:"An old woman at the gate says the guardian wasn't always what it is now, that it had a name once, before whatever happened to it happened. Ro asks what changed. The woman only shakes her head and won't say." }
   ],
   desert: [
     { scene:'desertDunes', sprite:'hero', pos:'left', particles:'dust', fx:'default',
       text:"The Scorched Reach doesn't kill quickly. It takes its time, the way grief does, the way a wound does when the cure is still two biomes away." },
     { scene:'desertDunes', sprite:'wolf', pos:'right', particles:'dust', fx:'default',
-      text:`${getWolfName()} goes down at midday, just long enough for Ro's whole world to go white with panic. She carries them into what shade there is and doesn't let go until the sun starts down.` }
+      text:`${getWolfName()} goes down at midday, just long enough for Ro's whole world to go white with panic. She carries them into what shade there is and doesn't let go until the sun starts down.` },
+    { scene:'desertDunes', sprite:'hero', pos:'left', particles:'dust', fx:'default',
+      text:"A trader passing the other way won't stop, won't even slow, just calls back over his shoulder: three of them now, wearing one shape. Ro doesn't understand what that means yet. She will." }
+  ],
+  grotto: [
+    { scene:'grottoInterior', sprite:'hero', pos:'left', fx:'default',
+      text:"The Grotto is barely more than a hollow in the rock, but after the Reach, it feels like a palace. Ro doesn't remember the last time she slept without one eye open." },
+    { scene:'grottoInterior', sprite:'wolf', pos:'right', fx:'default',
+      text:`${getWolfName()} doesn't lie down so much as give out, legs folding before Ro can catch them. This isn't like the desert. This is different, and she knows it before she even reaches their side.` },
+    { scene:'grottoInterior', sprite:'hero', pos:'left', fx:'punch',
+      text:"She does everything she knows how to do. It isn't enough. It was never going to be enough, not out here, not with what she has." },
+    { scene:'grottoInterior', sprite:'wolf', pos:'right', fx:'punch',
+      text:`${getWolfName()}'s breathing goes shallow, then shallower, then it doesn't come back. Ro doesn't remember deciding to scream. She just is.` },
+    { scene:'grottoInterior', sprite:'hero', pos:'left', fx:'default',
+      text:"There is a kind of quiet that only exists after. Ro has heard it before, at Alerra. She never thought she'd hear it here, with her hand still resting on fur that's already starting to go cold." },
+    { scene:'grottoInterior', sprite:'orin', pos:'right', fx:'rackfocus',
+      text:"\"You are not the first to grieve in this hollow,\" says a voice from the dark at the back of the cave. \"You will not be the last. But you are, perhaps, the first to grieve loudly enough that I felt obligated to answer.\"" },
+    { scene:'grottoInterior', sprite:'hero', pos:'left', fx:'default',
+      text:"Ro doesn't have it in her to be afraid of whatever this is. \"Can you help.\" Not really a question. She's past asking questions." },
+    { scene:'grottoInterior', sprite:'orin', pos:'right', fx:'default',
+      text:"\"I can call back what has only just left. I cannot promise it stays gone from wherever it went. What returns will be borrowed, not returned, not undone, only delayed. Use the time better than most do.\"" },
+    { scene:'grottoInterior', sprite:'hero', pos:'left', fx:'punch',
+      text:"\"Then delay it,\" Ro says, and doesn't hesitate, and would say it again a thousand times over if she had to." },
+    { scene:'grottoInterior', sprite:'orin', pos:'right', fx:'default',
+      text:`The old wolf presses a paw to ${getWolfName()}'s chest, and says something in a language older than Alerra's oldest stone. The Grotto holds its breath along with her.` },
+    { scene:'grottoInterior', sprite:'wolf', pos:'right', fx:'punch',
+      text:`${getWolfName()}'s chest rises. Falls. Rises again, steadier this time. Their eyes open, amber and confused and alive, and Ro is on the ground beside them before she's decided to move.` },
+    { scene:'grottoInterior', sprite:'orin', pos:'right', fx:'default',
+      text:"\"The flower will finish what I have only postponed,\" Orin says, already fading back toward the dark. \"Climb quickly, and be wary of what guards it now. Kaelen was a friend to my kind, once. What answers for him these days may not remember that.\"" }
   ],
   sanctuary: [
     { scene:'sanctuaryCliffs', sprite:'hero', pos:'left', prop:'mountainBloom', particles:'light', fx:'propfocus',
-      text:"The Borez Cliffs rise ahead at last, and somewhere above them, Mother's Crown. Closer now than at any point in the journey, close enough to be afraid to believe it." },
+      text:"The Borez Cliffs don't invite climbing so much as dare it. Loose rock, wind that wants to take you sideways, a path barely wide enough for one foot at a time. Somewhere above it all: Mother's Crown." },
     { scene:'sanctuaryCliffs', sprite:'wolf', pos:'right', particles:'light', fx:'punch',
-      text:`${getWolfName()}'s breathing has gone shallow and quick, like something rationed. No more road left to spend, only the climb, and Ro would carry them up every inch of it if that's what it took.` }
+      text:`${getWolfName()} climbs like they're counting something down, and Ro doesn't ask what. She already knows. Borrowed time doesn't care how narrow the path gets.` }
   ]
 };
 const seenBiomeIntro = {};
@@ -4924,13 +5461,13 @@ let finalBossPhase = 0; // 0 = inactive
 let finalBossJustCompleted = false; // set true the instant phase 3 is won, consumed by modalBtn
 const FINAL_BOSS_PHASES = [ null,
   { mode:'riddle', name:'The Unmade', variant:'unmade', seqLength:5, moves:16,
-    banner:"This is what guards the Crown. Of course it isn't something with a face." },
+    banner:"The Unmade goes first. It has never needed a shape to be dangerous." },
   { mode:'lock', name:'The Maw', variant:'maw', moves:16, progressPerMatch:10,
-    banner:"It should be dead. It isn't. The shapeless thing draws itself together, and where there was nothing, now there is a mouth." },
-  { mode:'battle', name:'The Colossal Eye', variant:'colossaleye', hp:260,
-    banner:"The jaws snap shut on nothing. When they open again, there's no mouth left at all. Only an eye, vast and unblinking, and it has finally noticed her." }
+    banner:"The Unmade unravels, and the Maw takes its place. Where there was nothing, now there is a mouth, and it remembers being hungry." },
+  { mode:'battle', name:'Vaesk', variant:'colossaleye', hp:260,
+    banner:"The jaws close on nothing. When they open again, there's no mouth left at all. Only an eye, vast and unblinking. For the first time, it has a name: Vaesk." }
 ];
-const FINAL_BOSS_PRECLASH = "Whatever this thing truly is, it stands between her and the flower. That's answer enough.";
+const FINAL_BOSS_PRECLASH = "Whatever is left of Kaelen, it still stands between her and the flower, and borrowed time doesn't wait for anyone's sympathy.";
 function buildFinalBossNode(phase){
   const p = FINAL_BOSS_PHASES[phase];
   const node = { name:p.name, variant:p.variant, biome:'sanctuary', boss:true, banner:p.banner };
@@ -5025,7 +5562,7 @@ const BOSS_TAUNTS = {
   tentacled: { 0.5:"I have been hungry longer than your bloodline has existed.", 0.2:"Feed me, then, if you think you're enough." },
   gianteye: { 0.5:"I have watched a thousand travelers cross these dunes. None looked back.", 0.2:"You will not be the exception you think you are." },
   groveheart: { 0.5:"The grove does not forget what's taken root in it.", 0.2:"Even cut down, I will grow back." },
-  colossaleye: { 0.5:"You are further than any before you. It changes nothing.", 0.2:"The flower is not yours to take." },
+  colossaleye: { 0.5:"There is less of him in this, every time you strike.", 0.2:"Careful. What's left of Kaelen may not survive us leaving." },
 };
 function checkBossTaunt(){
   if(!state.isBoss || !state.bossVariant || state.enemyHP<=0) return;
@@ -5070,6 +5607,40 @@ function arcadeAwardPoints(){
 // Builds the victory/defeat modal text for whichever context is active —
 // story keeps its scene-specific flavor text, arcade and endless each get
 // their own score readout (endless additionally reports the wave reached).
+function randomVictoryLeadIn(){
+  const lines = [
+    `${state.enemyName} falls before you.`,
+    `${state.enemyName} goes down.`,
+    `${state.enemyName} collapses.`,
+    `${state.enemyName} can't take any more.`,
+    `${state.enemyName} is defeated.`,
+  ];
+  return lines[Math.floor(Math.random()*lines.length)];
+}
+function randomChainLeadIn(){
+  const lines = [
+    `${state.enemyName} falls before you, undone by a chain reaction.`,
+    `${state.enemyName} goes down in one cascading burst.`,
+    `${state.enemyName} can't withstand the chain reaction.`,
+  ];
+  return lines[Math.floor(Math.random()*lines.length)];
+}
+function randomSpellLeadIn(spellName){
+  const lines = [
+    `${state.enemyName} falls, undone by ${spellName}.`,
+    `${state.enemyName} is overwhelmed by ${spellName}.`,
+    `${spellName} finishes what the fight started.`,
+  ];
+  return lines[Math.floor(Math.random()*lines.length)];
+}
+function randomCompanionLeadIn(){
+  const lines = [
+    `${state.enemyName} falls, driven back by fang and claw.`,
+    `${state.enemyName} can't outrun ${getWolfName()}.`,
+    `${getWolfName()} finishes the fight before ${state.enemyName} can recover.`,
+  ];
+  return lines[Math.floor(Math.random()*lines.length)];
+}
 const VICTORY_FLOURISH = [
   'The road ahead clears.',
   'The path is yours again.',
@@ -5080,7 +5651,20 @@ const VICTORY_FLOURISH = [
   'The silence after feels almost peaceful.',
   'Onward.',
 ];
+const BOSS_VICTORY_FLOURISH = {
+  manyeyed: ['The eyes go dark, one by one, until none are left open.', 'Whatever watched through them stops watching.'],
+  arachnid: ['The web falls still. Nothing moves in it now.', 'The forest exhales, just once.'],
+  naga: ['The water goes calm, and stays that way.', 'Whatever coiled beneath the surface uncoils, and sinks.'],
+  tentacled: ['The hunger, finally, is quiet.', 'Something ancient stops feeding.'],
+  gianteye: ['The dune settles. The watching is over.', 'No eye remains open to see her leave.'],
+  groveheart: ['The grove falls silent, and stays that way.', 'What grew wild finally rests.'],
+  colossaleye: ['The eye closes, and something that was fighting to get out finally stops fighting.'],
+};
 function randomVictoryFlourish(){
+  if(state.isBoss && BOSS_VICTORY_FLOURISH[state.bossVariant]){
+    const lines = BOSS_VICTORY_FLOURISH[state.bossVariant];
+    return lines[Math.floor(Math.random()*lines.length)];
+  }
   return VICTORY_FLOURISH[Math.floor(Math.random()*VICTORY_FLOURISH.length)];
 }
 function victoryResultText(storyText){
@@ -5305,6 +5889,12 @@ function drawNodeStructure(ctx, type, x, groundY, color, dim){
     ctx.closePath(); ctx.fill();
     ctx.fillStyle = c;
     ctx.fillRect(x-1, groundY-8, 2, 2);
+  } else if(type === 'focus'){
+    // wizard's staff, topped with a small glowing orb
+    ctx.fillStyle = dark;
+    ctx.fillRect(x-0.7, groundY-11, 1.4, 11);
+    ctx.fillStyle = c;
+    ctx.beginPath(); ctx.arc(x, groundY-12, 2, 0, Math.PI*2); ctx.fill();
   } else if(type === 'rest'){
     // a simple bench/shrine
     ctx.fillStyle = dark;
@@ -5347,6 +5937,7 @@ const EVENT_LEGEND = [
   { type:'battle',   label:'Battle: fight an enemy in the strike window' },
   { type:'lock',     label:'Lock: turn tumblers to force a door open' },
   { type:'riddle',   label:'Riddle: match a pattern in the right order' },
+  { type:'focus',    label:'Focus: match the color a wizard is fixed on -- it keeps shifting' },
   { type:'campfire', label:'Campfire: rest and recover some HP' },
   { type:'shop',     label:'Shop: spend your gold' },
   { type:'rest',     label:'Reprieve: a story beat, no fight' }
@@ -5365,6 +5956,24 @@ document.getElementById('questLegendBtn').addEventListener('click', ()=>{
 document.getElementById('questLegendCloseBtn').addEventListener('click', ()=>{
   playSFX('legendToggle');
   document.getElementById('questLegendPopover').classList.add('hidden');
+});
+document.getElementById('enemyTraitBadge').addEventListener('click', showTraitInfoPopup);
+document.getElementById('traitInfoCloseBtn').addEventListener('click', ()=>{
+  playSFX('legendToggle');
+  document.getElementById('traitInfoPopover').classList.add('hidden');
+});
+document.querySelectorAll('.gear-slot[data-slot]').forEach(el=>{
+  el.addEventListener('click', ()=> showGearDetail(el.dataset.slot));
+});
+document.querySelectorAll('.equip-slot-mana').forEach(el=>{
+  el.addEventListener('click', ()=> showSpellDetail('mana'));
+});
+document.querySelectorAll('.equip-slot-companion').forEach(el=>{
+  el.addEventListener('click', ()=> showSpellDetail('companion'));
+});
+document.getElementById('gearDetailCloseBtn').addEventListener('click', ()=>{
+  playSFX('legendToggle');
+  document.getElementById('gearDetailPopover').classList.add('hidden');
 });
 function advanceQuestOnWin(){
   if(playContext!=='story') return;
@@ -5396,8 +6005,25 @@ const TRAVEL_CONTINUE_PHRASES = [
   'The road remembers no one...',
   'Onward, whatever waits...',
   'The path does not care who walks it...',
-  'Further still, no matter the cost...'
+  'Further still, no matter the cost...',
+  'The light thins ahead...',
+  'Every mile costs something...',
+  'The road doesn\'t ask if you\'re ready...',
+  'Still walking. Still watching.',
+  'The horizon doesn\'t get any closer...',
+  'One foot, then the other...',
+  'The quiet here has a weight to it...',
+  'Nothing behind is worth turning back for...',
+  'The path narrows, then widens again...'
 ];
+let lastTravelPhrase = null;
+function pickTravelPhrase(){
+  let phrase;
+  do{ phrase = TRAVEL_CONTINUE_PHRASES[Math.floor(Math.random()*TRAVEL_CONTINUE_PHRASES.length)]; }
+  while(phrase === lastTravelPhrase && TRAVEL_CONTINUE_PHRASES.length > 1);
+  lastTravelPhrase = phrase;
+  return phrase;
+}
 let travelTimeoutId = null;
 function handleQuestAdvance(index){
   if(index !== questIndex || state.travelBusy) return;
@@ -5410,7 +6036,7 @@ function handleQuestAdvance(index){
   const canvas = document.getElementById('travelCanvas');
   document.getElementById('travelText').textContent = enteringNewBiome
     ? `Entering ${BIOMES[node.biome].name}...`
-    : TRAVEL_CONTINUE_PHRASES[Math.floor(Math.random()*TRAVEL_CONTINUE_PHRASES.length)];
+    : pickTravelPhrase();
   drawHero(canvas.getContext('2d'), THEMES[currentTheme].sprites.hero);
   canvas.style.animation = 'none'; void canvas.offsetWidth; canvas.style.animation = '';
   overlay.classList.add('show');
@@ -5446,20 +6072,21 @@ function proceedToNode(node){
     showCutscene(BOSS_LORE[node.variant], ()=> initMode(node.type, node));
   }
   else if(node.battleTutorial && !skipPuzzleIntro.battle){ showPuzzleIntro(node); }
-  else if((node.type === 'lock' || node.type === 'riddle') && !skipPuzzleIntro[node.type]){ showPuzzleIntro(node); }
+  else if((node.type === 'lock' || node.type === 'riddle' || node.type === 'focus') && !skipPuzzleIntro[node.type]){ showPuzzleIntro(node); }
   else { initMode(node.type, node); }
 }
 // One skip flag per intro type, reset each fresh session (matches how the
 // rest of campaign progress already isn't persisted across reloads). Battle
 // is effectively one-time by construction — only the very first Battlefield
 // node is ever tagged battleTutorial — but it shares the same mechanism.
-const skipPuzzleIntro = { lock:false, riddle:false, battle:false };
+const skipPuzzleIntro = { lock:false, riddle:false, battle:false, focus:false };
 const PUZZLE_INTRO_TEXT = {
   lock: "Match GOLD gems to align the tumblers. Fill the mechanism to 100% before you run out of moves. Matching PURPLE (Charge) gems trips a warding rune and costs you an extra move, so avoid them.",
   riddle: "The Sphinx shows a sequence of gem colors, one at a time. Match the CURRENT gem in the sequence to advance. Matching the wrong color resets your progress back to the start, so watch the sequence closely.",
+  focus: "The wizard's attention is fixed on one color at a time, shown above. Match that color to make progress. Matching the wrong color wastes a move but doesn't reset you -- just adapt. The wizard's focus will shift on its own as you go.",
   battle: "Match 3+ gems to act: RED damages, BLUE fills Mana, GREEN heals, PURPLE charges your Wolf, GOLD earns coin. Tap a full Mana or Charge bar to cast a spell. Equip gear and spells at any Shop to grow stronger."
 };
-const PUZZLE_INTRO_HEADING = { lock:'The Lock', riddle:'The Riddle', battle:'Battle Basics' };
+const PUZZLE_INTRO_HEADING = { lock:'The Lock', riddle:'The Riddle', focus:'The Focus', battle:'Battle Basics' };
 function showPuzzleIntro(node){
   const introType = node.battleTutorial ? 'battle' : node.type;
   document.getElementById('puzzleIntroHeading').textContent = PUZZLE_INTRO_HEADING[introType];
@@ -5488,7 +6115,7 @@ function showRestNode(node){
   document.getElementById('restIconCanvas').classList.add('hidden');
   document.getElementById('restHeading').textContent = BIOMES[node.biome].name;
   typeText(document.getElementById('restText'),
-    `Here, in the cool dark, ${getWolfName()} finally rests. You remember the storm that brought you together, a shivering pup who refused to leave your side, even then. You press a hand to their flank and feel the shallow rise and fall of breath. Not long now, you tell yourself. Not long.`);
+    `${getWolfName()} sleeps like something that knows exactly how close it came. Ro doesn't move from their side, one hand resting where Orin's paw was, still faintly warm. Borrowed time, he said. She intends to spend every second of it well.`);
   document.getElementById('restOverlay').classList.add('show');
   playSFX('restSettle');
   startAmbientLoop('campfire');
@@ -5749,8 +6376,12 @@ function resolveBankedStrike(){
   // Same total ruby count spread across more events hits meaningfully
   // harder than one big single match -- e.g. 4 matches + 2 more before the
   // window closes should feel like a real x6 combo, not a minor bonus.
+  // Momentum caps at +50% (6+ events) rather than growing without bound --
+  // simpler to reason about, and combined with the boss HP recalibration
+  // below, keeps even an optimal combo at a real multi-hit fight instead
+  // of a near-instant kill once gear bonus is factored in.
   const tc = state.bankedCounts, events = state.bankedMatchEvents;
-  const momentumMult = 1 + Math.max(0, events-1)*0.18;
+  const momentumMult = 1 + Math.min(Math.max(0, events-1), 5)*0.10;
   let dmg = tc.ruby ? Math.round(tc.ruby*(6+gearBonus('ruby')) * momentumMult) : 0;
   // Perfect timing: the final banked match landed within 400ms of the
   // window actually closing -- rewards deliberately using the full window
@@ -5762,7 +6393,13 @@ function resolveBankedStrike(){
   if(perfectTiming){
     dmg = Math.round(dmg * 1.15);
     spawnPerfectTimingPopup();
+    triggerScreenShake(1.2);
     playSFX('perfectTiming');
+    if(!hasSeenPerfectTiming){
+      hasSeenPerfectTiming = true;
+      try{ localStorage.setItem('talesofazure_perfecttiming_v1', 'true'); }catch(e){ /* best effort */ }
+      addLog('Perfect timing! Landing your final match right as the window closes grants bonus damage. Watch the bar.');
+    }
   }
   if(dmg>0 && events>1){
     addLog(`Combo x${events}: your strikes compound (${momentumMult.toFixed(1)}x)!`);
@@ -5783,13 +6420,14 @@ function resolveBankedStrike(){
 
   if(state.enemyHP<=0){
     state.gameOver=true; state.won=true;
+    if(state.isBoss){ triggerScreenShake(2.5); spawnBossVictoryBurst(); }
     arcadeAwardPoints();
     if(playContext==='story') awardDifficultyXP(state.enemyMaxHP / DIFFICULTY_MULT[difficulty], state.isBoss);
     if(finalBossPhase===3){
       finalBossPhase = 0; finalBossJustCompleted = true;
-      state.resultText = "The eye closes. Whatever it was, it doesn't rise again.";
+      state.resultText = "The eye closes. Somewhere underneath three names that were never his, something that might still be Kaelen goes quiet.";
     } else {
-      state.resultText = victoryResultText(`${state.enemyName} falls before you. ${randomVictoryFlourish()}`);
+      state.resultText = victoryResultText(`${randomVictoryLeadIn()} ${randomVictoryFlourish()}`);
     }
     react('enemy','defeat'); react('player','victory');
     playSFX('victory');
@@ -5852,13 +6490,14 @@ async function resolveWindow(){
     await resolveBattleCascade();
     if(state.enemyHP<=0){
       state.gameOver=true; state.won=true;
-      arcadeAwardPoints();
+      if(state.isBoss){ triggerScreenShake(2.5); spawnBossVictoryBurst(); }
+    arcadeAwardPoints();
     if(playContext==='story') awardDifficultyXP(state.enemyMaxHP / DIFFICULTY_MULT[difficulty], state.isBoss);
       if(finalBossPhase===3){
         finalBossPhase = 0; finalBossJustCompleted = true;
         state.resultText = "The eye closes, undone by a chain reaction. Whatever it was, it doesn't rise again.";
       } else {
-        state.resultText = victoryResultText(`${state.enemyName} falls before you, undone by a chain reaction. ${randomVictoryFlourish()}`);
+        state.resultText = victoryResultText(`${randomChainLeadIn()} ${randomVictoryFlourish()}`);
       }
       react('enemy','defeat'); react('player','victory');
       playSFX('victory');
@@ -5892,6 +6531,7 @@ async function resolveWindow(){
     }
     document.getElementById('enemyFrame').classList.remove('engaged');
     await sleep(skipEnemyAttackAnim ? 60 : 400);
+    state.turnCount = (state.turnCount||0) + 1;
     if(state.playerHP<=0){
       state.gameOver=true; state.won=false;
       state.resultText = defeatResultText();
@@ -5952,6 +6592,7 @@ let dragState = null;
 
 function onPointerDown(e){
   if(state.busy || state.gameOver || state.resolving) return;
+  clearIdleHint();
   const cellEl = e.target.closest('.cell');
   if(!cellEl) return;
   const r = +cellEl.dataset.r, c = +cellEl.dataset.c;
@@ -6033,7 +6674,7 @@ async function attemptSwap(r0,c0,r1,c1){
 // understated) shimmer, everything else the standard chiptune match sound.
 function matchSoundName(isCascade, isBig){
   if(state.mode==='lock') return isCascade ? 'lockCascade' : (isBig ? 'lockMatchBig' : 'lockMatch');
-  if(state.mode==='riddle') return isCascade ? 'riddleCascade' : (isBig ? 'riddleMatchBig' : 'riddleMatch');
+  if(state.mode==='riddle' || state.mode==='focus') return isCascade ? 'riddleCascade' : (isBig ? 'riddleMatchBig' : 'riddleMatch');
   return isCascade ? 'cascade' : (isBig ? 'gemMatchBig' : 'gemMatch3');
 }
 async function resolveCascade(){
@@ -6139,16 +6780,20 @@ async function resolveCascadeStatic(){
   renderBoard();
   return {typeCounts, combo:1};
 }
-function decrementMoves(){ if(state.mode==='lock') state.lockMoves--; if(state.mode==='riddle') state.riddleMoves--; }
+function decrementMoves(){ if(state.mode==='lock') state.lockMoves--; if(state.mode==='riddle') state.riddleMoves--; if(state.mode==='focus') state.focusMoves--; }
 function applyEffects(typeCounts, combo){
   if(state.mode==='lock') applyLockEffects(typeCounts, combo);
   else if(state.mode==='riddle') applyRiddleEffects(typeCounts, combo);
+  else if(state.mode==='focus') applyFocusEffects(typeCounts, combo);
 }
 
 async function castManaSpell(){
-  if(state.playerMana<state.playerMaxMana || state.busy || state.gameOver || state.resolving) return;
+  if(state.playerMana<state.playerMaxMana || state.busy || state.gameOver || state.resolving || !state.windowActive) return;
+  if((state.turnCount||0) < (state.manaCooldownTurn||0)) return;
+  const castSpell = MANA_SPELLS.find(s=>s.id===equippedManaSpell) || MANA_SPELLS[0];
+  state.manaCooldownTurn = (state.turnCount||0) + spellCooldownTurns(castSpell.level);
   try{
-  const spell = MANA_SPELLS.find(s=>s.id===equippedManaSpell) || MANA_SPELLS[0];
+  const spell = castSpell;
   state.playerMana=0;
   let dmg=spell.damage;
   if(state.bossDamageReduction>0) dmg = Math.round(dmg * (1-state.bossDamageReduction));
@@ -6167,13 +6812,14 @@ async function castManaSpell(){
   if(state.enemyHP<=0){
     over = true;
     state.gameOver=true; state.won=true;
+    if(state.isBoss){ triggerScreenShake(2.5); spawnBossVictoryBurst(); }
     arcadeAwardPoints();
     if(playContext==='story') awardDifficultyXP(state.enemyMaxHP / DIFFICULTY_MULT[difficulty], state.isBoss);
     if(finalBossPhase===3){
       finalBossPhase = 0; finalBossJustCompleted = true;
       state.resultText = `The eye closes, undone by ${spell.name}. Whatever it was, it doesn't rise again.`;
     } else {
-      state.resultText = victoryResultText(`${state.enemyName} falls, undone by ${spell.name}. ${randomVictoryFlourish()}`);
+      state.resultText = victoryResultText(`${randomSpellLeadIn(spell.name)} ${randomVictoryFlourish()}`);
     }
     react('enemy','defeat'); react('player','victory');
     playSFX('victory');
@@ -6191,8 +6837,11 @@ async function castManaSpell(){
   }
 }
 async function castWolfAttack(){
-  if(state.rage<100 || state.busy || state.gameOver || state.resolving) return;
-  const spell = COMPANION_SPELLS.find(s=>s.id===equippedCompanionSpell) || COMPANION_SPELLS[0];
+  if(state.rage<100 || state.busy || state.gameOver || state.resolving || !state.windowActive) return;
+  if((state.turnCount||0) < (state.companionCooldownTurn||0)) return;
+  const castSpell = COMPANION_SPELLS.find(s=>s.id===equippedCompanionSpell) || COMPANION_SPELLS[0];
+  state.companionCooldownTurn = (state.turnCount||0) + spellCooldownTurns(castSpell.level);
+  const spell = castSpell;
   state.rage=0;
   let dmg=spell.damage;
   if(state.bossDamageReduction>0) dmg = Math.round(dmg * (1-state.bossDamageReduction));
@@ -6218,13 +6867,14 @@ async function castWolfAttack(){
   if(state.enemyHP<=0){
     over = true;
     state.gameOver=true; state.won=true;
+    if(state.isBoss){ triggerScreenShake(2.5); spawnBossVictoryBurst(); }
     arcadeAwardPoints();
     if(playContext==='story') awardDifficultyXP(state.enemyMaxHP / DIFFICULTY_MULT[difficulty], state.isBoss);
     if(finalBossPhase===3){
       finalBossPhase = 0; finalBossJustCompleted = true;
       state.resultText = "The eye closes, driven back by fang and claw. Whatever it was, it doesn't rise again.";
     } else {
-      state.resultText = victoryResultText(`${state.enemyName} falls, driven back by fang and claw. ${randomVictoryFlourish()}`);
+      state.resultText = victoryResultText(`${randomCompanionLeadIn()} ${randomVictoryFlourish()}`);
     }
     react('enemy','defeat'); react('player','victory');
     playSFX('victory');
@@ -6292,9 +6942,46 @@ function applyLockEffects(typeCounts, combo){
     playSFX('lockFail');
   }
 }
+function applyFocusEffects(typeCounts, combo){
+  const focusType = state.focusColor;
+  if(typeCounts[focusType]){
+    const p = typeCounts[focusType]*(state.focusProgressPerMatch||12);
+    state.focusProgress = Math.min(100, state.focusProgress+p);
+    state.focusStreak++;
+    addLog(`Focus held. The ward yields to ${LABEL[focusType]}. ${state.focusProgress}% clear.`);
+    react('enemy','hit');
+    playSFX('lockTick');
+    if(state.focusStreak >= state.focusSwitchEvery){
+      state.focusStreak = 0;
+      const nextColors = ['ruby','sapphire','emerald','amethyst'].filter(c=>c!==state.focusColor);
+      state.focusColor = nextColors[Math.floor(Math.random()*nextColors.length)];
+      addLog(`The wizard's attention shifts. Now: ${LABEL[state.focusColor]}.`);
+      playSFX('riddleCorrect');
+    }
+  } else {
+    addLog("Wrong color. The wizard doesn't notice.");
+    react('enemy','attack'); react('player','hit');
+    playSFX('lockFail');
+  }
+
+  if(state.focusProgress>=100){
+    state.gameOver=true; state.won=true; state.resultText='The ward settles, its attention finally at peace.';
+    react('enemy','defeat'); react('player','victory');
+    playSFX('vaultOpen');
+    advanceQuestOnWin();
+    return;
+  }
+  if(state.focusMoves<=0){
+    state.gameOver=true; state.won=false;
+    state.resultText = "The ward's attention scatters entirely. It will not settle today.";
+    react('player','defeat');
+    playSFX('lockFail');
+  }
+}
 function applyRiddleEffects(typeCounts, combo){
   const needed = state.riddleSequence[state.riddleIndex];
-  if(typeCounts[needed]){
+  const wasCorrect = !!typeCounts[needed];
+  if(wasCorrect){
     state.riddleIndex++;
     addLog(`The Sphinx's eyes glow. The ${LABEL[needed]} rune is accepted.`);
     react('enemy','hit');
@@ -6329,7 +7016,12 @@ function applyRiddleEffects(typeCounts, combo){
     advanceQuestOnWin();
     return;
   }
-  if(state.riddleMoves<=0){
+  // Running out of moves only ends the riddle in defeat if the match that
+  // used up the last move was actually wrong. If the player was making
+  // correct progress right up to that point, simply not having quite
+  // enough moves left shouldn't be punished the same as a real mistake --
+  // they keep going until they either finish or genuinely miss.
+  if(state.riddleMoves<=0 && !wasCorrect){
     state.gameOver=true; state.won=false;
     state.resultText = finalBossPhase===1
       ? 'The Unmade was never going to hold still for this. It doesn\'t now either.'
@@ -6408,11 +7100,13 @@ function initMode(mode, node){
   updateTally();
   const instructionHudEl = document.getElementById('instructionHud');
   const instructionTextEl = document.getElementById('instructionText');
-  instructionHudEl.classList.toggle('hidden', mode!=='lock' && mode!=='riddle');
+  instructionHudEl.classList.toggle('hidden', mode!=='lock' && mode!=='riddle' && mode!=='focus');
   if(mode==='lock'){
     instructionTextEl.textContent = 'Match gems to charge the mechanism.';
   } else if(mode==='riddle'){
     instructionTextEl.textContent = 'Match gems in the sequence shown.';
+  } else if(mode==='focus'){
+    instructionTextEl.textContent = 'Match the color the wizard is fixed on.';
   }
   instructionTextEl.style.fontSize = '';
   fitTextToBox(instructionTextEl, 9);
@@ -6440,6 +7134,9 @@ function initMode(mode, node){
   state.bossVariant = node ? node.variant : null;
   state.bossTraitFired = false;
   state.bossTauntsFired = {};
+  state.turnCount = 0;
+  state.manaCooldownTurn = 0;
+  state.companionCooldownTurn = 0;
   state.ambushConsumed = false;
   state.fadingAnnounced = false;
   state.bossDamageReduction = 0;
@@ -6447,6 +7144,7 @@ function initMode(mode, node){
     state.bossDamageReduction = 0.15;
     setTimeout(()=> announceEnemyTrait('DISCIPLINED!', 'Takes 15% less damage', '#8a90a0'), 600);
   }
+  updateTraitBadge();
   state.bossEnrageMultiplier = 1;
   if(mode === 'battle' && !state.isBoss){
     const options = BATTLE_MUSIC_VARIANTS.filter(k=>k!==currentBattleVariant);
@@ -6492,6 +7190,15 @@ function initMode(mode, node){
     const mv = (node && node.moves) || 14;
     const len = (node && node.seqLength) || 4;
     state.riddleSequence=generateRiddleSequence(len); state.riddleIndex=0; state.riddleMoves=mv; state.riddleMovesMax=mv;
+    playSFX('riddleArrival');
+  } else if(mode==='focus'){
+    const mv = (node && node.moves) || 14;
+    state.focusProgress=0; state.focusMoves=mv; state.focusMovesMax=mv;
+    state.focusProgressPerMatch = (node && node.progressPerMatch) || 12;
+    state.focusSwitchEvery = (node && node.switchEvery) || 3;
+    state.focusStreak = 0;
+    const FOCUS_COLORS = ['ruby','sapphire','emerald','amethyst'];
+    state.focusColor = FOCUS_COLORS[Math.floor(Math.random()*FOCUS_COLORS.length)];
     playSFX('riddleArrival');
   }
   renderAll();
@@ -6620,6 +7327,7 @@ function loadWolfPrefs(){
 let skipEnemyAttackAnim = false;
 let sfxVolume = 0.7;
 let sfxMuted = false;
+let crtEnabled = false;
 const SETTINGS_KEY = 'talesofazure_settings_v1';
 // One-time migration: the storage keys used to be prefixed "emberfall_" --
 // renamed as part of dropping the old project name from the codebase. This
@@ -6643,7 +7351,7 @@ const SETTINGS_KEY = 'talesofazure_settings_v1';
   } catch(e){ /* storage unavailable — nothing to migrate */ }
 })();
 function saveSettings(){
-  try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify({ skipEnemyAttackAnim, sfxVolume, sfxMuted, musicVolume, musicMuted })); }
+  try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify({ skipEnemyAttackAnim, sfxVolume, sfxMuted, musicVolume, musicMuted, crtEnabled })); }
   catch(e){ /* storage unavailable — setting still applies for this session */ }
 }
 function loadSettings(){
@@ -6656,6 +7364,8 @@ function loadSettings(){
       sfxMuted = !!s.sfxMuted;
       if(typeof s.musicVolume === 'number') musicVolume = s.musicVolume;
       musicMuted = !!s.musicMuted;
+      crtEnabled = !!s.crtEnabled;
+      document.body.classList.toggle('crt-enabled', crtEnabled);
     }
   } catch(e){ /* keep default */ }
 }
@@ -6990,7 +7700,7 @@ function updateMusicForCurrentContext(){
         playMusic(state.isBoss ? 'boss' : currentBattleVariant);
       }
     }
-    else if(state.mode==='riddle' || state.mode==='lock') playMusic('puzzle');
+    else if(state.mode==='riddle' || state.mode==='lock' || state.mode==='focus') playMusic('puzzle');
     else playMusic('overworld');
   }
 }
@@ -8028,6 +8738,7 @@ document.getElementById('bossRushStartBtn').addEventListener('click', ()=>{
 document.getElementById('menuCharacterBtn').addEventListener('click', ()=>{
   playSFX('screenTransition');
   showScreen('character');
+  renderCharacterBackdrop(bgAnimTick);
   drawSprite(document.getElementById('charPreviewCanvas').getContext('2d'), 'hero', THEMES[currentTheme].sprites.hero);
   wolfNameInputEl.value = wolfName;
   renderCoatSwatches();
@@ -8059,10 +8770,17 @@ document.getElementById('menuOptionsBtn').addEventListener('click', ()=>{
   document.getElementById('sfxVolumeSlider').value = Math.round(sfxVolume*100);
   document.getElementById('musicMuteCheck').checked = musicMuted;
   document.getElementById('musicVolumeSlider').value = Math.round(musicVolume*100);
+  document.getElementById('crtToggleCheck').checked = crtEnabled;
 });
 document.getElementById('skipEnemyAttackCheck').addEventListener('change', (e)=>{
   skipEnemyAttackAnim = e.target.checked;
   saveSettings();
+});
+document.getElementById('crtToggleCheck').addEventListener('change', (e)=>{
+  crtEnabled = e.target.checked;
+  document.body.classList.toggle('crt-enabled', crtEnabled);
+  saveSettings();
+  playSFX('buttonTap');
 });
 document.getElementById('sfxMuteCheck').addEventListener('change', (e)=>{
   sfxMuted = e.target.checked;
