@@ -1164,7 +1164,9 @@ const BIOMES = {
   grotto:     { name:'The Grotto',      bg1:'#142622', bg2:'#0a1512', panel:'#1c322c', panelBorder:'#4aaa8a', gold:'#8fe8c9', text:'#dcf0e8', textDim:'#6aa892', glow:'#8fe8c9',
     trim:'repeating-linear-gradient(90deg, #1c322c 0 5px, #4aaa8a 5px 8px)' },
   sanctuary:  { name:"The Borez Cliffs",  bg1:'#2e2438', bg2:'#181220', panel:'#382c48', panelBorder:'#d9b8ff', gold:'#f0d8ff', text:'#f4ecff', textDim:'#b89ad9', glow:'#f0d8ff',
-    trim:'repeating-linear-gradient(90deg, #d9b8ff 0 5px, #f0d8ff 5px 9px)' }
+    trim:'repeating-linear-gradient(90deg, #d9b8ff 0 5px, #f0d8ff 5px 9px)' },
+  motherscrown: { name:"Mother's Crown",  bg1:'#3a3018', bg2:'#201a0c', panel:'#4a3e20', panelBorder:'#f0d878', gold:'#fff2b0', text:'#fff8e0', textDim:'#d0b878', glow:'#fff2b0',
+    trim:'repeating-linear-gradient(90deg, #f0d878 0 5px, #fff2b0 5px 9px)' }
 };
 let currentBiome = null;
 function renderAmbient(biomeKey, layerId){
@@ -1785,6 +1787,19 @@ function drawGuardian(ctx, pal){
   band(ctx,14,3,3,pal.hoodShadow); band(ctx,15,4,5,pal.hoodShadow); band(ctx,17,15,16,pal.hoodShadow);
 }
 const WIZARD_PAL = {outline:'#0a0614',hoodMain:'#5a3a8a',hoodShadow:'#3a2260',skin:'#d8c8b8',eye:'#e8d060',cloakMain:'#3a2260',cloakShadow:'#241448',trim:'#e8d060',accent:'#8a5ac0'};
+const KAELEN_PAL = {outline:'#140e08',hoodMain:'#3a5a30',hoodShadow:'#243a1c',skin:'#c9a878',eye:'#f0d060',cloakMain:'#5a4a28',cloakShadow:'#3a2e18',trim:'#e8c860',accent:'#7a9a4a'};
+function drawKaelen(ctx, pal){
+  const p = pal && pal.outline ? pal : KAELEN_PAL;
+  drawBase(ctx, REGAL_SHAPE, p);
+  band(ctx,7,8,11,p.skin);
+  band(ctx,7,9,9,p.eye); band(ctx,7,10,10,p.eye);
+  // Small, dignified antler points -- a guardian's mark, not a crown
+  band(ctx,2,7,7,p.trim); band(ctx,2,12,12,p.trim);
+  band(ctx,3,6,7,p.trim); band(ctx,3,12,13,p.trim);
+  band(ctx,4,6,6,p.trim); band(ctx,4,13,13,p.trim);
+  // Leaf/vine accent at the chest -- the grove, not corruption
+  band(ctx,12,9,10,p.accent);
+}
 function drawWizard(ctx, pal){
   const p = pal && pal.outline ? pal : WIZARD_PAL;
   drawBase(ctx, REGAL_SHAPE, p);
@@ -2228,7 +2243,7 @@ const DRAWERS = { hero:drawHero, bandit:drawBandit, guardian:drawGuardian, sphin
   thornspike:drawThornSpike, skeletal:drawSkeletal, crownregal:drawCrownRegal, gianteye:drawGiantEye, twisted:drawTwisted,
   titan:drawTitan, manymouth:drawManyMouth, hollowvoid:drawHollowVoid,
   naga:drawNaga, arachnid:drawArachnid, tentacled:drawTentacled, manyeyed:drawManyEyed, horned:drawHorned,
-  unmade:drawUnmade, maw:drawMaw, colossaleye:drawColossalEye, orin:drawOrin, wizard:drawWizard };
+  unmade:drawUnmade, maw:drawMaw, colossaleye:drawColossalEye, orin:drawOrin, wizard:drawWizard, kaelen:drawKaelen };
 let playerVariant = 'hero';
 
 // ---------- sprite images: async-loaded, with procedural fallback ----------
@@ -2334,7 +2349,7 @@ function getWolfName(){
 // clear story beats (leaving Forest, leaving Castle) rather than drifting
 // up gradually. Grotto is a rest stop between Desert and Sanctuary, not
 // its own leg, so it inherits Desert's tier rather than resetting.
-const WOLF_CONDITION_BIOMES = ['battlefield','forest','lake','castle','desert','sanctuary'];
+const WOLF_CONDITION_BIOMES = ['battlefield','forest','lake','castle','desert','sanctuary','motherscrown'];
 function getWolfCondition(){
   const biome = currentBiome==='grotto' ? 'desert' : currentBiome;
   const idx = WOLF_CONDITION_BIOMES.indexOf(biome);
@@ -2407,6 +2422,26 @@ function cutsceneSlides(){
       text:'The Ancient Relics of Virtue stir in answer to her blood. There is no other choice. She rises. The journey begins.' }
   ];
 }
+function kaelenRedemptionSlides(){
+  return [
+    { scene:'mountainPeakBloom', sprite:'hero', pos:'left', fx:'default', speaker:'RO',
+      text:"...Kaelen?" },
+    { scene:'mountainPeakBloom', sprite:'kaelen', pos:'right', fx:'punch', impact:true, speaker:'KAELEN',
+      text:"...Ro." },
+    { scene:'mountainPeakBloom', sprite:'kaelen', pos:'right', fx:'default', speaker:'KAELEN',
+      text:"Three guests, and now none. I had almost forgotten what quiet felt like." },
+    { scene:'mountainPeakBloom', sprite:'hero', pos:'left', fx:'default', speaker:'RO',
+      text:"Are you--" },
+    { scene:'mountainPeakBloom', sprite:'kaelen', pos:'right', fx:'default', speaker:'KAELEN',
+      text:"Still here. Still tired. But mine again, for however long that lasts." },
+    { scene:'mountainPeakBloom', sprite:'kaelen', pos:'right', prop:'mountainBloom', particles:'light', fx:'rackfocus', speaker:'KAELEN',
+      text:"You did what I couldn't do for myself, for longer than I can count. The flower is yours. Take it. Azure has waited long enough." },
+    { scene:'mountainPeakBloom', sprite:'hero', pos:'left', fx:'default', speaker:'RO',
+      text:"What happens to you now?" },
+    { scene:'mountainPeakBloom', sprite:'kaelen', pos:'right', fx:'default', speaker:'KAELEN',
+      text:"I keep watch, the way I always have. Just... lighter, now. Go to your wolf. This part of the story is finally yours to finish." }
+  ];
+}
 function epilogueSlides(){
   return [
     { scene:'mountainPeakBloom', sprite:'hero', pos:'left', prop:'mountainBloom', particles:'light', fx:'propfocus',
@@ -2466,11 +2501,13 @@ function showEnding(){
   markStoryCompleted();
   try{ localStorage.removeItem(SAVE_KEY); } catch(e){ /* best effort */ }
   playMusic('campfire');
-  showCutscene(epilogueSlides(), ()=>{
-    showRunSummary(()=>{
-      stopMusic();
-      resetToDefaultPalette();
-      showScreen('menu');
+  showCutscene(kaelenRedemptionSlides(), ()=>{
+    showCutscene(epilogueSlides(), ()=>{
+      showRunSummary(()=>{
+        stopMusic();
+        resetToDefaultPalette();
+        showScreen('menu');
+      });
     });
   });
 }
@@ -4955,6 +4992,7 @@ const BOSS_HP_BY_BIOME   = { battlefield:375, forest:425, lake:470, castle:530, 
 const ENEMY_DMG_BY_BIOME = {
   battlefield:{ base:6, range:9 }, forest:{ base:7, range:10 }, lake:{ base:8, range:11 },
   castle:{ base:10, range:13 }, desert:{ base:12, range:15 }, sanctuary:{ base:14, range:18 },
+  motherscrown:{ base:16, range:20 },
 };
 // Light shared traits per enemy archetype, not per individual enemy --
 // applies to regular (non-boss) enemies only, grouped by their existing
@@ -5080,7 +5118,10 @@ function generateQuestChain(){
   chain.push({ type:'rest', name:'The Grotto', biome:'grotto' });
 
   chain.push(...buildBiomeNodes('sanctuary', 8, [lockNode('sanctuary'), riddleNode('sanctuary'), focusNode('sanctuary')]));
-  chain.push({ type:'finalboss', name:"Kaelen, the Crown's Guardian", biome:'sanctuary', boss:true,
+  chain.push({ type:'battle', name:'The Root-Bound Warden', biome:'sanctuary', boss:true, variant:'groveheart',
+    banner:"Something has taken root at the top of the cliffs, and it has no intention of letting anything pass." });
+
+  chain.push({ type:'finalboss', name:"Kaelen, the Crown's Guardian", biome:'motherscrown', boss:true,
     banner:'Light unlike any you have seen filters through leaves untouched for centuries. The flower blooms at the heart of Mother\'s Crown, and something ancient stands between you and it.' });
 
   return chain;
@@ -5360,25 +5401,35 @@ const BOSS_LORE = {
     { bg:'linear-gradient(180deg, #2a2010 0%, #150f08 100%)', sprite:'gianteye', pos:'right', speaker:'THE UNBLINKING DUNE',
       text:'We shall see how far patience carries against desperation.' }
   ],
+  groveheart: [
+    { bg:'linear-gradient(180deg, #2e2438 0%, #181220 100%)', sprite:'hero', pos:'left', speaker:'RO',
+      text:"The cliffs have been quiet the whole climb. Too quiet." },
+    { bg:'linear-gradient(180deg, #2e2438 0%, #181220 100%)', sprite:'groveheart', pos:'right', speaker:'THE ROOT-BOUND WARDEN', impact:true,
+      text:"Quiet is what's left when nothing else survives long enough to make noise." },
+    { bg:'linear-gradient(180deg, #2e2438 0%, #181220 100%)', sprite:'hero', pos:'left', speaker:'RO',
+      text:"I didn't come this far to be stopped by something that grows out of rock." },
+    { bg:'linear-gradient(180deg, #2e2438 0%, #181220 100%)', sprite:'groveheart', pos:'right', speaker:'THE ROOT-BOUND WARDEN',
+      text:"Then you'll learn what roots are for." }
+  ],
   finalboss: [
-    { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'hero', pos:'left', speaker:'RO',
+    { bg:'linear-gradient(180deg, #4a3a18 0%, #201a0c 100%)', sprite:'hero', pos:'left', speaker:'RO',
       text:`The climb ends, and the world opens. Mother's Crown. She's never seen anything so quiet, or so clearly not empty. Somewhere behind her, ${getWolfName()}'s breathing is still counting down.` },
-    { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'hero', pos:'left', speaker:'RO',
+    { bg:'linear-gradient(180deg, #4a3a18 0%, #201a0c 100%)', sprite:'hero', pos:'left', speaker:'RO',
       text:"So it's true. Something still stands watch here." },
-    { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'unmade', pos:'right', speaker:'???', impact:true, prop:'mountainBloom',
+    { bg:'linear-gradient(180deg, #4a3a18 0%, #201a0c 100%)', sprite:'unmade', pos:'right', speaker:'???', impact:true, prop:'mountainBloom',
       text:'Kaelen stood watch. Kaelen does not, anymore. Not entirely.' },
-    { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'hero', pos:'left', speaker:'RO',
+    { bg:'linear-gradient(180deg, #4a3a18 0%, #201a0c 100%)', sprite:'hero', pos:'left', speaker:'RO',
       text:"Kaelen. That's a name, not a monster. What happened to you?" },
-    { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'unmade', pos:'right', speaker:'???',
+    { bg:'linear-gradient(180deg, #4a3a18 0%, #201a0c 100%)', sprite:'unmade', pos:'right', speaker:'???',
       text:'The Unmade came first. Then the Maw. Then Vaesk. Three guests who never left. There is very little of Kaelen answering you now.' },
-    { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'hero', pos:'left', speaker:'RO',
+    { bg:'linear-gradient(180deg, #4a3a18 0%, #201a0c 100%)', sprite:'hero', pos:'left', speaker:'RO',
       text:"Then I'm sorry. But the flower isn't yours to keep from me, not like this." },
-    { bg:'linear-gradient(180deg, #241830 0%, #120c1a 100%)', sprite:'unmade', pos:'right', speaker:'???',
+    { bg:'linear-gradient(180deg, #4a3a18 0%, #201a0c 100%)', sprite:'unmade', pos:'right', speaker:'???',
       text:'It was never meant to be easy to take. Kaelen made sure of that, once. We intend to keep his promise, whether he would want us to or not.' }
   ]
 };
 const seenBossLore = {};
-const BOSS_BIOME = { manyeyed:'battlefield', arachnid:'forest', naga:'lake', tentacled:'castle', gianteye:'desert', finalboss:'sanctuary' };
+const BOSS_BIOME = { manyeyed:'battlefield', arachnid:'forest', naga:'lake', tentacled:'castle', gianteye:'desert', groveheart:'sanctuary', finalboss:'motherscrown' };
 Object.keys(BOSS_LORE).forEach(variant=>{
   const biome = BOSS_BIOME[variant];
   if(biome) BOSS_LORE[variant].forEach(s=> s.biome = biome);
@@ -5464,13 +5515,13 @@ const FINAL_BOSS_PHASES = [ null,
     banner:"The Unmade goes first. It has never needed a shape to be dangerous." },
   { mode:'lock', name:'The Maw', variant:'maw', moves:16, progressPerMatch:10,
     banner:"The Unmade unravels, and the Maw takes its place. Where there was nothing, now there is a mouth, and it remembers being hungry." },
-  { mode:'battle', name:'Vaesk', variant:'colossaleye', hp:260,
+  { mode:'battle', name:'Vaesk', variant:'colossaleye', hp:755,
     banner:"The jaws close on nothing. When they open again, there's no mouth left at all. Only an eye, vast and unblinking. For the first time, it has a name: Vaesk." }
 ];
 const FINAL_BOSS_PRECLASH = "Whatever is left of Kaelen, it still stands between her and the flower, and borrowed time doesn't wait for anyone's sympathy.";
 function buildFinalBossNode(phase){
   const p = FINAL_BOSS_PHASES[phase];
-  const node = { name:p.name, variant:p.variant, biome:'sanctuary', boss:true, banner:p.banner };
+  const node = { name:p.name, variant:p.variant, biome:'motherscrown', boss:true, banner:p.banner };
   const rush = playContext==='bossrush';
   if(p.mode==='riddle'){ node.seqLength = p.seqLength; node.moves = rush ? Math.max(8, p.moves-3) : p.moves; }
   else if(p.mode==='lock'){ node.moves = rush ? Math.max(8, p.moves-3) : p.moves; node.progressPerMatch = p.progressPerMatch; }
@@ -7057,7 +7108,8 @@ const ENDLESS_BOSS_POOL = [
   { name:'The Bramblefang Weaver',  variant:'arachnid' },
   { name:'The Drowned Naga',        variant:'naga' },
   { name:"The Keep's Hunger",       variant:'tentacled' },
-  { name:'The Unblinking Dune',     variant:'gianteye' }
+  { name:'The Unblinking Dune',     variant:'gianteye' },
+  { name:'The Root-Bound Warden',   variant:'groveheart' }
 ];
 function pickEndlessEnemy(wave){
   if(wave % 5 === 0){
